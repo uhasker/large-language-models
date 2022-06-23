@@ -1,0 +1,1332 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Computational graphs and backpropagation &#8212; Large Language Models</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="High-level overview" href="../chapter1/high_level_overview.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Large Language Models</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../chapter1/high_level_overview.html">
+   High-level overview
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Computational graphs and backpropagation
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/uhasker/llm-book/main?urlpath=tree/./chapter2/computational_graphs.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/uhasker/llm-book"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/uhasker/llm-book/issues/new?title=Issue%20on%20page%20%2Fchapter2/computational_graphs.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/chapter2/computational_graphs.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#computational-graph">
+   Computational graph
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tensor">
+   Tensor
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#our-first-neural-network">
+   Our first neural network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#updating-our-parameters">
+   Updating our parameters
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#improving-the-parameter-update-with-backpropagation">
+   Improving the parameter update with backpropagation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#backpropagation-in-pytorch">
+   Backpropagation in pytorch
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Computational graphs and backpropagation</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#computational-graph">
+   Computational graph
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tensor">
+   Tensor
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#our-first-neural-network">
+   Our first neural network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#updating-our-parameters">
+   Updating our parameters
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#improving-the-parameter-update-with-backpropagation">
+   Improving the parameter update with backpropagation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#backpropagation-in-pytorch">
+   Backpropagation in pytorch
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="computational-graphs-and-backpropagation">
+<h1>Computational graphs and backpropagation<a class="headerlink" href="#computational-graphs-and-backpropagation" title="Permalink to this headline">#</a></h1>
+<p>In this chapter we will introduce the fundamental concepts that underpin all deep learning - computational graphs and backpropagation. To showcase these ideas we will create and train a neural network from scratch which will solve a <em>very simple</em> classification task.</p>
+<p>If you want to follow along, you will need to execute the following imports:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Function</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="computational-graph">
+<h2>Computational graph<a class="headerlink" href="#computational-graph" title="Permalink to this headline">#</a></h2>
+<p>The basic concept you need to understand in order to grasp neural networks is that of a <strong>computational graph</strong>. Remember that a <em>graph</em> has nodes and edges. In a <em>computational graph</em> the <em>nodes represent functions</em>. These functions take input values and produce (compute) output values. The <em>edges carry</em> these <em>values</em> (which are either input values to the graph or results of preceding computations). Computational graphs allow for simple representations of complex functions.</p>
+<p>Consider the function <span class="math notranslate nohighlight">\(f: \mathbb{R}^3 \rightarrow \mathbb{R}, f(x, y, z) = (x + y) \cdot z\)</span>. We will write <span class="math notranslate nohighlight">\(f = (x + y) \cdot z\)</span> to simplify notation.</p>
+<p>This function really consists of two functions. The first function calculates <span class="math notranslate nohighlight">\(x + y\)</span>. The second function multiplies the result of <span class="math notranslate nohighlight">\(x + y\)</span> by <span class="math notranslate nohighlight">\(z\)</span>. Put simply, we first compute <span class="math notranslate nohighlight">\(g = x + y\)</span> and then calculate <span class="math notranslate nohighlight">\(f = g \cdot z\)</span>.</p>
+<p>This is how the visual representation of the computational graph representing <span class="math notranslate nohighlight">\(f\)</span> would look like:</p>
+<a class="reference internal image-reference" href="../_images/compgraph1.png"><img alt="drawing" src="../_images/compgraph1.png" style="width: 300px;" /></a>
+<blockquote>
+<div><p>Do note that this is not the most common visualization of computational graphs. Nevertheless we will stick to it, since it drives home most of the important ideas quite nicely.</p>
+</div></blockquote>
+<p>We can see that the graph has two nodes. The first node represents an addition function. It takes the values <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> and outputs the value <span class="math notranslate nohighlight">\(g\)</span>. The second node represents a multiplication function. It takes the values <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(z\)</span> and outputs the value <span class="math notranslate nohighlight">\(f\)</span>. Note that here one of the inputs to the multiplication node (namely <span class="math notranslate nohighlight">\(g\)</span>) is the output of a preceding node (namely the addition node).</p>
+<p>By decomposing arbitrary functions into simple components we can create computational graphs that represent very complex functions. In fact <strong>neural networks</strong> are nothing more than just certain kinds of computational graphs, namely computational graphs which are <em>differentiable</em>. This means that every node function has a gradient (or more technically a subgradient, but this distinction largely doesn’t matter right now). If all of this sounds like wizardry, don’t worry - we will get into this in a few minutes.</p>
+<p>We just saw that the edges carry values. But which values do they carry? There aren’t many restrictions here. While in the above examples we had numbers, there is nothing that prevents us from passing vectors, matrices or even more complicated objects around. In fact, this is what we will usually do!</p>
+<p>Consider the function <span class="math notranslate nohighlight">\(f: \mathbb{R}^{n} \rightarrow \mathbb{R}^{m}, f(\vec{x}) = \max(W\vec{x} + \vec{b}, \vec{0})\)</span> where <span class="math notranslate nohighlight">\(W \in \mathbb{R}^{m \times n}\)</span>, <span class="math notranslate nohighlight">\(\vec{b} \in \mathbb{R}^{m}\)</span> and <span class="math notranslate nohighlight">\(\max\)</span> is the elementwise maximum.</p>
+<blockquote>
+<div><p>The form of this function is no accident. It represents a (very simple) neural network.</p>
+</div></blockquote>
+<p>We can break this function up as following:</p>
+<p><span class="math notranslate nohighlight">\(\vec{c} = W\vec{x}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\vec{d} = \vec{c} + \vec{b}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\vec{f} = \max(\vec{d}, \vec{0})\)</span></p>
+<p>The visual representation looks like this:</p>
+<a class="reference internal image-reference" href="../_images/compgraph2.png"><img alt="drawing" src="../_images/compgraph2.png" style="width: 400px;" /></a>
+</section>
+<section id="tensor">
+<h2>Tensor<a class="headerlink" href="#tensor" title="Permalink to this headline">#</a></h2>
+<p>A <strong>tensor</strong> is nothing else than a <em>multidimensional array</em> (if you’ve ever used numpy arrays, this is very similar). For example a zero-dimensional tensor is just a number:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tensor0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">tensor0</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor(1)
+</pre></div>
+</div>
+</div>
+</div>
+<p>A one-dimensional tensor is a vector (or an array or a list, depending on what language you like more):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tensor1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">tensor1</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([1, 2, 3, 4])
+</pre></div>
+</div>
+</div>
+</div>
+<p>A two-dimensional tensor is a matrix:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tensor2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="n">tensor2</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1, 2, 3],
+        [4, 5, 6]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can also construct tensors of three, four or any arbitrary number of dimensions. Here is how a three-dimensional tensor could look like:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tensor3</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]],</span> <span class="p">[[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]]])</span>
+<span class="n">tensor3</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[1, 2],
+         [4, 5]],
+
+        [[6, 7],
+         [8, 9]]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can get the dimension of a tensor using the <em>dim</em> function:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tensor0</span><span class="o">.</span><span class="n">dim</span><span class="p">(),</span> <span class="n">tensor1</span><span class="o">.</span><span class="n">dim</span><span class="p">(),</span> <span class="n">tensor2</span><span class="o">.</span><span class="n">dim</span><span class="p">(),</span> <span class="n">tensor3</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(0, 1, 2, 3)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Why would we need such high-dimensional tensors? Consider an NLP task where each <em>word is represented by a high-dimensional vector</em> (this is the <em>first</em> dimension). A <em>text consists of multiple words</em> (this is the <em>second</em> dimension). To decrease training time, we often pass <em>multiple texts at the same time</em> through a neural network (this is the <em>third</em> dimension). I want to reiterate, that this is <em>not</em> some theoretical construction, but in fact a very common setup. So the earlier you get used to high-dimensional tensors, the better.</p>
+<p>This is not meant to intimidate you (of course I <em>would</em> say that, wouldn’t I). High-dimensional tensors sound scary (mostly because people associate them with quantum mechanics and the like), but for our purposes we don’t care about most of that scariness. In fact, a lot of concepts concerning vectors and matrices generalize quite nicely to tensors.</p>
+<p>For example <strong>tensor addition</strong> and <strong>tensor-constant multiplication</strong> are done componentwise (just like with vectors and matrices).</p>
+<p>Consider another operation we will commonly use with tensors - their <strong>product</strong> (which we denote by <span class="math notranslate nohighlight">\(\otimes\)</span>). Do note that we will introduce a very particular tensor product (which is sometimes called the <em>matrix product of tensors</em>). Depending on your background, you may be familiar with other tensor products.</p>
+<blockquote>
+<div><p>This is nothing unusual. Consider matrix products for example. There is the matrix multiplication and the Hadamard product (which is the element-wise multiplication of two matrices). In fact even pytorch has a multitude of functions for computing tensor products (for example matmul and tensordot, which do different things). I want to stress - we introduce the tensor product the way we do because that is what is useful for us in this chapter - no more, no less.</p>
+</div></blockquote>
+<p>The product of two one-dimensional tensors is essentially the dot product. For example if <span class="math notranslate nohighlight">\(\vec{v} = \begin{bmatrix} 1 \\ 2 \\ 3 \\ 4 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(\vec{w} = \begin{bmatrix} 5 \\ 6 \\ 7 \\ 8 \end{bmatrix}\)</span>, then <span class="math notranslate nohighlight">\(\vec{v} \otimes \vec{w} = 1 \cdot 5 + 2 \cdot 6 + 3 \cdot 7 + 4 \cdot 8 = 70\)</span>. This is where you might have a first clash with the tensor product as it is known in other areas (where <span class="math notranslate nohighlight">\(\vec{v} \otimes \vec{w}\)</span> may be the <em>outer</em> product of <span class="math notranslate nohighlight">\(\vec{v}\)</span> and <span class="math notranslate nohighlight">\(\vec{w}\)</span>).</p>
+<p>To compute this in pytorch, we could use the dot function:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor(70)
+</pre></div>
+</div>
+</div>
+</div>
+<p>We could also use the matmul function, which also generalizes to higher-dimensional tensors:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor(70)
+</pre></div>
+</div>
+</div>
+</div>
+<p>The product of a one-dimensional tensor and a two-dimensional tensor is just regular matrix-vector multiplication. For example if <span class="math notranslate nohighlight">\(W = \begin{bmatrix} 1 &amp; 3 \\ 5 &amp; 7 \\ 9 &amp; 11 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(\vec{x} = \begin{bmatrix} 2 \\ 4 \end{bmatrix}\)</span>, then <span class="math notranslate nohighlight">\(W \otimes \vec{x} = W \cdot \vec{x} = \begin{bmatrix} 1 \cdot 2 + 3 \cdot 4 \\ 5 \cdot 2 + 7 \cdot 4 \\ 9 \cdot 2 + 11 \cdot 4 \end{bmatrix} = \begin{bmatrix} 14 \\ 38 \\ 62 \end{bmatrix}\)</span>.</p>
+<p>Let us reproduce this with pytorch:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">11</span><span class="p">]])</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([14, 38, 62])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Similarly the product of two two-dimensional tensors is just regular matrix-matrix multiplication. For example if <span class="math notranslate nohighlight">\(U = \begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \\ 5 &amp; 6 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(V = \begin{bmatrix} 2 &amp; 1 \\ 1 &amp; 3 \end{bmatrix}\)</span>, then <span class="math notranslate nohighlight">\(U \otimes V = U \cdot V = \begin{bmatrix} 1 \cdot 2 + 2 \cdot 1 &amp; 1 \cdot 1 + 2 \cdot 3 \\ 3 \cdot 2 + 4 \cdot 1 &amp; 3 \cdot 1 + 4 \cdot 3 \\ 5 \cdot 2 + 6 \cdot 1 &amp; 5 \cdot 1 + 6 \cdot 3 \end{bmatrix} = \begin{bmatrix} 4 &amp; 7 \\ 10 &amp; 15 \\ 16 &amp; 23 \end{bmatrix}\)</span></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 4,  7],
+        [10, 15],
+        [16, 23]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>But what about products of tensors with more than two dimensions? The tensor product generalizes in a straighforward fashion. Consider the multiplication of a three-dimensional tensor <span class="math notranslate nohighlight">\(Q\)</span> of dimension <span class="math notranslate nohighlight">\(m \times n \times d\)</span> (i.e. <span class="math notranslate nohighlight">\(Q \in \mathbb{R}^{m \times n \times d}\)</span>) with a one-dimensional tensor <span class="math notranslate nohighlight">\(\vec{x}\)</span> of dimension <span class="math notranslate nohighlight">\(d\)</span> (i.e. <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^d\)</span>). We can treat <span class="math notranslate nohighlight">\(Q\)</span> as a list of <span class="math notranslate nohighlight">\(m\)</span> matrices of dimension <span class="math notranslate nohighlight">\(n \times d\)</span> each. Then we simply compute <span class="math notranslate nohighlight">\(m\)</span> vector-matrix products. Each such product is a product of a matrix <span class="math notranslate nohighlight">\(Q_i \in \mathbb{R}^{n \times d}\)</span> and the vector <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^d\)</span>. Therefore each product results in vector of dimension <span class="math notranslate nohighlight">\(n\)</span>. We can stack these vectors back into a matrix resulting in a matrix of dimension <span class="math notranslate nohighlight">\(\mathbb{R}^{m \times n}\)</span>.</p>
+<p>Consider the tensor <span class="math notranslate nohighlight">\(Q = \begin{bmatrix} \begin{bmatrix} 1 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 0 \\ 1 &amp; 0 &amp; 1 \\ 1 &amp; 1 &amp; 1\end{bmatrix}, \begin{bmatrix} 0 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 1 \\ 1 &amp; 1 &amp; 1 \\ 1 &amp; 0 &amp; 0 \end{bmatrix} \end{bmatrix}\)</span> and the vector <span class="math notranslate nohighlight">\(\vec{x} = \begin{bmatrix} 5 \\ 6 \\ 7 \end{bmatrix}\)</span>. We can think of <span class="math notranslate nohighlight">\(Q\)</span> as a list of two matrices <span class="math notranslate nohighlight">\(Q = \begin{bmatrix} Q_1 &amp; Q_2 \end{bmatrix}\)</span> where <span class="math notranslate nohighlight">\(Q_1 = \begin{bmatrix} 1 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 0 \\ 1 &amp; 0 &amp; 1 \\ 1 &amp; 1 &amp; 1 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(Q_2 = \begin{bmatrix} 0 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 1 \\ 1 &amp; 1 &amp; 1 \\ 1 &amp; 0 &amp; 0 \end{bmatrix}\)</span>.</p>
+<p>Now we have <span class="math notranslate nohighlight">\(Q \otimes \vec{x} = \begin{bmatrix} (Q_1 \cdot \vec{x})^\intercal \\ (Q_2 \cdot \vec{x})^\intercal \end{bmatrix}\)</span> (note that we need to transpose the individual dot products). Now we easily obtain <span class="math notranslate nohighlight">\(Q_1 \cdot \vec{x} = \begin{bmatrix} 12 \\ 6 \\ 12 \\ 18 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(Q_2 \cdot \vec{x} = \begin{bmatrix} 7 \\ 13 \\ 18 \\ 5 \end{bmatrix}\)</span>. Stacking these vectors together, we get that <span class="math notranslate nohighlight">\(Q \otimes \vec{x} = \begin{bmatrix} 12 &amp; 6 &amp; 12 &amp; 18 \\ 7 &amp; 13 &amp; 18 &amp; 5 \end{bmatrix}\)</span>.</p>
+<p>Let’s confirm this in code:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span>
+    <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+    <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="p">])</span>
+<span class="n">Q</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 4, 3])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
+<span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([3])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 4])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[12,  6, 12, 18],
+        [ 7, 13, 18,  5]])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="our-first-neural-network">
+<h2>Our first neural network<a class="headerlink" href="#our-first-neural-network" title="Permalink to this headline">#</a></h2>
+<p>Armed with the concepts we just learned, we can now construct our first very simple neural network.</p>
+<p>We will attempt to fit a toy classification dataset. Recall from chapter 1 that the neural network <em>fits</em> the data if it labels all points from a dataset (more or less) correctly. Note that will not worry about concepts like validation or testing in this chapter (and <em>only</em> in this chapter). The only thing we <em>will</em> worry about is the training (fitting) process.</p>
+<p>Let’s create a toy dataset:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x1s</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)]</span>
+<span class="n">x2s</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)]</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If you are familiar with basic logic, this is just the truth table of the <em>AND</em> function:</p>
+<p>Of course we can fit such a trivial dataset without the fanciness of deep learning. Nevertheless this is a very nice example that will allow us to show a bunch of important concepts.</p>
+<p>Let’s think about the simplest meaningful computational graph we could construct here. This would obviously be some kind of affine function, i.e. something like <span class="math notranslate nohighlight">\(x_1 \cdot w_1 + x_2 \cdot w_2 + b\)</span>. However the output of an affine function can be arbitrary, but our classes can only take the values 0 and 1 (i.e. we are dealing with binary classification here). We would therefore like to squash the outputs of our function to the range <span class="math notranslate nohighlight">\([0, 1]\)</span>. Then we can interpret the squashed value as the probability of the class represented by 1. For example if the squashed output is <span class="math notranslate nohighlight">\(0.7\)</span>, then with probability <span class="math notranslate nohighlight">\(0.7\)</span> the values are of class 1. This has the added benefit that we can assign a <em>confidence</em> to our predictions. If the probability is very high (or very low), we have more confidence regarding our prediction than if the probability is e.g. <span class="math notranslate nohighlight">\(0.5\)</span>.</p>
+<p>A commonly used squashing function is the so called <em>sigmoid</em> function defined by <span class="math notranslate nohighlight">\(\sigma(z) = \frac{1}{1 + \exp(-z)}\)</span>. It looks like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">sigmoid_xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="n">sigmoid_ys</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sigmoid_xs</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sigmoid_xs</span><span class="p">,</span> <span class="n">sigmoid_ys</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fe96cecbfa0&gt;]
+</pre></div>
+</div>
+<img alt="../_images/computational_graphs_34_1.png" src="../_images/computational_graphs_34_1.png" />
+</div>
+</div>
+<p>We can see the very small values essentially become 0, very large values essentially become 1 and everything in between is mapped to an appropriate probability value (with <span class="math notranslate nohighlight">\(\sigma(0) = 0.5\)</span>). This looks like a function that accomplishes what we intended.</p>
+<p>Therefore we define our first neural network by <em>applying a sigmoid function to an affine function</em>. Yes, that’s really all we are going to do! Note that while this is the simplest meaningful setup for a classification task, it is still a very <em>real</em> setup that is used in practice for certain tasks.</p>
+<p>Formally speaking, our network is defined as <span class="math notranslate nohighlight">\(y = f(x_1, x_2) = \sigma(x_1 \cdot w_1 + x_2 \cdot w_2 + b)\)</span>.</p>
+<p>Let us represent this function using a computational graph.</p>
+<p>First we split <span class="math notranslate nohighlight">\(f\)</span> into its respective computations:</p>
+<p><span class="math notranslate nohighlight">\(h_1 = x_1 \cdot w_1\)</span></p>
+<p><span class="math notranslate nohighlight">\(h_2 = x_2 \cdot w_2\)</span></p>
+<p><span class="math notranslate nohighlight">\(h = h_1 + h_2\)</span></p>
+<p><span class="math notranslate nohighlight">\(z = h + b\)</span></p>
+<p><span class="math notranslate nohighlight">\(y = \sigma(z)\)</span></p>
+<p>Let’s explicitly draw the graph:</p>
+<a class="reference internal image-reference" href="../_images/simple_net.png"><img alt="drawing" src="../_images/simple_net.png" style="width: 600px;" /></a>
+<p>Note that this computational graph is indeed <em>differentiable</em> since every function has a derivative.</p>
+<p>Recall that the basic idea behind the training of (any) machine learning model is quite simple. We start with randomly initialized parameters (we will discuss initialization schemes later). Then we iterate through all the examples and update the parameters in such a way that we improve our performance on those examples. We often do multiple iterations on the dataset. Each iteration is called an <strong>epoch</strong>. In its simplest form, the training loop therefore looks like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">NeuralNetwork</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that in practice this is a bit different, but we will talk about this later.</p>
+<p>The big question we will discuss in this chapter is how the update should be performed. Intuitively, we would like to update the model parameters in such a way that the network “performs” a bit better on the example <span class="math notranslate nohighlight">\(x\)</span> labeled with the target value <span class="math notranslate nohighlight">\(t\)</span>.</p>
+</section>
+<section id="updating-our-parameters">
+<h2>Updating our parameters<a class="headerlink" href="#updating-our-parameters" title="Permalink to this headline">#</a></h2>
+<p>How could we accomplish that? First of all we need to define a <strong>loss function</strong> which is the measure of how far the output of the network is from the correct target. We then simply update our parameters in such a way that the <em>loss decreases</em>. Put differently, we want to <em>minimize the loss</em>.</p>
+<p>In this particular case we will use a loss function called <strong>binary crossentropy</strong> which is defined as <span class="math notranslate nohighlight">\(BCE(y, t) = -t \cdot log(y) - (1 - t) \cdot log(1 - y)\)</span>. Here <span class="math notranslate nohighlight">\(y\)</span> is the value produced by our network and <span class="math notranslate nohighlight">\(t\)</span> is the target value.</p>
+<p>Binary crossentropy is a concept deep learning shamelessly stole (a.k.a. <em>borrowed</em>) from information theory, but we will not go into all that and instead motivate it with very simple intuition. Basically if <span class="math notranslate nohighlight">\(t = 1\)</span>, then we want the loss to be proportional to <span class="math notranslate nohighlight">\(-\log(y)\)</span>. This is because a lower <span class="math notranslate nohighlight">\(y\)</span> in our interpretation means a higher probability of <span class="math notranslate nohighlight">\(t = 0\)</span> which is bad if in reality <span class="math notranslate nohighlight">\(t = 1\)</span>. Similarly, if <span class="math notranslate nohighlight">\(t = 0\)</span>, we want the loss to be proportional to <span class="math notranslate nohighlight">\(-\log(1 - y)\)</span>. Now we simply combine this into one expression which gets us the formula from above.</p>
+<p>How does the loss fit into the computational graph? Even deep learning practicioners sometimes get confused about that, but the simple truth is that the loss is just another node put on top of the network:</p>
+<a class="reference internal image-reference" href="../_images/simple_net_loss.png"><img alt="drawing" src="../_images/simple_net_loss.png" style="width: 600px;" /></a>
+<p>Let us take our simple neural net and set <span class="math notranslate nohighlight">\(w_1 = w_2 = 0.5\)</span>, <span class="math notranslate nohighlight">\(b = 0\)</span>. A quick calculation yields an output value of <span class="math notranslate nohighlight">\(y = 0.6225\)</span> for <span class="math notranslate nohighlight">\(x_1 = 0\)</span>, <span class="math notranslate nohighlight">\(x_2 = 1\)</span>. We see that the output value is not quite right. It should be <span class="math notranslate nohighlight">\(t = 0\)</span> and not <span class="math notranslate nohighlight">\(y = 0.6225\)</span>. Therefore we want to update the parameters of the network (i.e. <span class="math notranslate nohighlight">\(w_1, w_2\)</span> and <span class="math notranslate nohighlight">\(b\)</span>) in such a way that the output <span class="math notranslate nohighlight">\(y\)</span> becomes a bit closer to the target <span class="math notranslate nohighlight">\(t\)</span>.</p>
+<p>What this really means is that we have to update our weights in such a way that the loss (let us call it <span class="math notranslate nohighlight">\(L\)</span>) becomes smaller. How could we approach this?</p>
+<p>If you have some basic knowledge of optimization theory, you are probably smirking right now. This is what gradient descent (and a bunch of other optimization algorithms) are for! However even if you do not know any numerical optimization, you can still easily develop an idea for what we should do.</p>
+<p>Remember from high school that the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b}\)</span> tells you the way <span class="math notranslate nohighlight">\(L\)</span> changes if we change <span class="math notranslate nohighlight">\(b\)</span>. For example if <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} &gt; 0\)</span> then increasing <span class="math notranslate nohighlight">\(b\)</span> would lead to an increase in <span class="math notranslate nohighlight">\(L\)</span>. If <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} &lt; 0\)</span> then an increase in <span class="math notranslate nohighlight">\(b\)</span> would lead to a decrease in <span class="math notranslate nohighlight">\(L\)</span>.</p>
+<p>Now assume that we somehow get our hands on <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b}\)</span>. We want to change <span class="math notranslate nohighlight">\(b\)</span> in such a way that <span class="math notranslate nohighlight">\(L\)</span> decreases. After all, we want to <em>minimize</em> the loss. Therefore we should update <span class="math notranslate nohighlight">\(b\)</span> by a value proportionate to <span class="math notranslate nohighlight">\(-\frac{\partial L}{\partial b}\)</span>. Put differently, we want to update <span class="math notranslate nohighlight">\(b\)</span> by <span class="math notranslate nohighlight">\(-\alpha \cdot \frac{\partial L}{\partial b}\)</span> where <span class="math notranslate nohighlight">\(\alpha\)</span> is some parameter that controls how big our update should be. Formally the update step therefore looks as follows:</p>
+<p><span class="math notranslate nohighlight">\(b^{(t+1)} = b^{(t)} - \alpha \cdot \frac{\partial L}{\partial b^{(t)}}\)</span></p>
+<p>That is, at step <span class="math notranslate nohighlight">\(t\)</span> we update <span class="math notranslate nohighlight">\(b\)</span> by subtracting <span class="math notranslate nohighlight">\(\alpha \cdot \frac{\partial L}{\partial b^{(t)}}\)</span> from it.</p>
+<p>A similar logic applies to the other parameters, i.e.</p>
+<p><span class="math notranslate nohighlight">\(w_1^{(t+1)} = w_1^{(t)} - \alpha \cdot \frac{\partial L}{\partial w_1^{(t)}}\)</span></p>
+<p><span class="math notranslate nohighlight">\(w_2^{(t+1)} = w_2^{(t)} - \alpha \cdot \frac{\partial L}{\partial w_2^{(t)}}\)</span></p>
+<p>After such an update the loss would become smaller. But how could we could calculate the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b}\)</span>? Calculating e.g. the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span> would be easy - we would simply need to take the derivative of the loss function. But <span class="math notranslate nohighlight">\(b\)</span> does not influence the loss directly, it influences the loss through <span class="math notranslate nohighlight">\(y\)</span>.</p>
+<p>Despair not, we can use the <em>chain rule</em>. We know that <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b}\)</span> can be calculated as <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial b}\)</span>. But now we have the same problem. Again <span class="math notranslate nohighlight">\(b\)</span> is not a direct input to <span class="math notranslate nohighlight">\(y\)</span>. How do we get <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial b}\)</span>?</p>
+<p>You can probably already see where this is going. We see that <span class="math notranslate nohighlight">\(y\)</span> depends on <span class="math notranslate nohighlight">\(b\)</span> through <span class="math notranslate nohighlight">\(z\)</span>. By the chain rule we have <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial b} = \frac{\partial y}{\partial z} \frac{\partial z}{\partial b}\)</span>.</p>
+<p>We therefore have: <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial z} \frac{\partial z}{\partial b}\)</span>. Now we only need to calculate the individual derivatives using our knowledge of basic differentiation and we are all set.</p>
+<ol class="simple">
+<li><p>We begin with <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span>. Since <span class="math notranslate nohighlight">\(L = -t \cdot log(y) - (1 - t) \cdot log(1 - y)\)</span> we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} = \frac{y - t}{(1 - y)y}\)</span>.</p></li>
+<li><p>Similarly we get <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z} = \frac{\exp(-z)}{(1 + \exp(-z))^2}\)</span>.</p></li>
+<li><p>Finally we have <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial b} = 1\)</span>.</p></li>
+</ol>
+<p>Therefore <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} = \frac{y - t}{(1 - y)y} \cdot \frac{\exp(-z)}{(1 + \exp(-z))^2}\)</span></p>
+<p>The same logic holds for <span class="math notranslate nohighlight">\(w_1\)</span> and <span class="math notranslate nohighlight">\(w_2\)</span>. Here we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial z} \frac{\partial z}{\partial h} \frac{\partial h}{\partial h_1} \frac{\partial h_1}{\partial w_1}\)</span></p>
+<p>Since <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} = -\frac{t}{y} + \frac{1 - t}{1 - y}\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z} = \frac{\exp(-z)}{(1 + \exp(-z))^2}\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial h} = 1\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial h}{\partial h_1} = 1\)</span> and <span class="math notranslate nohighlight">\(\frac{\partial h_1}{\partial w_1} = x_1\)</span> we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial w_1} = \frac{y - t}{(1 - y)y} \cdot \frac{\exp(-z)}{(1 + \exp(-z))^2} \cdot x_1\)</span>.</p>
+<p>You <em>should</em> verify all of this. It’s a nice and simple, but <em>very relevant</em> exercise in calculating derivatives.</p>
+<p>In a very similar fashion <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial w_2} = \frac{y - t}{(1 - y)y} \cdot \frac{\exp(-z)}{(1 + \exp(-z))^2} \cdot x_2\)</span></p>
+<p>Let’s write all of this down in code:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SimpleNet</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="mf">0.0</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">h1</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">w1</span>
+        <span class="n">h2</span> <span class="o">=</span> <span class="n">x2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">h1</span> <span class="o">+</span> <span class="n">h2</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="o">-</span><span class="n">t</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="n">x1</span><span class="p">,</span> <span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="n">x2</span><span class="p">,</span> <span class="s2">&quot;h1&quot;</span><span class="p">:</span> <span class="n">h1</span><span class="p">,</span> <span class="s2">&quot;h2&quot;</span><span class="p">:</span> <span class="n">h2</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="n">L</span> <span class="p">}</span>
+        
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="c1"># Forward pass</span>
+        <span class="n">forward_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">z</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">forward_res</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">],</span> <span class="n">forward_res</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
+        
+        <span class="c1"># Derivatives</span>
+        <span class="n">dLdy</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">dydz</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">dLdw1</span> <span class="o">=</span> <span class="n">dLdy</span> <span class="o">*</span> <span class="n">dydz</span> <span class="o">*</span> <span class="n">x1</span>
+        <span class="n">dLdw2</span> <span class="o">=</span> <span class="n">dLdy</span> <span class="o">*</span> <span class="n">dydz</span> <span class="o">*</span> <span class="n">x2</span>
+        <span class="n">dLdb</span> <span class="o">=</span> <span class="n">dLdy</span> <span class="o">*</span> <span class="n">dydz</span>
+        
+        <span class="c1"># Update</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dLdw1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dLdw2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dLdb</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;dLdw1&quot;</span><span class="p">:</span> <span class="n">dLdw1</span><span class="p">,</span> <span class="s2">&quot;dLdw2&quot;</span><span class="p">:</span> <span class="n">dLdw2</span><span class="p">,</span> <span class="s2">&quot;dLdb&quot;</span><span class="p">:</span> <span class="n">dLdb</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>While this is pretty long, it’s really just our above formulas written in Python.</p>
+<p>Let’s take the first example from the dataset:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+
+<span class="n">net</span> <span class="o">=</span> <span class="n">SimpleNet</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We run a forward pass:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;x1&#39;: 0.0,
+ &#39;x2&#39;: 0.0,
+ &#39;h1&#39;: 0.0,
+ &#39;h2&#39;: 0.0,
+ &#39;h&#39;: 0.0,
+ &#39;z&#39;: 0.0,
+ &#39;y&#39;: 0.5,
+ &#39;L&#39;: 0.6931471805599453}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we execute an update:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;dLdw1&#39;: 0.0, &#39;dLdw2&#39;: 0.0, &#39;dLdb&#39;: 0.5}
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can see that <span class="math notranslate nohighlight">\(w_1\)</span>, <span class="math notranslate nohighlight">\(w_2\)</span> and <span class="math notranslate nohighlight">\(b\)</span> changed:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">b</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(0.5, 0.5, -0.5)
+</pre></div>
+</div>
+</div>
+</div>
+<p>But did that change make sense? We could check this by running a forward pass and seeing if the loss decreased, i.e. if <span class="math notranslate nohighlight">\(y\)</span> is closer to <span class="math notranslate nohighlight">\(t\)</span> now:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;x1&#39;: 0.0,
+ &#39;x2&#39;: 0.0,
+ &#39;h1&#39;: 0.0,
+ &#39;h2&#39;: 0.0,
+ &#39;h&#39;: 0.0,
+ &#39;z&#39;: -0.5,
+ &#39;y&#39;: 0.3775406687981454,
+ &#39;L&#39;: 0.47407698418010663}
+</pre></div>
+</div>
+</div>
+</div>
+<p>This looks good! Now all we have to do is to repeatedly iterate over the dataset and do updates:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">SimpleNet</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">x1s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x2s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>That’s it! We successfully trained our first neural network. If you understood the preceding section, you’ve come a <em>tremendously long</em> way to understanding how neural networks operate. The rest of this chapter is really just about coming up with a more efficient algorithm for doing this (as calculating all the derivatives by hand is very tedious).</p>
+<p>Before we move on, let us verify that we indeed get useful predictions:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x1s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x2s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;x1&#39;: tensor(0.), &#39;x2&#39;: tensor(0.), &#39;h1&#39;: tensor(0.), &#39;h2&#39;: tensor(0.), &#39;h&#39;: tensor(0.), &#39;z&#39;: tensor(-8.9435), &#39;y&#39;: 0.00013056159878900093, &#39;L&#39;: tensor(0.0001)}
+{&#39;x1&#39;: tensor(0.), &#39;x2&#39;: tensor(1.), &#39;h1&#39;: tensor(0.), &#39;h2&#39;: tensor(5.8847), &#39;h&#39;: tensor(5.8847), &#39;z&#39;: tensor(-3.0589), &#39;y&#39;: 0.04483687464928194, &#39;L&#39;: tensor(0.0459)}
+{&#39;x1&#39;: tensor(1.), &#39;x2&#39;: tensor(0.), &#39;h1&#39;: tensor(5.9416), &#39;h2&#39;: tensor(0.), &#39;h&#39;: tensor(5.9416), &#39;z&#39;: tensor(-3.0019), &#39;y&#39;: 0.0473383390833865, &#39;L&#39;: tensor(0.0485)}
+{&#39;x1&#39;: tensor(1.), &#39;x2&#39;: tensor(1.), &#39;h1&#39;: tensor(5.9416), &#39;h2&#39;: tensor(5.8847), &#39;h&#39;: tensor(11.8263), &#39;z&#39;: tensor(2.8827), &#39;y&#39;: 0.9469867809360202, &#39;L&#39;: tensor(0.0545)}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Incredible! We can see that loss has become very small for every point. Let us have a look at the learned parameters and try to gain an intuition for what the network learned:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">b</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(tensor(5.9416), tensor(5.8847), tensor(-8.9435))
+</pre></div>
+</div>
+</div>
+</div>
+<p>Basically we learned the function <span class="math notranslate nohighlight">\(y = f(x_1, x_2) = \sigma(5.94 \cdot x_1 + 5.88 \cdot x_2 - 8.94)\)</span>. This makes sense. Essentially the network said “<span class="math notranslate nohighlight">\(x_1\)</span> and <span class="math notranslate nohighlight">\(x_2\)</span> both need to make a contribution to produce a large value, otherwise the bias will pull the total value down”, which is just another description for the <em>AND</em> function.</p>
+</section>
+<section id="improving-the-parameter-update-with-backpropagation">
+<h2>Improving the parameter update with backpropagation<a class="headerlink" href="#improving-the-parameter-update-with-backpropagation" title="Permalink to this headline">#</a></h2>
+<p>Manual updates work, but involve calculating lots of derivatives. This would mean that for every new model we would need to recalculate all the derivatives by hand. This is annoying. We want to be able to do this more effectively.</p>
+<p>We should more closely examine the flow of derivatives through the network:</p>
+<a class="reference internal image-reference" href="../_images/backprop.png"><img alt="drawing" src="../_images/backprop.png" style="width: 800px;" /></a>
+<p>As you can see the derivatives flow <em>backwards</em> (hence the name <strong>backpropagation</strong>).</p>
+<p>Let us look at a node up close. We take the sigmoid node. The derivative that flows out (<span class="math notranslate nohighlight">\(\frac{\partial L}{\partial z}\)</span>) only depends on the derivative that flows in (<span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span>) and the <em>local derivative</em> <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z}\)</span>. After all the chain rule tells us that <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial z} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial z}\)</span>.</p>
+<p>The same holds true for all the other nodes! This is such an important point that I even put an <em>exclamation mark</em> behind it. <em>Given the derivative flowing in each node can calculate the derivative flowing out.</em> Instead of calculating the derivatives for every network from scratch, we specify a bunch of nodes. Every node has a <em>forward</em> function which takes some inputs and produces some outputs and a <em>backward</em> function which takes the derivative flowing in and produces the derivative flowing out. We can then execute approximately the following <strong>backpropagation</strong> algorithm :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">forward_sorted_nodes</span> <span class="o">=</span> <span class="n">sort_forward</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">forward_sorted_nodes</span><span class="p">:</span>
+    <span class="n">incoming_nodes</span> <span class="o">=</span> <span class="n">get_incoming_nodes</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="n">node</span><span class="o">.</span><span class="n">output_values</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">calc_output_values</span><span class="p">(</span><span class="n">incoming_nodes</span><span class="p">)</span>
+    
+<span class="n">backward_sorted_nodes</span> <span class="o">=</span> <span class="n">sort_backward</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">backward_sorted_nodes</span><span class="p">:</span>
+    <span class="n">outgoing_node</span> <span class="o">=</span> <span class="n">get_outgoing_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="n">local_grad</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_local_grad</span><span class="p">()</span>
+    <span class="n">node</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="n">local_grad</span> <span class="o">*</span> <span class="n">outgoing_node</span><span class="o">.</span><span class="n">grad</span>
+</pre></div>
+</div>
+<p>Let us now implement a bunch of nodes in pytorch. Note that we usually do not have to do that (the pytorch authors already implemented most of the important nodes). Nevertheless this is an extremely useful exercise that will teach you a great deal about how neural networks <em>really work</em>.</p>
+<p>We begin by implementing the addition node. The forward function would simply be <span class="math notranslate nohighlight">\(z = x + y\)</span>. For the backward function we would need to return two gradients - one for <span class="math notranslate nohighlight">\(x\)</span> and one for <span class="math notranslate nohighlight">\(y\)</span>. They are pretty simple. We see that <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x} = \frac{\partial L}{\partial z}\frac{\partial z}{\partial x}\)</span>. Since <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial x} = 1\)</span> we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x} = \frac{\partial L}{\partial z}\)</span>. Similarly <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} = \frac{\partial L}{\partial z}\)</span>. Let us put this in code.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Add</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">grad_output</span><span class="p">,</span> <span class="n">grad_output</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we turn to multiplication. The forward function is <span class="math notranslate nohighlight">\(z = x \cdot y\)</span>. The backward pass again needs to calculate <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x} = \frac{\partial L}{\partial z}\frac{\partial z}{\partial x}\)</span>. However now the local gradients are different. We have <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial x} = y\)</span> and <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial y} = x\)</span>. This means that the backward pass is dependent on the forward pass. This is no problem however, as we can store the values from the forward pass using the ctx object:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Mul</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">return</span> <span class="n">grad_output</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">grad_output</span> <span class="o">*</span> <span class="n">x</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The sigmoid function is very similar:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Sigmoid</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">)))</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">x</span>
+        
+        <span class="c1"># Note that here we need to convert the local gradient to a tensor</span>
+        <span class="n">grad_local</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">grad_output</span> <span class="o">*</span> <span class="n">grad_local</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally this is how the node for the BCE loss would look like:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BCELoss</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span>          
+        <span class="k">return</span> <span class="o">-</span><span class="n">t</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">t</span>
+        <span class="n">y_grad_local</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">t_grad_local</span> <span class="o">=</span> <span class="o">-</span><span class="n">log</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">grad_output</span> <span class="o">*</span> <span class="n">y_grad_local</span><span class="p">,</span> <span class="n">grad_output</span> <span class="o">*</span> <span class="n">t_grad_local</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let us sanity check this. We pass the following values:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">x2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">w1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">w2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we execute the forward pass:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h1</span> <span class="o">=</span> <span class="n">Mul</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
+<span class="n">h2</span> <span class="o">=</span> <span class="n">Mul</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">w2</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">Add</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">)</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">Add</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Sigmoid</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">BCELoss</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+<span class="p">{</span> <span class="s2">&quot;h1&quot;</span><span class="p">:</span> <span class="n">h1</span><span class="p">,</span> <span class="s2">&quot;h2&quot;</span><span class="p">:</span> <span class="n">h2</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="n">L</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;h1&#39;: tensor(0., grad_fn=&lt;MulBackward&gt;),
+ &#39;h2&#39;: tensor(0., grad_fn=&lt;MulBackward&gt;),
+ &#39;h&#39;: tensor(0., grad_fn=&lt;AddBackward&gt;),
+ &#39;z&#39;: tensor(0., grad_fn=&lt;AddBackward&gt;),
+ &#39;y&#39;: tensor(0.5000, grad_fn=&lt;SigmoidBackward&gt;),
+ &#39;L&#39;: tensor(0.6931, grad_fn=&lt;BCELossBackward&gt;)}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Looks good so far. Now we call the backward function on the loss node. Pytorch will automatically calculate the gradients using the algorithm from above:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">L</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w1</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="n">w2</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">grad</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(tensor(0.), tensor(0.), tensor(0.5000))
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is the same as the result we got in the manual version from above. Let us define the forward and update functions, but now using our nodes instead of manual derivative calculations:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AutoSimpleNet</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">h1</span> <span class="o">=</span> <span class="n">Mul</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
+        <span class="n">h2</span> <span class="o">=</span> <span class="n">Mul</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">Add</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">Add</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">Sigmoid</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">BCELoss</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="n">x1</span><span class="p">,</span> <span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="n">x2</span><span class="p">,</span> <span class="s2">&quot;h1&quot;</span><span class="p">:</span> <span class="n">h1</span><span class="p">,</span> <span class="s2">&quot;h2&quot;</span><span class="p">:</span> <span class="n">h2</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="n">L</span> <span class="p">}</span>
+        
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="c1"># Forward pass</span>
+        <span class="n">forward_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">forward_res</span><span class="p">[</span><span class="s2">&quot;L&quot;</span><span class="p">]</span>
+        
+        <span class="c1"># Backward pass</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        
+        <span class="c1"># Update</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">dLdw1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+            <span class="n">dLdw2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+            <span class="n">dLdb</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dLdw1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dLdw2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dLdb</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">forward_res</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;dLdw1&quot;</span><span class="p">:</span> <span class="n">dLdw1</span><span class="p">,</span> <span class="s2">&quot;dLdw2&quot;</span><span class="p">:</span> <span class="n">dLdw2</span><span class="p">,</span> <span class="s2">&quot;dLdb&quot;</span><span class="p">:</span> <span class="n">dLdb</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The training loop doesn’t change:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">AutoSimpleNet</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">x1s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x2s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And now for the moment of truth.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x1s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x2s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;x1&#39;: tensor(0.), &#39;x2&#39;: tensor(0.), &#39;h1&#39;: tensor(0., grad_fn=&lt;MulBackward&gt;), &#39;h2&#39;: tensor(0., grad_fn=&lt;MulBackward&gt;), &#39;h&#39;: tensor(0., grad_fn=&lt;AddBackward&gt;), &#39;z&#39;: tensor(-8.9435, grad_fn=&lt;AddBackward&gt;), &#39;y&#39;: tensor(0.0001, grad_fn=&lt;SigmoidBackward&gt;), &#39;L&#39;: tensor(0.0001, grad_fn=&lt;BCELossBackward&gt;)}
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;x1&#39;: tensor(0.), &#39;x2&#39;: tensor(1.), &#39;h1&#39;: tensor(0., grad_fn=&lt;MulBackward&gt;), &#39;h2&#39;: tensor(5.8847, grad_fn=&lt;MulBackward&gt;), &#39;h&#39;: tensor(5.8847, grad_fn=&lt;AddBackward&gt;), &#39;z&#39;: tensor(-3.0589, grad_fn=&lt;AddBackward&gt;), &#39;y&#39;: tensor(0.0448, grad_fn=&lt;SigmoidBackward&gt;), &#39;L&#39;: tensor(0.0459, grad_fn=&lt;BCELossBackward&gt;)}
+{&#39;x1&#39;: tensor(1.), &#39;x2&#39;: tensor(0.), &#39;h1&#39;: tensor(5.9416, grad_fn=&lt;MulBackward&gt;), &#39;h2&#39;: tensor(0., grad_fn=&lt;MulBackward&gt;), &#39;h&#39;: tensor(5.9416, grad_fn=&lt;AddBackward&gt;), &#39;z&#39;: tensor(-3.0019, grad_fn=&lt;AddBackward&gt;), &#39;y&#39;: tensor(0.0473, grad_fn=&lt;SigmoidBackward&gt;), &#39;L&#39;: tensor(0.0485, grad_fn=&lt;BCELossBackward&gt;)}
+{&#39;x1&#39;: tensor(1.), &#39;x2&#39;: tensor(1.), &#39;h1&#39;: tensor(5.9416, grad_fn=&lt;MulBackward&gt;), &#39;h2&#39;: tensor(5.8847, grad_fn=&lt;MulBackward&gt;), &#39;h&#39;: tensor(11.8263, grad_fn=&lt;AddBackward&gt;), &#39;z&#39;: tensor(2.8827, grad_fn=&lt;AddBackward&gt;), &#39;y&#39;: tensor(0.9470, grad_fn=&lt;SigmoidBackward&gt;), &#39;L&#39;: tensor(0.0545, grad_fn=&lt;BCELossBackward&gt;)}
+</pre></div>
+</div>
+</div>
+</div>
+<p>That looks great! Let us perform an additional sanity check by confirming that <span class="math notranslate nohighlight">\(w_1\)</span>, <span class="math notranslate nohighlight">\(w_2\)</span> and <span class="math notranslate nohighlight">\(b\)</span> have the same values as in the manual version:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">b</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(tensor(5.9416, requires_grad=True),
+ tensor(5.8847, requires_grad=True),
+ tensor(-8.9435, requires_grad=True))
+</pre></div>
+</div>
+</div>
+</div>
+<p>Incredibly enough, there is not much more than this to backpropagation. We will now discuss a bunch of (important) technical details, but you can already go and impress everyone with your newfound knowledge! Go ahead and do just that - you now understand the algorithm which underpins basically all of deep learning - from the simplest perceptrons to the fanciest state of the art models out there.</p>
+</section>
+<section id="backpropagation-in-pytorch">
+<h2>Backpropagation in pytorch<a class="headerlink" href="#backpropagation-in-pytorch" title="Permalink to this headline">#</a></h2>
+<p>Of course in reality we do not actually go around implementing all the backward functions from scratch. The pytorch team has already done that for <em>a lot</em> of functions. We can therefore simply declare the computational graph using those builtin functions, call <code class="docutils literal notranslate"><span class="pre">backward</span></code> and then do the gradient updates:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TorchSimpleNet</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_fun</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCELoss</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">h1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
+        <span class="n">h2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">z</span><span class="o">.</span><span class="n">retain_grad</span><span class="p">()</span>
+        <span class="n">y</span><span class="o">.</span><span class="n">retain_grad</span><span class="p">()</span>
+        
+        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_fun</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="n">x1</span><span class="p">,</span> <span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="n">x2</span><span class="p">,</span> <span class="s2">&quot;h1&quot;</span><span class="p">:</span> <span class="n">h1</span><span class="p">,</span> <span class="s2">&quot;h2&quot;</span><span class="p">:</span> <span class="n">h2</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="n">L</span> <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">forward_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">forward_res</span><span class="p">[</span><span class="s2">&quot;L&quot;</span><span class="p">]</span>
+        
+        <span class="c1"># Backward</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        
+        <span class="c1"># Update</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">dLdw1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+            <span class="n">dLdw2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+            <span class="n">dLdb</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dLdw1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dLdw2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dLdb</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">forward_res</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;dLdw1&quot;</span><span class="p">:</span> <span class="n">dLdw1</span><span class="p">,</span> <span class="s2">&quot;dLdw2&quot;</span><span class="p">:</span> <span class="n">dLdw2</span><span class="p">,</span> <span class="s2">&quot;dLdb&quot;</span><span class="p">:</span> <span class="n">dLdb</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Again the training loop doesn’t change at all:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">TorchSimpleNet</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">x1s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x2s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<p>We do the forward passes:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">x1s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x2s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;x1&#39;: tensor(0.), &#39;x2&#39;: tensor(0.), &#39;h1&#39;: tensor(0., grad_fn=&lt;MulBackward0&gt;), &#39;h2&#39;: tensor(0., grad_fn=&lt;MulBackward0&gt;), &#39;h&#39;: tensor(0., grad_fn=&lt;AddBackward0&gt;), &#39;z&#39;: tensor(-8.9435, grad_fn=&lt;AddBackward0&gt;), &#39;y&#39;: tensor(0.0001, grad_fn=&lt;SigmoidBackward0&gt;), &#39;t&#39;: tensor(0), &#39;L&#39;: tensor(0.0001, grad_fn=&lt;BinaryCrossEntropyBackward0&gt;)}
+{&#39;x1&#39;: tensor(0.), &#39;x2&#39;: tensor(1.), &#39;h1&#39;: tensor(0., grad_fn=&lt;MulBackward0&gt;), &#39;h2&#39;: tensor(5.8847, grad_fn=&lt;MulBackward0&gt;), &#39;h&#39;: tensor(5.8847, grad_fn=&lt;AddBackward0&gt;), &#39;z&#39;: tensor(-3.0589, grad_fn=&lt;AddBackward0&gt;), &#39;y&#39;: tensor(0.0448, grad_fn=&lt;SigmoidBackward0&gt;), &#39;t&#39;: tensor(0), &#39;L&#39;: tensor(0.0459, grad_fn=&lt;BinaryCrossEntropyBackward0&gt;)}
+{&#39;x1&#39;: tensor(1.), &#39;x2&#39;: tensor(0.), &#39;h1&#39;: tensor(5.9416, grad_fn=&lt;MulBackward0&gt;), &#39;h2&#39;: tensor(0., grad_fn=&lt;MulBackward0&gt;), &#39;h&#39;: tensor(5.9416, grad_fn=&lt;AddBackward0&gt;), &#39;z&#39;: tensor(-3.0019, grad_fn=&lt;AddBackward0&gt;), &#39;y&#39;: tensor(0.0473, grad_fn=&lt;SigmoidBackward0&gt;), &#39;t&#39;: tensor(0), &#39;L&#39;: tensor(0.0485, grad_fn=&lt;BinaryCrossEntropyBackward0&gt;)}
+{&#39;x1&#39;: tensor(1.), &#39;x2&#39;: tensor(1.), &#39;h1&#39;: tensor(5.9416, grad_fn=&lt;MulBackward0&gt;), &#39;h2&#39;: tensor(5.8847, grad_fn=&lt;MulBackward0&gt;), &#39;h&#39;: tensor(11.8263, grad_fn=&lt;AddBackward0&gt;), &#39;z&#39;: tensor(2.8827, grad_fn=&lt;AddBackward0&gt;), &#39;y&#39;: tensor(0.9470, grad_fn=&lt;SigmoidBackward0&gt;), &#39;t&#39;: tensor(1), &#39;L&#39;: tensor(0.0545, grad_fn=&lt;BinaryCrossEntropyBackward0&gt;)}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let us also sanity check the gradients:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">b</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(tensor(5.9416, requires_grad=True),
+ tensor(5.8847, requires_grad=True),
+ tensor(-8.9435, requires_grad=True))
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is a very basic and simple, but <em>complete</em> example of a neural network. We can however tweak a bunch of things.</p>
+<p>First the <strong>architecture</strong> of our network will usually be more complex.</p>
+<p>Second for different cases we need to use different <strong>loss functions</strong>.</p>
+<p>Third the update step will often be different as defined by an <strong>optimizer</strong>.</p>
+<p>Fourth the initilization will be different as defined by an <strong>initialization scheme</strong>.</p>
+<p>We will tackle these things in the next chapter.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./chapter2"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="../chapter1/high_level_overview.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">High-level overview</p>
+        </div>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Mikhail Berkov<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

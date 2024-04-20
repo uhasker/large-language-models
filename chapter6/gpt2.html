@@ -1,0 +1,1744 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Deep Dive Into GPT-2 &#8212; Large Language Models</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapter6/gpt2';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Attention" href="../chapter5/attention.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../preface.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Large Language Models - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="Large Language Models - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../preface.html">
+                    Preface
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../chapter1/high_level_overview.html">High-level overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter2/computational_graphs.html">Computational Graphs and Backpropagation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter5/attention.html">Attention</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Deep Dive Into GPT-2</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uhasker/llm-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uhasker/llm-book/issues/new?title=Issue%20on%20page%20%2Fchapter6/gpt2.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapter6/gpt2.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Deep Dive Into GPT-2</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-the-model">Loading the Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#embeddings">Embeddings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-first-gpt2-block">The First GPT2 Block</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-other-blocks">The Other Blocks</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="deep-dive-into-gpt-2">
+<h1>Deep Dive Into GPT-2<a class="headerlink" href="#deep-dive-into-gpt-2" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2Tokenizer</span><span class="p">,</span> <span class="n">GPT2Model</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.9.19/x64/lib/python3.9/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div>
+</div>
+</div>
+</div>
+<section id="loading-the-model">
+<h2>Loading the Model<a class="headerlink" href="#loading-the-model" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">GPT2Tokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s1">&#39;gpt2&#39;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GPT2Model</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s1">&#39;gpt2&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   0%|          | 0.00/0.99M [00:00&lt;?, ?B/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  10%|▉         | 97.0k/0.99M [00:00&lt;00:01, 800kB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  49%|████▉     | 497k/0.99M [00:00&lt;00:00, 2.45MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|██████████| 0.99M/0.99M [00:00&lt;00:00, 3.95MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   0%|          | 0.00/446k [00:00&lt;?, ?B/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|██████████| 446k/446k [00:00&lt;00:00, 5.79MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   0%|          | 0.00/26.0 [00:00&lt;?, ?B/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|██████████| 26.0/26.0 [00:00&lt;00:00, 173kB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   0%|          | 0.00/665 [00:00&lt;?, ?B/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|██████████| 665/665 [00:00&lt;00:00, 3.36MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   0%|          | 0.00/523M [00:00&lt;?, ?B/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   1%|          | 4.53M/523M [00:00&lt;00:11, 47.5MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   2%|▏         | 11.3M/523M [00:00&lt;00:08, 61.6MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   4%|▎         | 18.3M/523M [00:00&lt;00:07, 66.9MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   5%|▍         | 25.2M/523M [00:00&lt;00:07, 68.8MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   6%|▌         | 32.3M/523M [00:00&lt;00:07, 71.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   8%|▊         | 39.6M/523M [00:00&lt;00:06, 72.7MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   9%|▉         | 46.8M/523M [00:00&lt;00:06, 73.7MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  10%|█         | 54.1M/523M [00:00&lt;00:06, 74.5MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  12%|█▏        | 61.2M/523M [00:00&lt;00:06, 74.7MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  13%|█▎        | 68.5M/523M [00:01&lt;00:06, 75.3MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  14%|█▍        | 75.7M/523M [00:01&lt;00:06, 74.4MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  16%|█▌        | 83.0M/523M [00:01&lt;00:06, 74.9MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  17%|█▋        | 90.2M/523M [00:01&lt;00:06, 75.2MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  19%|█▊        | 97.4M/523M [00:01&lt;00:05, 75.3MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  20%|██        | 105M/523M [00:01&lt;00:05, 75.1MB/s] 
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  21%|██▏       | 112M/523M [00:01&lt;00:05, 75.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  23%|██▎       | 119M/523M [00:01&lt;00:05, 75.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  24%|██▍       | 126M/523M [00:01&lt;00:05, 75.7MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  26%|██▌       | 134M/523M [00:01&lt;00:05, 75.3MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  27%|██▋       | 141M/523M [00:02&lt;00:05, 75.3MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  28%|██▊       | 148M/523M [00:02&lt;00:05, 75.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  30%|██▉       | 155M/523M [00:02&lt;00:05, 75.2MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  31%|███       | 162M/523M [00:02&lt;00:05, 72.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  32%|███▏      | 169M/523M [00:02&lt;00:05, 70.2MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  34%|███▎      | 176M/523M [00:02&lt;00:05, 68.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  35%|███▍      | 182M/523M [00:02&lt;00:05, 67.4MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  36%|███▌      | 189M/523M [00:02&lt;00:05, 67.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  37%|███▋      | 195M/523M [00:02&lt;00:05, 67.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  39%|███▊      | 202M/523M [00:02&lt;00:05, 67.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  40%|███▉      | 208M/523M [00:03&lt;00:04, 67.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  41%|████      | 214M/523M [00:03&lt;00:04, 67.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  42%|████▏     | 221M/523M [00:03&lt;00:04, 66.7MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  43%|████▎     | 227M/523M [00:03&lt;00:04, 66.2MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  45%|████▍     | 234M/523M [00:03&lt;00:04, 66.2MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  46%|████▌     | 240M/523M [00:03&lt;00:04, 66.4MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  47%|████▋     | 246M/523M [00:03&lt;00:04, 66.2MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  48%|████▊     | 253M/523M [00:03&lt;00:04, 66.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  50%|████▉     | 259M/523M [00:03&lt;00:04, 66.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  51%|█████     | 265M/523M [00:03&lt;00:04, 66.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  52%|█████▏    | 271M/523M [00:04&lt;00:03, 66.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  53%|█████▎    | 278M/523M [00:04&lt;00:03, 66.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  54%|█████▍    | 284M/523M [00:04&lt;00:03, 66.6MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  56%|█████▌    | 291M/523M [00:04&lt;00:03, 66.5MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  57%|█████▋    | 297M/523M [00:04&lt;00:03, 67.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  58%|█████▊    | 303M/523M [00:04&lt;00:03, 66.8MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  59%|█████▉    | 310M/523M [00:04&lt;00:03, 66.6MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  60%|██████    | 316M/523M [00:04&lt;00:03, 66.5MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  62%|██████▏   | 323M/523M [00:04&lt;00:03, 66.4MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  63%|██████▎   | 329M/523M [00:04&lt;00:03, 67.2MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  64%|██████▍   | 336M/523M [00:05&lt;00:02, 67.7MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  65%|██████▌   | 342M/523M [00:05&lt;00:02, 67.8MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  67%|██████▋   | 349M/523M [00:05&lt;00:02, 67.9MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  68%|██████▊   | 355M/523M [00:05&lt;00:02, 68.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  69%|██████▉   | 362M/523M [00:05&lt;00:02, 68.1MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  70%|███████   | 368M/523M [00:05&lt;00:02, 68.5MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  72%|███████▏  | 375M/523M [00:05&lt;00:02, 68.7MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  73%|███████▎  | 381M/523M [00:05&lt;00:02, 68.6MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  74%|███████▍  | 388M/523M [00:05&lt;00:02, 68.3MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  75%|███████▌  | 395M/523M [00:05&lt;00:01, 68.2MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  77%|███████▋  | 401M/523M [00:06&lt;00:01, 68.8MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  78%|███████▊  | 408M/523M [00:06&lt;00:01, 68.7MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  79%|███████▉  | 414M/523M [00:06&lt;00:01, 68.8MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  81%|████████  | 421M/523M [00:06&lt;00:01, 69.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  82%|████████▏ | 428M/523M [00:06&lt;00:01, 69.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  83%|████████▎ | 434M/523M [00:06&lt;00:01, 68.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  84%|████████▍ | 441M/523M [00:06&lt;00:01, 70.4MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  86%|████████▌ | 449M/523M [00:06&lt;00:01, 71.9MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  87%|████████▋ | 456M/523M [00:06&lt;00:00, 72.9MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  89%|████████▊ | 463M/523M [00:06&lt;00:00, 74.0MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  90%|████████▉ | 470M/523M [00:07&lt;00:00, 74.5MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  91%|█████████▏| 477M/523M [00:07&lt;00:00, 74.6MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  93%|█████████▎| 485M/523M [00:07&lt;00:00, 74.9MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  94%|█████████▍| 492M/523M [00:07&lt;00:00, 75.3MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  95%|█████████▌| 499M/523M [00:07&lt;00:00, 75.4MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  97%|█████████▋| 506M/523M [00:07&lt;00:00, 75.2MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  98%|█████████▊| 514M/523M [00:07&lt;00:00, 75.5MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|█████████▉| 521M/523M [00:07&lt;00:00, 76.3MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|██████████| 523M/523M [00:07&lt;00:00, 70.3MB/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;This is an example sentence&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">encoded_input</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span>
+<span class="n">encoded_input</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;input_ids&#39;: tensor([[1212,  318,  281, 1672, 6827]]), &#39;attention_mask&#39;: tensor([[1, 1, 1, 1, 1]])}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">encoded_input</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>transformers.modeling_outputs.BaseModelOutputWithPastAndCrossAttentions
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">output</span><span class="o">.</span><span class="n">last_hidden_state</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">output</span><span class="o">.</span><span class="n">last_hidden_state</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.0530, -0.0137, -0.2393,  ..., -0.1245, -0.1116,  0.0225],
+         [ 0.2470,  0.2260,  0.0397,  ...,  0.2413,  0.4349,  0.1768],
+         [ 0.7483, -0.4052, -0.9382,  ...,  0.3646, -0.0287,  0.3722],
+         [ 0.1990, -0.3695, -1.8210,  ..., -0.1772,  0.0093,  0.1647],
+         [ 0.0704, -0.0537, -2.5189,  ...,  0.0582, -0.1217, -0.3843]]],
+       grad_fn=&lt;ViewBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="embeddings">
+<h2>Embeddings<a class="headerlink" href="#embeddings" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_ids</span> <span class="o">=</span> <span class="n">encoded_input</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span>
+<span class="n">attention_mask</span> <span class="o">=</span> <span class="n">encoded_input</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_ids</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1212,  318,  281, 1672, 6827]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attention_mask</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1, 1, 1, 1, 1]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Generate the position IDs:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">position_ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Get the token embeddings:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">wte</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Embedding(50257, 768)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_embeds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">wte</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+<span class="n">input_embeds</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.0253, -0.0956,  0.0721,  ...,  0.0615, -0.0558,  0.1093],
+         [-0.0097,  0.0101,  0.0556,  ...,  0.1145, -0.0380, -0.0254],
+         [-0.0870, -0.0117,  0.0687,  ...,  0.0332,  0.0562, -0.0843],
+         [ 0.0716, -0.1287,  0.0815,  ..., -0.3787, -0.0285, -0.1234],
+         [-0.0964, -0.0075,  0.0396,  ..., -0.2623, -0.0469, -0.1976]]],
+       grad_fn=&lt;EmbeddingBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_embeds</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Generate the position embeddings:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">position_embeds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">wpe</span><span class="p">(</span><span class="n">position_ids</span><span class="p">)</span>
+<span class="n">position_embeds</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[-1.8821e-02, -1.9742e-01,  4.0267e-03,  ..., -4.3044e-02,
+           2.8267e-02,  5.4490e-02],
+         [ 2.3959e-02, -5.3792e-02, -9.4879e-02,  ...,  3.4170e-02,
+           1.0172e-02, -1.5573e-04],
+         [ 4.2161e-03, -8.4764e-02,  5.4515e-02,  ...,  1.9745e-02,
+           1.9325e-02, -2.1424e-02],
+         [-2.8337e-04, -7.3803e-02,  1.0553e-01,  ...,  1.0157e-02,
+           1.7659e-02, -7.0854e-03],
+         [ 7.6374e-03, -2.5090e-02,  1.2696e-01,  ...,  8.4643e-03,
+           9.8542e-03, -7.0117e-03]]], grad_fn=&lt;EmbeddingBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">position_embeds</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span> <span class="o">=</span> <span class="n">input_embeds</span> <span class="o">+</span> <span class="n">position_embeds</span>
+<span class="n">hidden_states</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.0065, -0.2930,  0.0762,  ...,  0.0184, -0.0275,  0.1638],
+         [ 0.0142, -0.0437, -0.0393,  ...,  0.1487, -0.0278, -0.0255],
+         [-0.0828, -0.0964,  0.1232,  ...,  0.0530,  0.0755, -0.1057],
+         [ 0.0714, -0.2025,  0.1870,  ..., -0.3685, -0.0108, -0.1304],
+         [-0.0888, -0.0326,  0.1666,  ..., -0.2539, -0.0370, -0.2046]]],
+       grad_fn=&lt;AddBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-first-gpt2-block">
+<h2>The First GPT2 Block<a class="headerlink" href="#the-first-gpt2-block" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">residual</span> <span class="o">=</span> <span class="n">hidden_states</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">layer_blocks</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">h</span>
+<span class="n">layer_blocks</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ModuleList(
+  (0): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (1): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (2): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (3): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (4): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (5): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (6): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (7): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (8): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (9): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (10): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (11): GPT2Block(
+    (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (attn): GPT2Attention(
+      (c_attn): Conv1D()
+      (c_proj): Conv1D()
+      (attn_dropout): Dropout(p=0.1, inplace=False)
+      (resid_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (mlp): GPT2MLP(
+      (c_fc): Conv1D()
+      (c_proj): Conv1D()
+      (act): NewGELUActivation()
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+  )
+)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">layer_block</span> <span class="o">=</span> <span class="n">layer_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">layer_block</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D()
+    (c_proj): Conv1D()
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D()
+    (c_proj): Conv1D()
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">ln_1</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+<span class="n">hidden_states</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.0046, -0.1147, -0.0292,  ...,  0.0021, -0.0244,  0.0727],
+         [ 0.0150, -0.0088, -0.0911,  ...,  0.1287, -0.0362, -0.0365],
+         [-0.0984, -0.0632,  0.0386,  ...,  0.0452,  0.0617, -0.1194],
+         [ 0.0778, -0.1550,  0.0805,  ..., -0.3588, -0.0225, -0.1376],
+         [-0.1005, -0.0005,  0.0658,  ..., -0.2506, -0.0460, -0.2082]]],
+       grad_fn=&lt;NativeLayerNormBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">c_attn</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Conv1D()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_key_value</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">c_attn</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+<span class="n">query_key_value</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[-0.0294, -0.6518,  0.5181,  ...,  0.0770, -0.2688, -0.0985],
+         [ 0.4271,  0.1531,  0.2167,  ...,  0.1749,  0.3729,  0.1266],
+         [ 0.8352, -0.3577,  0.6788,  ...,  0.1482,  0.0685, -0.0751],
+         [-0.1062,  0.6817,  0.4614,  ...,  0.0410,  0.1327, -0.1493],
+         [ 1.2036,  0.5522, -0.8434,  ...,  0.0273, -0.2853, -0.1288]]],
+       grad_fn=&lt;ViewBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_key_value</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 2304])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">query_key_value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="mi">768</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(torch.Size([1, 5, 768]), torch.Size([1, 5, 768]), torch.Size([1, 5, 768]))
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[-0.0294, -0.6518,  0.5181,  ..., -1.0025, -0.2499, -0.4812],
+         [ 0.4271,  0.1531,  0.2167,  ..., -0.0248, -1.6700, -0.7407],
+         [ 0.8352, -0.3577,  0.6788,  ..., -0.3742, -1.5068, -1.0755],
+         [-0.1062,  0.6817,  0.4614,  ..., -0.6008, -1.8102, -1.0448],
+         [ 1.2036,  0.5522, -0.8434,  ..., -0.4750, -1.2292, -0.1971]]],
+       grad_fn=&lt;SplitBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">key</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[-0.9706,  1.6740,  0.9128,  ..., -0.5452,  0.3212,  1.5770],
+         [-1.8348,  2.4955,  1.7497,  ...,  0.7098,  0.5259,  1.7975],
+         [-2.2066,  2.8389,  1.6342,  ..., -0.0561,  0.5616,  1.4394],
+         [-2.0450,  1.9159,  2.1838,  ..., -0.0274,  0.2950,  0.9736],
+         [-2.9504,  3.0648,  1.9827,  ..., -0.6849,  0.1057,  0.8111]]],
+       grad_fn=&lt;SplitBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">value</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.1759,  0.0996,  0.1026,  ...,  0.0770, -0.2688, -0.0985],
+         [ 0.2320, -0.2386,  0.2946,  ...,  0.1749,  0.3729,  0.1266],
+         [ 0.0950, -0.0382,  0.0530,  ...,  0.1482,  0.0685, -0.0751],
+         [-0.0951, -0.0121, -0.2828,  ...,  0.0410,  0.1327, -0.1493],
+         [-0.4495, -0.3067,  0.2846,  ...,  0.0273, -0.2853, -0.1288]]],
+       grad_fn=&lt;SplitBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_heads</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">head_dim</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">_split_heads</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">_split_heads</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">_split_heads</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
+<span class="n">query</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(torch.Size([1, 12, 5, 64]),
+ torch.Size([1, 12, 5, 64]),
+ torch.Size([1, 12, 5, 64]))
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attn_output</span><span class="p">,</span> <span class="n">attn_weights</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">_attn</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attn_output</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">attn_weights</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(torch.Size([1, 12, 5, 64]), torch.Size([1, 12, 5, 5]))
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attn_output</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">_merge_heads</span><span class="p">(</span><span class="n">attn_output</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
+<span class="n">attn_output</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attn_output</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.1759,  0.0996,  0.1026,  ...,  0.0770, -0.2688, -0.0985],
+         [ 0.1782,  0.0855,  0.1106,  ...,  0.1054, -0.0826, -0.0332],
+         [ 0.1779,  0.0423,  0.1259,  ...,  0.1113, -0.0683, -0.0458],
+         [ 0.1479,  0.0313,  0.0835,  ...,  0.0966, -0.0892, -0.0701],
+         [-0.0191, -0.0610,  0.1360,  ...,  0.0839, -0.0824, -0.0785]]],
+       grad_fn=&lt;ViewBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attn_output</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">c_proj</span><span class="p">(</span><span class="n">attn_output</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attn_output</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attn_output</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.6093, -0.2866,  0.2530,  ...,  0.0300, -0.0228,  0.0216],
+         [-0.2909, -0.2758,  0.2719,  ...,  0.0023,  0.0487, -0.0052],
+         [-0.3846,  0.0536,  0.2804,  ..., -0.0273,  0.0266, -0.0028],
+         [-0.5528, -0.0046, -0.1549,  ..., -0.0027, -0.0336,  0.0284],
+         [-1.3225,  0.7394, -0.4122,  ..., -0.0089, -0.0326, -0.0465]]],
+       grad_fn=&lt;ViewBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span> <span class="o">=</span> <span class="n">attn_output</span> <span class="o">+</span> <span class="n">residual</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.6158, -0.5796,  0.3292,  ...,  0.0484, -0.0504,  0.1853],
+         [-0.2766, -0.3195,  0.2326,  ...,  0.1510,  0.0209, -0.0308],
+         [-0.4673, -0.0429,  0.4036,  ...,  0.0257,  0.1020, -0.1085],
+         [-0.4814, -0.2070,  0.0321,  ..., -0.3712, -0.0445, -0.1020],
+         [-1.4112,  0.7068, -0.2456,  ..., -0.2627, -0.0697, -0.2511]]],
+       grad_fn=&lt;AddBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">residual</span> <span class="o">=</span> <span class="n">hidden_states</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">ln_2</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.1216, -0.0899,  0.0704,  ...,  0.0334, -0.0691,  0.1874],
+         [ 0.0099, -0.0268,  0.0387,  ...,  0.1106, -0.0021, -0.0539],
+         [-0.0154,  0.0191,  0.0730,  ..., -0.0230,  0.0884, -0.1339],
+         [-0.0199, -0.0133,  0.0053,  ..., -0.5003, -0.0804, -0.1320],
+         [-0.1165,  0.1540, -0.0424,  ..., -0.3300, -0.0937, -0.2504]]],
+       grad_fn=&lt;NativeLayerNormBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">feed_forward_hidden_states</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">feed_forward_hidden_states</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">feed_forward_hidden_states</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.4877,  0.3332, -0.0061,  ..., -1.2471, -0.6123,  1.7950],
+         [-1.0319,  0.0381, -1.0763,  ...,  0.0518,  0.0801,  0.7346],
+         [-0.5007, -0.7439, -0.2125,  ..., -0.5195, -0.1852, -1.0383],
+         [-1.7097,  0.0317, -1.6022,  ..., -1.6524,  0.8576,  1.2427],
+         [-1.8516,  2.2123, -0.2633,  ...,  0.2964,  0.0199, -0.4581]]],
+       grad_fn=&lt;ViewBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span> <span class="o">=</span> <span class="n">residual</span> <span class="o">+</span> <span class="n">feed_forward_hidden_states</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([1, 5, 768])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 1.1035, -0.2464,  0.3231,  ..., -1.1987, -0.6627,  1.9803],
+         [-1.3085, -0.2814, -0.8437,  ...,  0.2028,  0.1010,  0.7039],
+         [-0.9680, -0.7867,  0.1910,  ..., -0.4938, -0.0832, -1.1468],
+         [-2.1911, -0.1754, -1.5701,  ..., -2.0236,  0.8131,  1.1406],
+         [-3.2628,  2.9190, -0.5089,  ...,  0.0336, -0.0497, -0.7092]]],
+       grad_fn=&lt;AddBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thingy</span> <span class="o">=</span> <span class="n">hidden_states</span>
+<span class="n">thingy</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 1.1035, -0.2464,  0.3231,  ..., -1.1987, -0.6627,  1.9803],
+         [-1.3085, -0.2814, -0.8437,  ...,  0.2028,  0.1010,  0.7039],
+         [-0.9680, -0.7867,  0.1910,  ..., -0.4938, -0.0832, -1.1468],
+         [-2.1911, -0.1754, -1.5701,  ..., -2.0236,  0.8131,  1.1406],
+         [-3.2628,  2.9190, -0.5089,  ...,  0.0336, -0.0497, -0.7092]]],
+       grad_fn=&lt;AddBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-other-blocks">
+<h2>The Other Blocks<a class="headerlink" href="#the-other-blocks" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+    <span class="n">hidden_states</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[  1.0127,   0.0504,  -0.6634,  ...,  -0.8270,  -0.4964,   0.3985],
+         [  2.8837,   2.2619,   0.9429,  ...,   3.7264,   6.8395,   1.9387],
+         [  8.6963,  -5.3443,  -7.6458,  ...,   5.4947,  -0.1229,   4.5138],
+         [  2.1593,  -4.8067, -14.9140,  ...,  -2.5139,   0.4066,   1.6212],
+         [  0.7236,  -1.0082, -19.5502,  ...,   0.9085,  -1.3381,  -5.2373]]],
+       grad_fn=&lt;AddBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">ln_f</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+<span class="n">hidden_states</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.0530, -0.0137, -0.2393,  ..., -0.1245, -0.1116,  0.0225],
+         [ 0.2470,  0.2260,  0.0397,  ...,  0.2413,  0.4349,  0.1768],
+         [ 0.7483, -0.4052, -0.9382,  ...,  0.3646, -0.0287,  0.3722],
+         [ 0.1990, -0.3695, -1.8210,  ..., -0.1772,  0.0093,  0.1647],
+         [ 0.0704, -0.0537, -2.5189,  ...,  0.0582, -0.1217, -0.3843]]],
+       grad_fn=&lt;NativeLayerNormBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">,</span> <span class="n">output</span><span class="o">.</span><span class="n">last_hidden_state</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-05</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-06</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapter6"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../chapter5/attention.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Attention</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-the-model">Loading the Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#embeddings">Embeddings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-first-gpt2-block">The First GPT2 Block</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-other-blocks">The Other Blocks</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Mikhail Berkov
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

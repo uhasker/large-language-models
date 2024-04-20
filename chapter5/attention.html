@@ -62,6 +62,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapter5/attention';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Deep Dive Into GPT-2" href="../chapter6/gpt2.html" />
+    <link rel="prev" title="Computational Graphs and Backpropagation" href="../chapter2/computational_graphs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -123,8 +125,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -178,9 +178,11 @@
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../chapter1/high_level_overview.html">High-level overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../chapter2/computational_graphs.html">Computational graphs and backpropagation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter2/computational_graphs.html">Computational Graphs and Backpropagation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Attention</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter6/gpt2.html">Deep Dive Into GPT-2</a></li>
 </ul>
 
     </div>
@@ -380,6 +382,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#naive-attention">Naive Attention</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-and-query-vectors">Key and Query Vectors</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#value-vectors">Value Vectors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-head-attention">Multi - Head Attention</a></li>
 </ul>
             </nav>
         </div>
@@ -412,7 +415,7 @@ It seems sensible that token <span class="math notranslate nohighlight">\(T_2\)<
   from .autonotebook import tqdm as notebook_tqdm
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;torch._C.Generator at 0x7fb9d823efb0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;torch._C.Generator at 0x7f5c387b2fb0&gt;
 </pre></div>
 </div>
 </div>
@@ -719,6 +722,9 @@ Therefore we should disable this during training as well.</p>
 </div>
 </div>
 </section>
+<section id="multi-head-attention">
+<h2>Multi - Head Attention<a class="headerlink" href="#multi-head-attention" title="Link to this heading">#</a></h2>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -751,6 +757,24 @@ Therefore we should disable this during training as well.</p>
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="../chapter2/computational_graphs.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Computational Graphs and Backpropagation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../chapter6/gpt2.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Deep Dive Into GPT-2</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -771,6 +795,7 @@ Therefore we should disable this during training as well.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#naive-attention">Naive Attention</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-and-query-vectors">Key and Query Vectors</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#value-vectors">Value Vectors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-head-attention">Multi - Head Attention</a></li>
 </ul>
   </nav></div>
 

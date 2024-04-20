@@ -1,110 +1,173 @@
 
 <!DOCTYPE html>
 
-<html>
+
+<html lang="en" data-content_root="../" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>High-level overview &#8212; Large Language Models</title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
-    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js"></script>
-    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapter1/high_level_overview';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Computational graphs and backpropagation" href="../chapter2/computational_graphs.html" />
     <link rel="prev" title="Preface" href="../preface.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-    
-    <div class="container-fluid" id="banner"></div>
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
 
-    
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
 
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="../index.html">
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
       
-        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
         
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../preface.html">
+  
+  
+  
+  
+  
+    
+    
       
-      
-      <img src="../_static/logo.png" class="logo" alt="logo">
-      
-      
-      <h1 class="site-logo" id="site-title">Large Language Models</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Large Language Models - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="Large Language Models - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
@@ -114,304 +177,233 @@ const thebe_selector_output = ".output, .cell_output"
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
-   High-level overview
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../chapter2/computational_graphs.html">
-   Computational graphs and backpropagation
-  </a>
- </li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">High-level overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter2/computational_graphs.html">Computational graphs and backpropagation</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-            <div class="navbar_extra_footer">
-            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
-            </div>
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uhasker/llm-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uhasker/llm-book/issues/new?title=Issue%20on%20page%20%2Fchapter1/high_level_overview.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
 </div>
 
 
-          
-
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
-<div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
 
 
 
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapter1/high_level_overview.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
   </span>
-
-</label>
-
-        
-    </div>
-    <div class="header-article__right">
-<button onclick="toggleFullScreen()"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="bottom"
-title="Fullscreen mode"
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
   <i class="fas fa-expand"></i>
   </span>
 
 </button>
 
-<div class="menu-dropdown menu-dropdown-repository-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Source repositories">
-      <i class="fab fa-github"></i>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://github.com/uhasker/llm-book"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Source repository"
->
-  
+`);
+</script>
 
-<span class="headerbtn__icon-container">
-  <i class="fab fa-github"></i>
-  </span>
-<span class="headerbtn__text-container">repository</span>
-</a>
 
-      </li>
-      
-      <li>
-        <a href="https://github.com/uhasker/llm-book/issues/new?title=Issue%20on%20page%20%2Fchapter1/high_level_overview.html&body=Your%20issue%20content%20here."
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Open an issue"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-lightbulb"></i>
-  </span>
-<span class="headerbtn__text-container">open issue</span>
-</a>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="../_sources/chapter1/high_level_overview.md"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="headerbtn__text-container">.md</span>
-</a>
-
-      </li>
-      
-      <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="headerbtn__text-container">.pdf</span>
-</button>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
-  </span>
-
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#machine-learning">
-   Machine learning
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#types-of-machine-learning">
-   Types of machine learning
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#deep-learning">
-   Deep learning
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#evaluating-a-model">
-   Evaluating a model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#natural-language-processing">
-   Natural Language Processing
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#language-models">
-   Language models
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#transfer-learning">
-   Transfer learning
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>High-level overview</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#machine-learning">
-   Machine learning
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#types-of-machine-learning">
-   Types of machine learning
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#deep-learning">
-   Deep learning
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#evaluating-a-model">
-   Evaluating a model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#natural-language-processing">
-   Natural Language Processing
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#language-models">
-   Language models
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#transfer-learning">
-   Transfer learning
-  </a>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>High-level overview</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#machine-learning">Machine learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-machine-learning">Types of machine learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deep-learning">Deep learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluating-a-model">Evaluating a model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#natural-language-processing">Natural Language Processing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#language-models">Language models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transfer-learning">Transfer learning</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section class="tex2jax_ignore mathjax_ignore" id="high-level-overview">
-<h1>High-level overview<a class="headerlink" href="#high-level-overview" title="Permalink to this headline">#</a></h1>
+<h1>High-level overview<a class="headerlink" href="#high-level-overview" title="Link to this heading">#</a></h1>
 <p>This chapter contains a very high-level overview of the topics discussed in this book. It serves both as an introduction for this book as well as a standalone text for those who don’t care about technical details, but want to get a general feel for the field.</p>
 <section id="machine-learning">
-<h2>Machine learning<a class="headerlink" href="#machine-learning" title="Permalink to this headline">#</a></h2>
+<h2>Machine learning<a class="headerlink" href="#machine-learning" title="Link to this heading">#</a></h2>
 <p>Consider the problem of sorting a list of numbers. For example given the list [1, 3, 4, 2, 5] you might want to output the list [1, 2, 3, 4, 5]. It is relatively easy to come up with a series of steps that solves this problem. For example we could repeatedly swap numbers in multiple passes through the list until the list is sorted (this is what BubbleSort does). Sorting a list is therefore a <em>classical problem</em> - you can formally define a series of steps (an <em>algorithm</em>) that solves the problem.</p>
 <p>On the other hand consider the problem of recognizing the category of a document. For example, given an email we might want to tell whether it is spam or not spam. While (<em>most</em>) humans are capable of solving such problems with little effort, it is not at all clear how one would specify a formal series of steps in this case. Imagine trying to explain to someone <em>why</em> you recognized that particular email as a spam. Any description you could come up with would be very fuzzy and informal. You can’t just say that e.g. the presence of “viagra” indicates spam (although such a classifier would probably be not <em>all</em> that terrible). This means that - contrary to the sorting problem - we can’t easily translate such a description into an algorithm. We need a different angle of attack.</p>
 <p>Let us rethink this whole process. When we recognize a spam email, we don’t actually go through a giant checklist that someone specified for us and think “well, yeah there was word X in position Y, therefore since word A is also present in position B the email is spam”. Instead we have <em>learned</em> how spam looks like, because we have observed a lot of spam. This is how we came up with that fuzzy mental image of spam that is so hard to formalize. Basically we think “well this email is very similar to a bunch of spam emails I saw previously and also I learned that these combinations of words might indicate spam, so it is probably spam”.</p>
 <p>Can we replicate something like this when trying to solve such a problem using a computer? It turns out, we can! This is where the area of <strong>machine learning</strong> comes in.</p>
 <p>The basic idea behind machine learning is to solve tasks for which there is no clear solution description by feeding a bunch of <em>data</em> into a mathematical model and letting the model <em>learn</em> the solution. This process is called <em>training</em> the model (or <em>fitting</em> the data). It’s like showing a bunch of cats to a baby and hoping that the baby learns to recognize a cat.</p>
 <p>In order to perform machine learning, we therefore need the following components:</p>
-<ol class="simple">
+<ol class="arabic simple">
 <li><p>A mathematical <em>model</em> that specifies how to transform a given input into the desired output</p></li>
 <li><p>The <em>data</em> we use for training the mathematical <em>model</em></p></li>
 <li><p>A <em>learning algorithm</em> that tells us how to train the model given the data we have</p></li>
@@ -430,14 +422,14 @@ title="Print to PDF"
 <p>Another thing about machine learning is that you should use it when appropriate. Applying it to problems where there already is a formal solution is not a good idea. If you can solve a problem without machine learning, you should!</p>
 </section>
 <section id="types-of-machine-learning">
-<h2>Types of machine learning<a class="headerlink" href="#types-of-machine-learning" title="Permalink to this headline">#</a></h2>
+<h2>Types of machine learning<a class="headerlink" href="#types-of-machine-learning" title="Link to this heading">#</a></h2>
 <p>There are a lot of fancy words being thrown around whenever people talk about machine learning. However most of them actually represent very simple concepts. Note that we focus on the types of machine learning we actually discuss in this book.</p>
 <p>A <strong>supervised learning</strong> task is a task where we need to predict labels given inputs. Therefore the training data has been <em>labeled</em> (or <em>annotated</em>) by a human. For example if we want to differentiate spam from no spam, we would create a dataset containing a bunch of emails labeled “spam” and a bunch of images labeled “no spam”. Then we could train a model on this data set. At inference time such a model could then predict whether an email is “spam” or “no spam”.</p>
 <p><strong>Classification</strong> is a subfield of supervised learning where the labels represent categories. Given a data point, we then want to predict the category of that data point. Our spam recognition problem is an example of <strong>binary classification</strong>, since two classes are present (“spam” or “no spam”). If more than two classes are present, we are dealing with <strong>multiclass classification</strong>. Consider the problem of predicting the class of a news article as either “business”, “sport”, “entertainment” or “politics”. Here we have a multiclass classification problem with four possible classes.</p>
 <p>In <strong>unsupervised learning</strong> the data is not <em>labeled</em> and we want to learn or find useful relationships in the data. For example, given a bunch of documents, we could cluster them according to their similarity. Such clusterization could e.g. reveal different document categories.</p>
 </section>
 <section id="deep-learning">
-<h2>Deep learning<a class="headerlink" href="#deep-learning" title="Permalink to this headline">#</a></h2>
+<h2>Deep learning<a class="headerlink" href="#deep-learning" title="Link to this heading">#</a></h2>
 <p><strong>Deep learning</strong> sounds very - well - <em>deep</em>. However it is nothing more that a subfield of machine learning, where the mathematical model is a so-called <strong>neural network</strong>.</p>
 <p>A <strong>neural network</strong> is a <em>differentiable computational graph</em>. If you a limited technical background, this sounds very scary. But the basic idea is actually fairly simple. Let us walk through the terms one by one.</p>
 <p>A <strong>graph</strong> consists of nodes and edges. The edges connect the nodes. A classical example is a transportation network. Here the nodes might represent cities and the edges roads between the cities. This is how we could visualize such a graph:</p>
@@ -450,7 +442,7 @@ title="Print to PDF"
 <p>Chapter 2 explains how all this functions in great technical detail.</p>
 </section>
 <section id="evaluating-a-model">
-<h2>Evaluating a model<a class="headerlink" href="#evaluating-a-model" title="Permalink to this headline">#</a></h2>
+<h2>Evaluating a model<a class="headerlink" href="#evaluating-a-model" title="Link to this heading">#</a></h2>
 <p>Unless the task at hand is relatively simple, our model is certainly not going to be perfect. Therefore we need to quantify how good it is using an <strong>evaluation metric</strong>. If we have such an evaluation metric we can compare models against each other and pick the best one.</p>
 <p>A very simple (yet very common) evaluation metric used with classification tasks is <strong>accuracy</strong>. We obtain the accuracy of a model on a dataset by simply dividing the number of correct classifications on the dataset by the total number of points in the dataset.</p>
 <p>The astute reader may notice a problem here - <em>which dataset should we use for evaluation</em>? If we use the same dataset we trained on, we run into the problem that such an evaluation is meaningless. Consider a machine learning model that simply remembers all the classes it saw at training time. Such a model would have a perfect accuracy of 1.0 under our definition of accuracy! But of course, as soon it sees data is hasn’t seen before (which is the <em>whole point</em> of doing machine learning), this model will crash and burn. This is an extreme example of <strong>overfitting</strong>. In general overfitting occurs when we accidentally fit a model too close to the idiosyncrasies of a training dataset instead of learning the more general patterns which are present.</p>
@@ -458,7 +450,7 @@ title="Print to PDF"
 <p>Sometimes we need to split the dataset even more. Let’s say we want to train multiple machine learning models and use the best one. If we do the selection using the test dataset, we have the same problem as above - our final evaluation will be too biased towards a particular dataset (the test dataset this time). In such a situation we need to split the dataset into a <strong>training dataset</strong>, a <strong>validation dataset</strong> and a <strong>test dataset</strong>. We train the models on the training dataset. Then we select the model which performs best on the validation dataset. Finally we report the accuracy of that model on the test dataset.</p>
 </section>
 <section id="natural-language-processing">
-<h2>Natural Language Processing<a class="headerlink" href="#natural-language-processing" title="Permalink to this headline">#</a></h2>
+<h2>Natural Language Processing<a class="headerlink" href="#natural-language-processing" title="Link to this heading">#</a></h2>
 <p>Deep Learning has been applied to many fields, but in this book we will focus exclusively on the field of <strong>Natural Language Processing</strong> (NLP for short). After all the title of this book is “Large <em>Language</em> Models” (and not, say “Large <em>Vision</em> Models”). As the name already says, NLP concerns itself with stuying natural language using methods from mathematics and computer science.</p>
 <p>There are many NLP tasks to which deep learning has been applied successfully in the past decades.</p>
 <p>We have already discussed the task of <strong>document classification</strong>, where we want to find the category a document belongs to.</p>
@@ -468,7 +460,7 @@ title="Print to PDF"
 <p>These are only a few examples of problems NLP tries to address. Others include <strong>named entity recognition</strong> (recognizing named entities such as organizations, locations etc), <strong>part-of-speech tagging</strong> (marking words with their corresponding part of speech, like “noun” or “verb”), <strong>semantic similarity</strong> (measuring how close the meaning of two texts is) and many more.</p>
 </section>
 <section id="language-models">
-<h2>Language models<a class="headerlink" href="#language-models" title="Permalink to this headline">#</a></h2>
+<h2>Language models<a class="headerlink" href="#language-models" title="Link to this heading">#</a></h2>
 <p>We will use a very general definition of the term “language model” in this book, namely as a model that takes a text and produces a <em>useful (numerical) representation</em> of that text. As a side note, a lot of other literature uses the term “language model” exclusively for models which are capable of predicting the probabilities of text given some other text. Both definitions are totally fine, just keep in mind that we will stick to the first one.</p>
 <p>This is how it would look like in an image:</p>
 <a class="reference internal image-reference" href="../_images/llm1.png"><img alt="drawing" src="../_images/llm1.png" style="width: 400px;" /></a>
@@ -480,7 +472,7 @@ title="Print to PDF"
 <p>But what if instead of learning the English language from scratch every time we want to do some simple document classification we could create a big model that already <em>understands</em> English language and then just <em>fine-tune</em> it for the respective tasks?</p>
 </section>
 <section id="transfer-learning">
-<h2>Transfer learning<a class="headerlink" href="#transfer-learning" title="Permalink to this headline">#</a></h2>
+<h2>Transfer learning<a class="headerlink" href="#transfer-learning" title="Link to this heading">#</a></h2>
 <p>The core idea behind <strong>transfer learning</strong> is to pretrain the model on a very large general language corpus to give it language understanding and then fine-tune it for the specific task. We essentially do this by splitting the model into a body and a head. The body takes a bunch of text and produces an <em>intermediate numerical representation</em> that is useful for any language task. Such a representation should have a bunch of desirable properties, such as similar texts being mapped to similar representations. This intermediate representation then gets fed into the model head.</p>
 <a class="reference internal image-reference" href="../_images/transfer1.png"><img alt="drawing" src="../_images/transfer1.png" style="width: 600px;" /></a>
 </section>
@@ -498,7 +490,7 @@ title="Print to PDF"
             mode: "python"
         },
         kernelOptions: {
-            kernelName: "python3",
+            name: "python3",
             path: "./chapter1"
         },
         predefinedOutput: true
@@ -506,50 +498,109 @@ title="Print to PDF"
     </script>
     <script>kernelName = 'python3'</script>
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../preface.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Preface</p>
-        </div>
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../preface.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Preface</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="../chapter2/computational_graphs.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="../chapter2/computational_graphs.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Computational graphs and backpropagation</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#machine-learning">Machine learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-machine-learning">Types of machine learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deep-learning">Deep learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluating-a-model">Evaluating a model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#natural-language-processing">Natural Language Processing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#language-models">Language models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transfer-learning">Transfer learning</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
   
-    By Mikhail Berkov<br/>
-  
-      &copy; Copyright 2022.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
+<p class="component-author">
+By Mikhail Berkov
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
 </div>
+          </footer>
+        
 
-
-      </div>
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
-
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>

@@ -8,74 +8,68 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Download this page"
-msgstr "Descarga esta pagina"
-
-msgid "Download notebook file"
-msgstr "Descargar archivo de cuaderno"
+msgid "Theme by the"
+msgstr "Tema por el"
 
 msgid "Open an issue"
 msgstr "Abrir un problema"
 
-msgid "repository"
-msgstr "repositorio"
-
-msgid "Theme by the"
-msgstr "Tema por el"
-
 msgid "Contents"
 msgstr "Contenido"
 
-msgid "next page"
-msgstr "siguiente página"
-
-msgid "Last updated on"
-msgstr "Ultima actualización en"
-
-msgid "Launch"
-msgstr "Lanzamiento"
-
-msgid "Edit this page"
-msgstr "Edita esta página"
-
-msgid "Source repository"
-msgstr "Repositorio de origen"
-
-msgid "Download source file"
-msgstr "Descargar archivo fuente"
+msgid "Download notebook file"
+msgstr "Descargar archivo de cuaderno"
 
 msgid "Sphinx Book Theme"
 msgstr "Tema del libro de la esfinge"
 
-msgid "Copyright"
-msgstr "Derechos de autor"
-
 msgid "Fullscreen mode"
 msgstr "Modo de pantalla completa"
 
-msgid "Search the docs ..."
-msgstr "Buscar los documentos ..."
-
-msgid "suggest edit"
-msgstr "sugerir editar"
-
-msgid "Search this book..."
-msgstr "Buscar este libro ..."
+msgid "Edit this page"
+msgstr "Edita esta página"
 
 msgid "By"
 msgstr "Por"
 
-msgid "open issue"
-msgstr "Tema abierto"
+msgid "Copyright"
+msgstr "Derechos de autor"
 
-msgid "Print to PDF"
-msgstr "Imprimir en PDF"
+msgid "Source repository"
+msgstr "Repositorio de origen"
 
 msgid "previous page"
 msgstr "pagina anterior"
 
+msgid "next page"
+msgstr "siguiente página"
+
 msgid "Toggle navigation"
 msgstr "Navegación de palanca"
 
+msgid "repository"
+msgstr "repositorio"
+
+msgid "suggest edit"
+msgstr "sugerir editar"
+
+msgid "open issue"
+msgstr "Tema abierto"
+
+msgid "Launch"
+msgstr "Lanzamiento"
+
+msgid "Print to PDF"
+msgstr "Imprimir en PDF"
+
 msgid "By the"
 msgstr "Por el"
+
+msgid "Last updated on"
+msgstr "Ultima actualización en"
+
+msgid "Download source file"
+msgstr "Descargar archivo fuente"
+
+msgid "Download this page"
+msgstr "Descarga esta pagina"

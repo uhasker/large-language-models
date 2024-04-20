@@ -5,8 +5,5 @@ root: preface
 chapters:
   - file: chapter1/high_level_overview
   - file: chapter2/computational_graphs
-  - file: chapter3/deep_learning_concepts
-  - file: chapter4/context_free_embeddings
-  - file: chapter5/encoder
-  - file: chapter6/decoder
-  - file: chapter7/finetuning
+  - file: chapter5/attention
+  - file: chapter6/gpt2

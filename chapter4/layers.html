@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Linear Layer &#8212; Large Language Models</title>
+    <title>Layers &#8212; Large Language Models</title>
   
   
   
@@ -57,6 +57,8 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapter4/layers';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -183,10 +185,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../chapter1/high_level_overview.html">High-level overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter2/tokenizer.html">Tokenization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter3/computational_graphs.html">Computational Graphs and Backpropagation</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Linear Layer</a></li>
-
-
-
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter5/attention.html">Attention</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter6/gpt2.html">Deep Dive Into GPT-2</a></li>
 </ul>
@@ -374,7 +373,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Linear Layer</h1>
+    <h1>Layers</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -384,12 +383,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Linear Layer</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#activation-functions">Activation Functions</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#dropout-layer">Dropout Layer</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#layer-normalization">Layer Normalization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-layer">Linear Layer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#activation-functions">Activation Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dropout-layer">Dropout Layer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#layer-normalization">Layer Normalization</a></li>
 </ul>
-
             </nav>
         </div>
     </div>
@@ -400,9 +398,14 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <div class="cell docutils container">
+  <section class="tex2jax_ignore mathjax_ignore" id="layers">
+<h1>Layers<a class="headerlink" href="#layers" title="Link to this heading">#</a></h1>
+<p>Import the following:</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 </pre></div>
 </div>
@@ -414,9 +417,12 @@ document.write(`
 </div>
 </div>
 </div>
+<p>Apart from the basic nodes we encountered in the previous chapter, pytorch also provides a bunch of more complex <em>layers</em> located in torch.nn which encapsulate one or more nodes. Essentially you can think of such a layer as a subgraph of the computation graph.</p>
 <section id="linear-layer">
-<h1>Linear Layer<a class="headerlink" href="#linear-layer" title="Link to this heading">#</a></h1>
-<p>A linear layer is simply a linear transformation of input represented by matrix multiplication:</p>
+<h2>Linear Layer<a class="headerlink" href="#linear-layer" title="Link to this heading">#</a></h2>
+<p>One of the simplest and most important layers is the linear layer. This layer takes an input tensor <span class="math notranslate nohighlight">\(\vec{x}\)</span> and produces an output tensor <span class="math notranslate nohighlight">\(\vec{y} = W\vec{x} + \vec{b}\)</span>.</p>
+<p>Whenever you are looking at a node or a layer, it is very helpful to think about the dimensionalities of the tensors involved. Consider an example, where <span class="math notranslate nohighlight">\(\vec{x}\)</span> has 3 features, i.e. <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^{3}\)</span>. Let <span class="math notranslate nohighlight">\(\vec{y}\)</span> be a probability distribution over <span class="math notranslate nohighlight">\(10\)</span> classes, i.e. <span class="math notranslate nohighlight">\(\vec{y} \in \mathbb{R}^{5}\)</span>. Then we have <span class="math notranslate nohighlight">\(W \in \mathbb{R}^{5 \times 3}\)</span> and <span class="math notranslate nohighlight">\(\vec{b} \in \mathbb{R}^{3}\)</span> (otherwise the dimensions won’t match).</p>
+<p>This is how the above example would look in code:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d_in</span> <span class="o">=</span> <span class="mi">3</span>
@@ -424,15 +430,55 @@ document.write(`
 
 <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_in</span><span class="p">)</span>
 
-<span class="n">layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">d_in</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="n">d_out</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s inspect the input vector:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.0605, -0.0870,  0.5846])
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="n">y</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([3])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let us also inspect the output vector:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.1337, -0.1797, -0.2310,  0.8908,  0.4960], grad_fn=&lt;AddBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Indeed we see that <span class="math notranslate nohighlight">\(W \in \mathbb{R}^{3 \times 5}\)</span> and <span class="math notranslate nohighlight">\(\vec{b} \in \mathbb{R}^{5}\)</span>.</p>
+<p>Put more generally if we have an input vector <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^d\)</span>, the linear layer with parameters <span class="math notranslate nohighlight">\(W \in \mathbb{R}^{k \times d}\)</span> and <span class="math notranslate nohighlight">\(\vec{b} \in \mathbb{R}^k\)</span> will compute an output vector <span class="math notranslate nohighlight">\(\vec{y} \in \mathbb{R}^k\)</span>. Always keep thinking about tensor dimensionalities - this is the only way to <em>really</em> understand a node or layer computation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -442,18 +488,7 @@ document.write(`
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.2268, -0.7855, -0.0630, -1.2706,  0.2759], grad_fn=&lt;AddBackward0&gt;)
-</pre></div>
-</div>
-</div>
-</div>
+<p>We can also manually verify the calculations:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">layer</span><span class="o">.</span><span class="n">weight</span>
@@ -462,11 +497,11 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Parameter containing:
-tensor([[ 0.4133,  0.5473, -0.2960],
-        [ 0.0238,  0.1348,  0.1353],
-        [ 0.0150,  0.0207, -0.2698],
-        [-0.1738,  0.5308,  0.2764],
-        [ 0.4114,  0.3917,  0.0429]], requires_grad=True)
+tensor([[-0.3649, -0.1443,  0.1803],
+        [ 0.2821,  0.0146,  0.5503],
+        [ 0.3712,  0.1261, -0.1212],
+        [ 0.3426, -0.3742,  0.5228],
+        [ 0.3600, -0.1733, -0.1145]], requires_grad=True)
 </pre></div>
 </div>
 </div>
@@ -491,7 +526,7 @@ tensor([[ 0.4133,  0.5473, -0.2960],
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Parameter containing:
-tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
+tensor([ 0.0378, -0.5172, -0.1716,  0.5320,  0.5261], requires_grad=True)
 </pre></div>
 </div>
 </div>
@@ -515,7 +550,7 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.2268, -0.7855, -0.0630, -1.2706,  0.2759], grad_fn=&lt;AddBackward0&gt;)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.1337, -0.1797, -0.2310,  0.8908,  0.4960], grad_fn=&lt;AddBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -545,22 +580,49 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </section>
 <section id="activation-functions">
-<h1>Activation Functions<a class="headerlink" href="#activation-functions" title="Link to this heading">#</a></h1>
+<h2>Activation Functions<a class="headerlink" href="#activation-functions" title="Link to this heading">#</a></h2>
+<p>Remember how we talk about <em>deep</em> learning all the time? That is because usually we have multiple layers following each other. The idea is that each layer learns progressively more complex features. For example the first layer might learn how individual words interact with each other, the second layer might look at word groups and the third layer might look at sentences. Note that this just an example - in practice the layers much more complicated features that can’t be easily described (this is also one of their drawbacks). How would we go about constructing such a <em>deep</em> network?</p>
+<p>Unfortunately, we cannot just put linear layers on top of each other. Consider two linear layers, which compute <span class="math notranslate nohighlight">\(\vec{h} = W\vec{x} + \vec{b}\)</span> and <span class="math notranslate nohighlight">\(\vec{y} = V\vec{h} + \vec{c}\)</span> respectively. Then we would have <span class="math notranslate nohighlight">\(\vec{y} = V\vec{h} + \vec{c} = V(W\vec{x} + \vec{b} + \vec{c}) = VW\vec{x} + V\vec{b} + \vec{c}\)</span>. Denote <span class="math notranslate nohighlight">\(U = VW\)</span> and <span class="math notranslate nohighlight">\(\vec{d} = V\vec{b} + \vec{c}\)</span> and we get <span class="math notranslate nohighlight">\(\vec{y} = U\vec{x} + \vec{c}\)</span>. Therefore the composition of two linear layers is again a linear layer! If you know your linear algebra, the above computation was a trivial exercise, but it reveals an important truth. We need to go beyond linearities to obtain models with rich capabilities.</p>
+<p>To solve this problem, we introduce a nonlinear <em>activation function</em> between the layers to break the linearity. That is, the first layer computes <span class="math notranslate nohighlight">\(\vec{h} = f(W\vec{x} + \vec{b})\)</span> (where <span class="math notranslate nohighlight">\(f\)</span> works elementwise). The composition will no longer be a linear layer.</p>
+<p>Now we need to actually define the activation function. We could use the sigmoid from chapter 2. However this function has a problem which we can see if we look at the graph of its derivative:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">GELU</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigmoid_derivative_xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="n">sigmoid_derivative_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sigmoid_derivative_xs</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sigmoid_derivative_xs</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sigmoid_derivative_xs</span><span class="p">,</span> <span class="n">sigmoid_derivative_ys</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(torch.nn.modules.activation.ReLU, torch.nn.modules.activation.GELU)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fa2d7e40730&gt;]
+</pre></div>
+</div>
+<img alt="../_images/d1178daa712e0417e85bf36d38079bc659bd0ea5cf5a4ee7e5b08783418ffa55.png" src="../_images/d1178daa712e0417e85bf36d38079bc659bd0ea5cf5a4ee7e5b08783418ffa55.png" />
+</div>
+</div>
+<p>The derivative of the sigmoid function is very close to <span class="math notranslate nohighlight">\(0\)</span> outside of a relatively small input range. Why is this a problem? Let us say that during backpropagation the sigmoid node gets a derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span>. It will then backpropagate the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial z} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial z}\)</span>. But since <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z}\)</span> will be approximately <span class="math notranslate nohighlight">\(0\)</span>, the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial z}\)</span> will be approximately <span class="math notranslate nohighlight">\(0\)</span> as well. The derivative (and therefore the error signal) will be lost.</p>
+<p>Just as a side note, the above explanation is one of the reasons why it so important to actually understand what backpropagation does on a technical level even though you will probably never need to implement it. It would be very hard to grasp why sigmoids are a bad idea for activation functions unless you have the technical understanding. This is not the last time we will encounter a problem that has its root in the way backpropagation works.</p>
+<p>Executive summary - we need a different activation function that does not have such a small “good” range of inputs. A very simple way to address this is to simply take the identity function and cut off half the input range resulting in <span class="math notranslate nohighlight">\(\max(0, x)\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">relu_xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="n">relu_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">relu_xs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">relu_xs</span><span class="p">,</span> <span class="n">relu_ys</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fa2d7b6aa00&gt;]
+</pre></div>
 </div>
+<img alt="../_images/5e246e894c97d60548189ef3d7285426611dc7a94d6304e654fc8d473e699965.png" src="../_images/5e246e894c97d60548189ef3d7285426611dc7a94d6304e654fc8d473e699965.png" />
+</div>
+</div>
+<p>The derivative is <span class="math notranslate nohighlight">\(0\)</span> if <span class="math notranslate nohighlight">\(x &lt; 0\)</span> and <span class="math notranslate nohighlight">\(1\)</span> if <span class="math notranslate nohighlight">\(x &gt; 0\)</span>. We still lose half the input range, but the crucial point is that as long as <span class="math notranslate nohighlight">\(x &gt; 0\)</span> we are fine. Interestingly this function is not called the “most lazy activation possible” but has the fancy name <strong>Rectified Linear Unit</strong> (ReLU for short). Not only is this function very ~~lazy~~ simple, but it works extremely well in practice. So well in fact, that it is the default activation function people go with when creating neural networks. It is hard to overstate how much ReLU is used in deep learning nowadays.</p>
 </section>
 <section id="dropout-layer">
-<h1>Dropout Layer<a class="headerlink" href="#dropout-layer" title="Link to this heading">#</a></h1>
+<h2>Dropout Layer<a class="headerlink" href="#dropout-layer" title="Link to this heading">#</a></h2>
+<p>The dropout layer randomly zeroes some of the elements of the input tensor with probability <code class="docutils literal notranslate"><span class="pre">p</span></code>. This can be used to prevent overfitting:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dropout_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
@@ -571,7 +633,7 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([0.0603, 0.1740, 2.8637])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.9052,  0.7360, -0.2161])
 </pre></div>
 </div>
 </div>
@@ -583,7 +645,7 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([0.1207, 0.3481, 0.0000])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([1.8105, 0.0000, -0.0000])
 </pre></div>
 </div>
 </div>
@@ -596,10 +658,10 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.1430, -0.6931,  1.3882],
-        [ 1.0126, -1.0956,  0.1840],
-        [-0.3753,  0.4310,  0.0910],
-        [ 0.7905,  0.3532,  0.7112]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.4745, -1.2671, -1.9323],
+        [ 0.4569, -0.9602, -1.7031],
+        [-0.8139, -1.7166, -0.4676],
+        [-1.3465, -0.8483,  0.3969]])
 </pre></div>
 </div>
 </div>
@@ -611,17 +673,18 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.2860, -1.3861,  2.7764],
-        [ 2.0252, -2.1912,  0.3680],
-        [-0.0000,  0.0000,  0.0000],
-        [ 0.0000,  0.0000,  0.0000]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.9491, -2.5342, -3.8647],
+        [ 0.9137, -0.0000, -3.4061],
+        [-0.0000, -3.4332, -0.9353],
+        [-0.0000, -1.6966,  0.0000]])
 </pre></div>
 </div>
 </div>
 </div>
 </section>
 <section id="layer-normalization">
-<h1>Layer Normalization<a class="headerlink" href="#layer-normalization" title="Link to this heading">#</a></h1>
+<h2>Layer Normalization<a class="headerlink" href="#layer-normalization" title="Link to this heading">#</a></h2>
+<p>Layer normalization helps stabilize training:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batch_dim</span><span class="p">,</span> <span class="n">d_in</span><span class="p">)</span>
@@ -630,10 +693,10 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.3365,  1.1115,  1.6519],
-        [ 0.0853,  0.4104, -0.2491],
-        [-0.3958, -0.8454,  1.4682],
-        [ 1.3806,  0.3925, -1.1529]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.2732, -0.3237,  1.5711],
+        [-3.4719, -0.8233,  0.9711],
+        [-0.8299, -0.9363, -0.0366],
+        [ 1.1419, -1.0564, -0.0372]])
 </pre></div>
 </div>
 </div>
@@ -646,10 +709,10 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1.0333],
-        [0.0822],
-        [0.0757],
-        [0.2067]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-0.0086],
+        [-1.1080],
+        [-0.6009],
+        [ 0.0161]])
 </pre></div>
 </div>
 </div>
@@ -662,10 +725,10 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.4371],
-        [0.1087],
-        [1.5049],
-        [1.6306]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[2.0969],
+        [4.9959],
+        [0.2417],
+        [1.2103]])
 </pre></div>
 </div>
 </div>
@@ -684,10 +747,10 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.0539,  0.1183,  0.9356],
-        [ 0.0094,  0.9953, -1.0047],
-        [-0.3843, -0.7508,  1.1351],
-        [ 0.9193,  0.1455, -1.0648]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-0.8733, -0.2176,  1.0909],
+        [-1.0576,  0.1274,  0.9302],
+        [-0.4658, -0.6821,  1.1479],
+        [ 1.0233, -0.9749, -0.0484]])
 </pre></div>
 </div>
 </div>
@@ -699,10 +762,10 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-7.9473e-08],
-        [ 0.0000e+00],
-        [ 0.0000e+00],
-        [-3.9736e-08]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.0000e+00],
+        [-1.9868e-08],
+        [-1.1921e-07],
+        [ 4.9671e-09]])
 </pre></div>
 </div>
 </div>
@@ -748,10 +811,10 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.2907,  0.1449,  1.1458],
-        [ 0.0115,  1.2189, -1.2304],
-        [-0.4707, -0.9196,  1.3903],
-        [ 1.1259,  0.1782, -1.3041]], grad_fn=&lt;NativeLayerNormBackward0&gt;)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.0695, -0.2665,  1.3361],
+        [-1.2953,  0.1560,  1.1393],
+        [-0.5705, -0.8354,  1.4059],
+        [ 1.2533, -1.1940, -0.0593]], grad_fn=&lt;NativeLayerNormBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -764,13 +827,14 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1.0000],
-        [0.9999],
         [1.0000],
+        [0.9999],
         [1.0000]], grad_fn=&lt;VarBackward0&gt;)
 </pre></div>
 </div>
 </div>
 </div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -837,12 +901,11 @@ tensor([ 0.5601, -0.5368, -0.1843, -0.2247,  0.5605], requires_grad=True)
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Linear Layer</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#activation-functions">Activation Functions</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#dropout-layer">Dropout Layer</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#layer-normalization">Layer Normalization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-layer">Linear Layer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#activation-functions">Activation Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dropout-layer">Dropout Layer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#layer-normalization">Layer Normalization</a></li>
 </ul>
-
   </nav></div>
 
 </div></div>

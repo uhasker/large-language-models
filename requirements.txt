@@ -1,5 +1,7 @@
 jupyter-book
+notebook
 numpy==1.22.3
 torch==1.11.0
 transformers==4.18.0
 matplotlib==3.5.1
+tiktoken

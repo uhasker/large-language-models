@@ -4,6 +4,8 @@ format: jb-book
 root: preface
 chapters:
   - file: chapter1/high_level_overview
-  - file: chapter2/computational_graphs
+  - file: chapter2/tokenizer
+  - file: chapter3/computational_graphs
+  - file: chapter4/layers
   - file: chapter5/attention
   - file: chapter6/gpt2

@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
@@ -180,7 +180,7 @@
         </ul>
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../chapter1/high_level_overview.html">High-level overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../chapter2/tokenizer.html">Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter2/tokenization.html">Tokenization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter3/computational_graphs.html">Computational Graphs and Backpropagation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter4/layers.html">Layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter5/attention.html">Attention</a></li>
@@ -425,223 +425,220 @@ document.write(`
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   0%|          | 0.00/523M [00:00&lt;?, ?B/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   1%|          | 6.02M/523M [00:00&lt;00:08, 63.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   1%|          | 5.10M/523M [00:00&lt;00:10, 53.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   3%|▎         | 13.2M/523M [00:00&lt;00:07, 70.4MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   2%|▏         | 11.5M/523M [00:00&lt;00:08, 61.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   4%|▍         | 20.5M/523M [00:00&lt;00:07, 73.0MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   3%|▎         | 18.0M/523M [00:00&lt;00:08, 64.4MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   5%|▌         | 27.7M/523M [00:00&lt;00:07, 74.0MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   5%|▍         | 24.4M/523M [00:00&lt;00:07, 65.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   7%|▋         | 34.9M/523M [00:00&lt;00:06, 74.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   6%|▌         | 30.6M/523M [00:00&lt;00:08, 64.3MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   8%|▊         | 42.1M/523M [00:00&lt;00:06, 74.9MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   7%|▋         | 36.8M/523M [00:00&lt;00:08, 63.1MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   9%|▉         | 49.3M/523M [00:00&lt;00:06, 75.1MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   8%|▊         | 44.1M/523M [00:00&lt;00:07, 67.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  11%|█         | 56.5M/523M [00:00&lt;00:06, 75.3MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  10%|▉         | 51.7M/523M [00:00&lt;00:06, 71.2MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  12%|█▏        | 63.7M/523M [00:00&lt;00:06, 75.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  11%|█▏        | 59.2M/523M [00:00&lt;00:06, 73.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  14%|█▎        | 70.9M/523M [00:01&lt;00:06, 75.4MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  13%|█▎        | 66.5M/523M [00:01&lt;00:06, 74.4MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  15%|█▍        | 78.1M/523M [00:01&lt;00:06, 75.3MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  14%|█▍        | 74.0M/523M [00:01&lt;00:06, 75.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  16%|█▋        | 85.3M/523M [00:01&lt;00:06, 75.3MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  16%|█▌        | 81.5M/523M [00:01&lt;00:06, 76.7MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  18%|█▊        | 92.5M/523M [00:01&lt;00:06, 75.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  17%|█▋        | 88.9M/523M [00:01&lt;00:05, 77.0MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  19%|█▉        | 99.7M/523M [00:01&lt;00:05, 75.0MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  18%|█▊        | 96.5M/523M [00:01&lt;00:05, 77.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  20%|██        | 107M/523M [00:01&lt;00:05, 74.9MB/s] 
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  20%|█▉        | 104M/523M [00:01&lt;00:05, 77.7MB/s] 
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  22%|██▏       | 114M/523M [00:01&lt;00:05, 74.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  21%|██▏       | 111M/523M [00:01&lt;00:05, 77.8MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  23%|██▎       | 121M/523M [00:01&lt;00:05, 74.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  23%|██▎       | 119M/523M [00:01&lt;00:05, 78.0MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  25%|██▍       | 128M/523M [00:01&lt;00:05, 74.4MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  24%|██▍       | 126M/523M [00:01&lt;00:05, 78.2MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  26%|██▌       | 135M/523M [00:01&lt;00:05, 74.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  26%|██▌       | 134M/523M [00:01&lt;00:05, 78.3MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  27%|██▋       | 142M/523M [00:02&lt;00:05, 74.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  27%|██▋       | 141M/523M [00:02&lt;00:05, 78.3MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  29%|██▊       | 150M/523M [00:02&lt;00:05, 74.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  28%|██▊       | 149M/523M [00:02&lt;00:05, 74.1MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  30%|███       | 157M/523M [00:02&lt;00:05, 75.1MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  30%|██▉       | 156M/523M [00:02&lt;00:05, 75.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  31%|███▏      | 164M/523M [00:02&lt;00:04, 75.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  31%|███▏      | 164M/523M [00:02&lt;00:04, 76.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  33%|███▎      | 171M/523M [00:02&lt;00:04, 75.8MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  33%|███▎      | 171M/523M [00:02&lt;00:04, 76.9MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  34%|███▍      | 179M/523M [00:02&lt;00:04, 76.0MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  34%|███▍      | 179M/523M [00:02&lt;00:04, 77.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  36%|███▌      | 186M/523M [00:02&lt;00:04, 76.1MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  36%|███▌      | 186M/523M [00:02&lt;00:04, 77.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  37%|███▋      | 193M/523M [00:02&lt;00:04, 76.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  37%|███▋      | 194M/523M [00:02&lt;00:04, 77.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  38%|███▊      | 201M/523M [00:02&lt;00:04, 76.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  38%|███▊      | 201M/523M [00:02&lt;00:04, 77.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  40%|███▉      | 208M/523M [00:02&lt;00:04, 76.4MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  40%|███▉      | 209M/523M [00:02&lt;00:04, 77.9MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  41%|████      | 215M/523M [00:03&lt;00:04, 76.4MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  41%|████▏     | 216M/523M [00:03&lt;00:04, 77.8MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  43%|████▎     | 223M/523M [00:03&lt;00:04, 76.3MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  43%|████▎     | 223M/523M [00:03&lt;00:04, 77.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  44%|████▍     | 230M/523M [00:03&lt;00:04, 75.9MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  44%|████▍     | 231M/523M [00:03&lt;00:03, 77.3MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  45%|████▌     | 237M/523M [00:03&lt;00:03, 75.8MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  46%|████▌     | 238M/523M [00:03&lt;00:03, 77.3MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  47%|████▋     | 244M/523M [00:03&lt;00:03, 75.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  47%|████▋     | 246M/523M [00:03&lt;00:03, 77.4MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  48%|████▊     | 251M/523M [00:03&lt;00:03, 75.6MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  48%|████▊     | 253M/523M [00:03&lt;00:03, 77.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  49%|████▉     | 259M/523M [00:03&lt;00:03, 75.6MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  50%|████▉     | 260M/523M [00:03&lt;00:03, 77.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  51%|█████     | 266M/523M [00:03&lt;00:03, 75.3MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  51%|█████▏    | 268M/523M [00:03&lt;00:03, 77.9MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  52%|█████▏    | 273M/523M [00:03&lt;00:03, 75.4MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  53%|█████▎    | 275M/523M [00:03&lt;00:03, 77.8MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  54%|█████▎    | 280M/523M [00:03&lt;00:03, 74.8MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  54%|█████▍    | 283M/523M [00:03&lt;00:03, 78.0MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  55%|█████▍    | 287M/523M [00:04&lt;00:03, 71.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  56%|█████▌    | 290M/523M [00:04&lt;00:03, 78.4MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  56%|█████▋    | 294M/523M [00:04&lt;00:03, 70.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  57%|█████▋    | 298M/523M [00:04&lt;00:03, 77.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  58%|█████▊    | 302M/523M [00:04&lt;00:03, 72.1MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  58%|█████▊    | 305M/523M [00:04&lt;00:02, 77.8MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  59%|█████▉    | 309M/523M [00:04&lt;00:03, 73.0MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  60%|█████▉    | 313M/523M [00:04&lt;00:02, 77.8MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  60%|██████    | 316M/523M [00:04&lt;00:02, 73.1MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  61%|██████▏   | 320M/523M [00:04&lt;00:02, 77.8MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  62%|██████▏   | 323M/523M [00:04&lt;00:02, 71.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  63%|██████▎   | 328M/523M [00:04&lt;00:02, 78.1MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  63%|██████▎   | 329M/523M [00:04&lt;00:02, 70.6MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  64%|██████▍   | 335M/523M [00:04&lt;00:02, 77.9MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  64%|██████▍   | 337M/523M [00:04&lt;00:02, 71.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  66%|██████▌   | 343M/523M [00:04&lt;00:02, 78.0MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  66%|██████▌   | 344M/523M [00:04&lt;00:02, 72.6MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  67%|██████▋   | 350M/523M [00:04&lt;00:02, 78.3MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  67%|██████▋   | 351M/523M [00:04&lt;00:02, 73.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  68%|██████▊   | 358M/523M [00:04&lt;00:02, 78.1MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  68%|██████▊   | 358M/523M [00:05&lt;00:02, 73.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  70%|██████▉   | 365M/523M [00:05&lt;00:02, 77.9MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  70%|██████▉   | 365M/523M [00:05&lt;00:02, 73.8MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  71%|███████▏  | 372M/523M [00:05&lt;00:02, 77.4MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  71%|███████   | 372M/523M [00:05&lt;00:02, 74.3MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  73%|███████▎  | 380M/523M [00:05&lt;00:01, 77.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  73%|███████▎  | 379M/523M [00:05&lt;00:02, 74.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  74%|███████▍  | 387M/523M [00:05&lt;00:01, 78.0MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  74%|███████▍  | 387M/523M [00:05&lt;00:01, 74.6MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  76%|███████▌  | 395M/523M [00:05&lt;00:01, 78.2MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  75%|███████▌  | 394M/523M [00:05&lt;00:01, 74.6MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  77%|███████▋  | 402M/523M [00:05&lt;00:01, 78.2MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  77%|███████▋  | 401M/523M [00:05&lt;00:01, 75.0MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  78%|███████▊  | 410M/523M [00:05&lt;00:01, 78.2MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  78%|███████▊  | 408M/523M [00:05&lt;00:01, 75.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  80%|███████▉  | 417M/523M [00:05&lt;00:01, 78.6MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  79%|███████▉  | 415M/523M [00:05&lt;00:01, 75.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  81%|████████▏ | 425M/523M [00:05&lt;00:01, 77.7MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  81%|████████  | 423M/523M [00:05&lt;00:01, 75.4MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  83%|████████▎ | 432M/523M [00:05&lt;00:01, 67.2MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  82%|████████▏ | 430M/523M [00:06&lt;00:01, 75.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  84%|████████▍ | 440M/523M [00:06&lt;00:01, 69.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  84%|████████▎ | 437M/523M [00:06&lt;00:01, 75.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  86%|████████▌ | 447M/523M [00:06&lt;00:01, 71.8MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  85%|████████▌ | 444M/523M [00:06&lt;00:01, 75.9MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  87%|████████▋ | 454M/523M [00:06&lt;00:00, 73.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  86%|████████▋ | 452M/523M [00:06&lt;00:00, 76.0MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  88%|████████▊ | 462M/523M [00:06&lt;00:00, 74.9MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  88%|████████▊ | 459M/523M [00:06&lt;00:00, 75.8MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  90%|████████▉ | 469M/523M [00:06&lt;00:00, 76.0MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  89%|████████▉ | 466M/523M [00:06&lt;00:00, 74.8MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  91%|█████████ | 477M/523M [00:06&lt;00:00, 76.8MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  91%|█████████ | 473M/523M [00:06&lt;00:00, 74.9MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  93%|█████████▎| 484M/523M [00:06&lt;00:00, 77.5MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  92%|█████████▏| 480M/523M [00:06&lt;00:00, 75.1MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  94%|█████████▍| 492M/523M [00:06&lt;00:00, 77.7MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  93%|█████████▎| 488M/523M [00:06&lt;00:00, 75.5MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  96%|█████████▌| 499M/523M [00:06&lt;00:00, 78.1MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  95%|█████████▍| 495M/523M [00:06&lt;00:00, 75.6MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  97%|█████████▋| 507M/523M [00:06&lt;00:00, 78.2MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  96%|█████████▌| 502M/523M [00:07&lt;00:00, 75.8MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  98%|█████████▊| 514M/523M [00:07&lt;00:00, 78.2MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  97%|█████████▋| 510M/523M [00:07&lt;00:00, 75.2MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|█████████▉| 522M/523M [00:07&lt;00:00, 78.3MB/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  99%|█████████▉| 517M/523M [00:07&lt;00:00, 74.9MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|██████████| 523M/523M [00:07&lt;00:00, 74.7MB/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|██████████| 523M/523M [00:07&lt;00:00, 76.0MB/s]
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>

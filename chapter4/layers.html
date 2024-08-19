@@ -187,7 +187,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../chapter3/computational_graphs.html">Computational Graphs and Backpropagation</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter5/attention.html">Attention</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../chapter6/gpt2.html">Deep Dive Into GPT-2</a></li>
 </ul>
 
     </div>
@@ -444,7 +443,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 1.6130, -0.0086, -1.7295])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([0.2461, 1.8229, 0.3914])
 </pre></div>
 </div>
 </div>
@@ -469,7 +468,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 1.7337,  1.2870,  1.4104, -0.2491,  0.6380], grad_fn=&lt;AddBackward0&gt;)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-1.0154,  0.6198, -0.0177, -1.3216,  0.3391], grad_fn=&lt;AddBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -497,11 +496,11 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Parameter containing:
-tensor([[ 0.4559, -0.4197, -0.4849],
-        [ 0.5245,  0.0408, -0.1593],
-        [ 0.5458,  0.1350, -0.3073],
-        [-0.1972, -0.2739,  0.0120],
-        [ 0.2424,  0.1800, -0.1335]], requires_grad=True)
+tensor([[-0.4332, -0.2671,  0.0525],
+        [ 0.4547,  0.2366,  0.4876],
+        [ 0.0400,  0.1332, -0.4513],
+        [-0.0461, -0.5181, -0.2737],
+        [ 0.2852,  0.0881,  0.1466]], requires_grad=True)
 </pre></div>
 </div>
 </div>
@@ -526,7 +525,7 @@ tensor([[ 0.4559, -0.4197, -0.4849],
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Parameter containing:
-tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
+tensor([-0.4425, -0.1142, -0.0938, -0.2587,  0.0510], requires_grad=True)
 </pre></div>
 </div>
 </div>
@@ -550,7 +549,7 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 1.7337,  1.2870,  1.4104, -0.2491,  0.6380], grad_fn=&lt;AddBackward0&gt;)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-1.0154,  0.6198, -0.0177, -1.3216,  0.3391], grad_fn=&lt;AddBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -594,7 +593,7 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f40183ffa00&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f8eb8b419a0&gt;]
 </pre></div>
 </div>
 <img alt="../_images/d1178daa712e0417e85bf36d38079bc659bd0ea5cf5a4ee7e5b08783418ffa55.png" src="../_images/d1178daa712e0417e85bf36d38079bc659bd0ea5cf5a4ee7e5b08783418ffa55.png" />
@@ -612,7 +611,7 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f40182ecc10&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f8eb8aadb50&gt;]
 </pre></div>
 </div>
 <img alt="../_images/5e246e894c97d60548189ef3d7285426611dc7a94d6304e654fc8d473e699965.png" src="../_images/5e246e894c97d60548189ef3d7285426611dc7a94d6304e654fc8d473e699965.png" />
@@ -633,7 +632,7 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-0.6590, -0.9719, -0.3535])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-0.6706, -0.3817, -0.3032])
 </pre></div>
 </div>
 </div>
@@ -645,7 +644,7 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-0.0000, -1.9437, -0.0000])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-1.3412, -0.7634, -0.0000])
 </pre></div>
 </div>
 </div>
@@ -658,10 +657,10 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.0468, -0.2878, -0.6381],
-        [-0.4780, -0.7942, -0.3585],
-        [-1.3453, -1.2013, -0.2220],
-        [-1.4258,  0.0674,  0.1264]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-0.6771, -1.6871,  0.1642],
+        [ 0.8497, -1.0195, -0.9591],
+        [-0.5699, -0.5884, -0.0932],
+        [-0.0665,  0.6608,  1.4546]])
 </pre></div>
 </div>
 </div>
@@ -673,10 +672,10 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-0.0000, -0.5755, -0.0000],
-        [-0.0000, -1.5885, -0.0000],
-        [-0.0000, -0.0000, -0.4441],
-        [-2.8515,  0.1347,  0.0000]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.3542, -0.0000,  0.0000],
+        [ 0.0000, -2.0390, -1.9183],
+        [-0.0000, -1.1768, -0.1865],
+        [-0.1331,  0.0000,  2.9093]])
 </pre></div>
 </div>
 </div>
@@ -693,10 +692,10 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-0.7680, -0.4309, -0.4566],
-        [-1.7748,  1.8406,  1.1483],
-        [-0.2132, -0.5244, -0.2482],
-        [-1.2514, -0.7626,  1.2328]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.3331,  1.4546,  0.8522],
+        [ 1.2329, -1.9156, -1.0723],
+        [-0.7424, -0.7055, -0.5797],
+        [-0.1368,  0.4155,  1.4341]])
 </pre></div>
 </div>
 </div>
@@ -709,10 +708,10 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-0.5518],
-        [ 0.4047],
-        [-0.3286],
-        [-0.2604]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.3245],
+        [-0.5850],
+        [-0.6759],
+        [ 0.5709]])
 </pre></div>
 </div>
 </div>
@@ -725,10 +724,10 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.0352],
-        [3.6824],
-        [0.0291],
-        [1.7320]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[2.1516],
+        [2.6562],
+        [0.0073],
+        [0.6350]])
 </pre></div>
 </div>
 </div>
@@ -747,10 +746,10 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.1520,  0.6443,  0.5077],
-        [-1.1358,  0.7483,  0.3875],
-        [ 0.6771, -1.1486,  0.4715],
-        [-0.7530, -0.3816,  1.1346]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.1301,  0.7704,  0.3597],
+        [ 1.1154, -0.8164, -0.2990],
+        [-0.7798, -0.3476,  1.1274],
+        [-0.8881, -0.1951,  1.0832]])
 </pre></div>
 </div>
 </div>
@@ -762,10 +761,10 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-3.9736e-08],
-        [-9.9341e-09],
-        [ 1.3908e-07],
-        [ 3.9736e-08]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[9.9341e-09],
+        [0.0000e+00],
+        [9.5367e-07],
+        [0.0000e+00]])
 </pre></div>
 </div>
 </div>
@@ -811,10 +810,10 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.4106,  0.7890,  0.6216],
-        [-1.3910,  0.9164,  0.4746],
-        [ 0.8290, -1.4064,  0.5773],
-        [-0.9222, -0.4674,  1.3896]], grad_fn=&lt;NativeLayerNormBackward0&gt;)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.3841,  0.9435,  0.4406],
+        [ 1.3661, -0.9999, -0.3662],
+        [-0.9541, -0.4253,  1.3794],
+        [-1.0877, -0.2389,  1.3266]], grad_fn=&lt;NativeLayerNormBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -826,9 +825,9 @@ tensor([ 0.1559,  0.1657, -0.0002,  0.0874,  0.0176], requires_grad=True)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.9996],
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1.0000],
         [1.0000],
-        [0.9995],
+        [0.9979],
         [1.0000]], grad_fn=&lt;VarBackward0&gt;)
 </pre></div>
 </div>

@@ -15,14 +15,28 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-last_logits = logits[0, -1, :]
+attn_output = torch.nn.functional.scaled_dot_product_attention(
+    head_queries,
+    head_keys,
+    head_values,
+    attn_mask=None,
+    dropout_p=0.0,
+    is_causal=True,
+)
 ------------------
 
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mNameError[0m                                 Traceback (most recent call last)
-Cell [0;32mIn[15], line 1[0m
-[0;32m----> 1[0m last_logits [38;5;241m=[39m [43mlogits[49m[[38;5;241m0[39m, [38;5;241m-[39m[38;5;241m1[39m, :]
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[55], line 1[0m
+[0;32m----> 1[0m attn_output [38;5;241m=[39m [43mtorch[49m[38;5;241;43m.[39;49m[43mnn[49m[38;5;241;43m.[39;49m[43mfunctional[49m[38;5;241;43m.[39;49m[43mscaled_dot_product_attention[49m(
+[1;32m      2[0m     head_queries,
+[1;32m      3[0m     head_keys,
+[1;32m      4[0m     head_values,
+[1;32m      5[0m     attn_mask[38;5;241m=[39m[38;5;28;01mNone[39;00m,
+[1;32m      6[0m     dropout_p[38;5;241m=[39m[38;5;241m0.0[39m,
+[1;32m      7[0m     is_causal[38;5;241m=[39m[38;5;28;01mTrue[39;00m,
+[1;32m      8[0m )
 
-[0;31mNameError[0m: name 'logits' is not defined
+[0;31mAttributeError[0m: module 'torch.nn.functional' has no attribute 'scaled_dot_product_attention'
 

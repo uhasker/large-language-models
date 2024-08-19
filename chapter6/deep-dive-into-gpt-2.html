@@ -446,7 +446,7 @@ If you want to follow along, you should also probably have these versions instal
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.11.0+cu102
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.4.0+cu121
 </pre></div>
 </div>
 </div>
@@ -458,7 +458,7 @@ If you want to follow along, you should also probably have these versions instal
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4.18.0
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4.44.0
 </pre></div>
 </div>
 </div>
@@ -570,15 +570,15 @@ This is basically the list of probabilities we discussed in chapter 1 except tha
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ -35.8890,  -35.2049,  -39.1336,  ...,  -42.4869,  -41.8196,
-           -36.0383],
-         [-107.7291, -108.0175, -113.2968,  ..., -116.4646, -115.7444,
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ -35.8889,  -35.2048,  -39.1335,  ...,  -42.4868,  -41.8196,
+           -36.0382],
+         [-107.7291, -108.0176, -113.2967,  ..., -116.4645, -115.7444,
           -110.8654],
-         [-100.5390,  -99.8514, -103.7539,  ..., -105.0177, -107.3317,
+         [-100.5390,  -99.8515, -103.7539,  ..., -105.0177, -107.3317,
           -102.0780],
-         [ -71.9370,  -72.7245,  -76.2084,  ...,  -82.9281,  -81.7860,
+         [ -71.9370,  -72.7244,  -76.2083,  ...,  -82.9281,  -81.7860,
            -73.6416],
-         [-104.6989, -105.5693, -111.0104,  ..., -116.2477, -115.0036,
+         [-104.6989, -105.5694, -111.0104,  ..., -116.2477, -115.0037,
           -106.4377]]], grad_fn=&lt;UnsafeViewBackward0&gt;)
 </pre></div>
 </div>
@@ -619,7 +619,7 @@ Therefore care about the probabilities of the tokens after the <em>last</em> tok
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-104.6989, -105.5693, -111.0104,  ..., -116.2477, -115.0036,
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-104.6989, -105.5694, -111.0104,  ..., -116.2477, -115.0037,
         -106.4377], grad_fn=&lt;SliceBackward0&gt;)
 </pre></div>
 </div>
@@ -634,7 +634,7 @@ Therefore care about the probabilities of the tokens after the <em>last</em> tok
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([1.0367e-03, 4.3415e-04, 1.8819e-06,  ..., 1.0002e-08, 3.4703e-08,
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([1.0367e-03, 4.3414e-04, 1.8819e-06,  ..., 1.0002e-08, 3.4703e-08,
         1.8218e-04], grad_fn=&lt;SoftmaxBackward0&gt;)
 </pre></div>
 </div>
@@ -765,185 +765,9 @@ Before we do that, we will inspect the architecture of the model first to see wh
     (wpe): Embedding(1024, 768)
     (drop): Dropout(p=0.1, inplace=False)
     (h): ModuleList(
-      (0): GPT2Block(
+      (0-11): 12 x GPT2Block(
         (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (1): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (2): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (3): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (4): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (5): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (6): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (7): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (8): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (9): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (10): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
-          (c_attn): Conv1D()
-          (c_proj): Conv1D()
-          (attn_dropout): Dropout(p=0.1, inplace=False)
-          (resid_dropout): Dropout(p=0.1, inplace=False)
-        )
-        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (mlp): GPT2MLP(
-          (c_fc): Conv1D()
-          (c_proj): Conv1D()
-          (act): NewGELUActivation()
-          (dropout): Dropout(p=0.1, inplace=False)
-        )
-      )
-      (11): GPT2Block(
-        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-        (attn): GPT2Attention(
+        (attn): GPT2SdpaAttention(
           (c_attn): Conv1D()
           (c_proj): Conv1D()
           (attn_dropout): Dropout(p=0.1, inplace=False)
@@ -1058,7 +882,7 @@ The <code class="docutils literal notranslate"><span class="pre">wte</span></cod
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GPT2Block(
   (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-  (attn): GPT2Attention(
+  (attn): GPT2SdpaAttention(
     (c_attn): Conv1D()
     (c_proj): Conv1D()
     (attn_dropout): Dropout(p=0.1, inplace=False)
@@ -1248,7 +1072,7 @@ Since the <code class="docutils literal notranslate"><span class="pre">transform
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GPT2Block(
   (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
-  (attn): GPT2Attention(
+  (attn): GPT2SdpaAttention(
     (c_attn): Conv1D()
     (c_proj): Conv1D()
     (attn_dropout): Dropout(p=0.1, inplace=False)
@@ -1383,23 +1207,6 @@ We have three dimensions and the queries, keys and values are split across the d
     <span class="n">dropout_p</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="n">is_causal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">55</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">sdpa_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">scaled_dot_product_attention</span><span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">head_queries</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">head_keys</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">head_values</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">attn_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">dropout_p</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">is_causal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="p">)</span>
-
-<span class="ne">AttributeError</span>: module &#39;torch.nn.functional&#39; has no attribute &#39;scaled_dot_product_attention&#39;
 </pre></div>
 </div>
 </div>

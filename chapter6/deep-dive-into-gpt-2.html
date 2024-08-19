@@ -471,250 +471,10 @@ Generally, we highly encourage you to read the <code class="docutils literal not
 <p>First, let us load the <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> tokenizer and the <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span>
+
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   0%|          | 0.00/523M [00:00&lt;?, ?B/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   1%|          | 4.78M/523M [00:00&lt;00:10, 50.1MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   2%|▏         | 11.2M/523M [00:00&lt;00:08, 60.3MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   3%|▎         | 17.6M/523M [00:00&lt;00:08, 63.4MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   5%|▍         | 24.0M/523M [00:00&lt;00:08, 64.8MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   6%|▌         | 30.5M/523M [00:00&lt;00:07, 65.9MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   7%|▋         | 36.9M/523M [00:00&lt;00:07, 66.5MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:   8%|▊         | 43.3M/523M [00:00&lt;00:07, 66.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  10%|▉         | 49.7M/523M [00:00&lt;00:07, 66.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  11%|█         | 56.2M/523M [00:00&lt;00:07, 67.1MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  12%|█▏        | 62.6M/523M [00:01&lt;00:07, 66.9MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  13%|█▎        | 69.0M/523M [00:01&lt;00:07, 66.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  14%|█▍        | 75.3M/523M [00:01&lt;00:07, 66.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  16%|█▌        | 81.7M/523M [00:01&lt;00:06, 66.9MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  17%|█▋        | 88.1M/523M [00:01&lt;00:06, 67.0MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  18%|█▊        | 94.5M/523M [00:01&lt;00:06, 66.4MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  19%|█▉        | 101M/523M [00:01&lt;00:06, 66.5MB/s] 
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  21%|██        | 107M/523M [00:01&lt;00:06, 66.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  22%|██▏       | 114M/523M [00:01&lt;00:06, 67.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  23%|██▎       | 120M/523M [00:01&lt;00:06, 67.6MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  24%|██▍       | 127M/523M [00:02&lt;00:06, 67.8MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  26%|██▌       | 133M/523M [00:02&lt;00:06, 68.0MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  27%|██▋       | 140M/523M [00:02&lt;00:05, 68.6MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  28%|██▊       | 147M/523M [00:02&lt;00:05, 68.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  29%|██▉       | 153M/523M [00:02&lt;00:05, 68.3MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  31%|███       | 160M/523M [00:02&lt;00:05, 67.3MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  32%|███▏      | 166M/523M [00:02&lt;00:05, 67.3MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  33%|███▎      | 173M/523M [00:02&lt;00:05, 67.5MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  34%|███▍      | 179M/523M [00:02&lt;00:05, 67.0MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  35%|███▌      | 185M/523M [00:02&lt;00:05, 66.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  37%|███▋      | 192M/523M [00:03&lt;00:05, 66.9MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  38%|███▊      | 198M/523M [00:03&lt;00:05, 65.9MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  39%|███▉      | 205M/523M [00:03&lt;00:05, 59.4MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  40%|████      | 210M/523M [00:03&lt;00:05, 57.9MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  42%|████▏     | 217M/523M [00:03&lt;00:05, 61.5MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  43%|████▎     | 224M/523M [00:03&lt;00:04, 64.1MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  44%|████▍     | 231M/523M [00:03&lt;00:04, 66.3MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  45%|████▌     | 238M/523M [00:03&lt;00:04, 68.0MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  47%|████▋     | 244M/523M [00:03&lt;00:04, 69.1MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  48%|████▊     | 251M/523M [00:03&lt;00:04, 69.8MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  49%|████▉     | 258M/523M [00:04&lt;00:03, 70.6MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  51%|█████     | 265M/523M [00:04&lt;00:03, 71.1MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  52%|█████▏    | 272M/523M [00:04&lt;00:03, 71.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  53%|█████▎    | 279M/523M [00:04&lt;00:03, 71.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  55%|█████▍    | 286M/523M [00:04&lt;00:03, 72.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  56%|█████▌    | 293M/523M [00:04&lt;00:03, 71.8MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  57%|█████▋    | 300M/523M [00:04&lt;00:03, 72.1MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  59%|█████▊    | 307M/523M [00:04&lt;00:03, 72.4MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  60%|█████▉    | 314M/523M [00:04&lt;00:03, 72.4MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  61%|██████▏   | 320M/523M [00:04&lt;00:02, 72.3MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  63%|██████▎   | 328M/523M [00:05&lt;00:02, 73.1MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  64%|██████▍   | 335M/523M [00:05&lt;00:02, 73.6MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  65%|██████▌   | 342M/523M [00:05&lt;00:02, 73.9MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  67%|██████▋   | 349M/523M [00:05&lt;00:02, 73.6MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  68%|██████▊   | 356M/523M [00:05&lt;00:02, 73.4MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  69%|██████▉   | 363M/523M [00:05&lt;00:02, 73.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  71%|███████   | 370M/523M [00:05&lt;00:02, 73.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  72%|███████▏  | 377M/523M [00:05&lt;00:02, 73.8MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  74%|███████▎  | 384M/523M [00:05&lt;00:01, 74.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  75%|███████▍  | 391M/523M [00:05&lt;00:01, 74.5MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  76%|███████▋  | 399M/523M [00:06&lt;00:01, 74.8MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  78%|███████▊  | 406M/523M [00:06&lt;00:01, 74.5MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  79%|███████▉  | 413M/523M [00:06&lt;00:01, 74.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  80%|████████  | 420M/523M [00:06&lt;00:01, 74.8MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  82%|████████▏ | 427M/523M [00:06&lt;00:01, 74.8MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  83%|████████▎ | 434M/523M [00:06&lt;00:01, 75.0MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  84%|████████▍ | 442M/523M [00:06&lt;00:01, 74.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  86%|████████▌ | 449M/523M [00:06&lt;00:01, 74.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  87%|████████▋ | 456M/523M [00:06&lt;00:00, 74.0MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  89%|████████▊ | 463M/523M [00:06&lt;00:00, 73.8MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  90%|████████▉ | 470M/523M [00:07&lt;00:00, 73.4MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  91%|█████████ | 477M/523M [00:07&lt;00:00, 73.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  93%|█████████▎| 484M/523M [00:07&lt;00:00, 73.3MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  94%|█████████▍| 491M/523M [00:07&lt;00:00, 73.7MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  95%|█████████▌| 498M/523M [00:07&lt;00:00, 73.3MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  97%|█████████▋| 505M/523M [00:07&lt;00:00, 73.6MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  98%|█████████▊| 512M/523M [00:07&lt;00:00, 74.2MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading:  99%|█████████▉| 520M/523M [00:07&lt;00:00, 74.6MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading: 100%|██████████| 523M/523M [00:07&lt;00:00, 70.0MB/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -1316,8 +1076,6 @@ The <code class="docutils literal notranslate"><span class="pre">wte</span></cod
 </div>
 </div>
 </div>
-<p>Basically, a <code class="docutils literal notranslate"><span class="pre">GPT2Block</span></code> has a <code class="docutils literal notranslate"><span class="pre">LayerNorm</span></code> layer, followed by a <code class="docutils literal notranslate"><span class="pre">GPT2Attention</span></code> block which contains the attention mechanism.
-This is in turn followed by another layer normalization, followed by a <code class="docutils literal notranslate"><span class="pre">GPT2MLP</span></code> block which contains a simple MLP with two linear layers separated by a non-linear activation function.</p>
 <p>The module list with the GPT blocks is followed by one last layer normalization:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1508,10 +1266,15 @@ Since the <code class="docutils literal notranslate"><span class="pre">transform
 </div>
 </div>
 </div>
-<p>Let’s save the tensor in another variable since we will need it later:</p>
+<p>Basically, a <code class="docutils literal notranslate"><span class="pre">GPT2Block</span></code> has two parts - an attention part and a MLP part.</p>
+<p>The attention part consists of a <code class="docutils literal notranslate"><span class="pre">LayerNorm</span></code> layer, followed by a <code class="docutils literal notranslate"><span class="pre">GPT2SdpaAttention</span></code> block which contains the attention mechanism.</p>
+<p>The MLP part consists of a <code class="docutils literal notranslate"><span class="pre">LayerNorm</span></code> layer, followed by a <code class="docutils literal notranslate"><span class="pre">GPT2MLP</span></code> block which contains a simple MLP with two linear layers separated by a non-linear activation function.</p>
+<p>We will now look at both parts in detail.</p>
+<p>Let’s rename the tensor and also save it in another variable since we will need it later:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">residual</span> <span class="o">=</span> <span class="n">hidden_states</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attention_input</span> <span class="o">=</span> <span class="n">hidden_states</span>
+<span class="n">attention_residual</span> <span class="o">=</span> <span class="n">attention_input</span>
 </pre></div>
 </div>
 </div>
@@ -1522,8 +1285,8 @@ Since the <code class="docutils literal notranslate"><span class="pre">transform
 <p>Remember that this operation does not change the dimension of the tensor:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">normalized_hidden_states</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">ln_1</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">normalized_hidden_states</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">normalized_attention_input</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">ln_1</span><span class="p">(</span><span class="n">attention_input</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">normalized_attention_input</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1537,7 +1300,7 @@ Since the <code class="docutils literal notranslate"><span class="pre">transform
 <p>This is what the <code class="docutils literal notranslate"><span class="pre">c_attn</span></code> layer is for:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_key_value</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">c_attn</span><span class="p">(</span><span class="n">normalized_hidden_states</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">query_key_value</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">c_attn</span><span class="p">(</span><span class="n">normalized_attention_input</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">query_key_value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1612,7 +1375,7 @@ We have three dimensions and the queries, keys and values are split across the d
 <p>Next, we compute the attention scores:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attn_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">scaled_dot_product_attention</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sdpa_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">scaled_dot_product_attention</span><span class="p">(</span>
     <span class="n">head_queries</span><span class="p">,</span>
     <span class="n">head_keys</span><span class="p">,</span>
     <span class="n">head_values</span><span class="p">,</span>
@@ -1627,7 +1390,7 @@ We have three dimensions and the queries, keys and values are split across the d
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">55</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">attn_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">scaled_dot_product_attention</span><span class="p">(</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">sdpa_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">scaled_dot_product_attention</span><span class="p">(</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">head_queries</span><span class="p">,</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">head_keys</span><span class="p">,</span>
 <span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">head_values</span><span class="p">,</span>
@@ -1643,7 +1406,7 @@ We have three dimensions and the queries, keys and values are split across the d
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">attn_output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">sdpa_output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1656,8 +1419,8 @@ We have three dimensions and the queries, keys and values are split across the d
 <p>Now its time to merge the attention heads back together:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attn_output_transposed</span> <span class="o">=</span> <span class="n">attn_output</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
-<span class="n">attn_output_view</span> <span class="o">=</span> <span class="n">attn_output_transposed</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">768</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sdpa_output_transposed</span> <span class="o">=</span> <span class="n">sdpa_output</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+<span class="n">sdpa_output_view</span> <span class="o">=</span> <span class="n">sdpa_output_transposed</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">768</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1665,7 +1428,7 @@ We have three dimensions and the queries, keys and values are split across the d
 <p>Let’s double check the dimension:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">attn_output_view</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">sdpa_output_view</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1678,7 +1441,7 @@ We have three dimensions and the queries, keys and values are split across the d
 <p>Now, we pass the the tensor through the projection layer <code class="docutils literal notranslate"><span class="pre">c_proj</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">projection_output</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">c_proj</span><span class="p">(</span><span class="n">attn_output_view</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">projection_output</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">c_proj</span><span class="p">(</span><span class="n">sdpa_output_view</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1699,7 +1462,7 @@ We have three dimensions and the queries, keys and values are split across the d
 <p>Finally, we add our saved hidden state to the output:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attention_part_output</span> <span class="o">=</span> <span class="n">projection_output</span> <span class="o">+</span> <span class="n">residual</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attention_output</span> <span class="o">=</span> <span class="n">projection_output</span> <span class="o">+</span> <span class="n">attention_residual</span>
 </pre></div>
 </div>
 </div>
@@ -1714,11 +1477,11 @@ We can see this by comparing the derivative of a hypothetical loss function (wit
 <p>Without the residual connection the derivative would simply be <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} \frac{\partial}{\partial x} f(x)\)</span>.
 With the residual connection however, we directly <em>add</em> the term <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span> on top of that.
 This means that even if the gradient of <code class="docutils literal notranslate"><span class="pre">f</span></code> is vanishingly small, this won’t be true for the gradient <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x}\)</span> and there should be a meaningful update when we perform gradient descent.</p>
-<p>Let’s print the shape of <code class="docutils literal notranslate"><span class="pre">attention_part_output</span></code>.
+<p>Let’s print the shape of <code class="docutils literal notranslate"><span class="pre">attention_output</span></code>.
 Note that the attention part of the GPT block did not change the <em>shape</em> of the tensor, only its <em>values</em>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">attention_part_output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">attention_output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1730,7 +1493,7 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">attention_input</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1747,7 +1510,7 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">attention_part_output</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">attention_output</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1771,7 +1534,7 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
 <p>Again, we first save the current hidden state tensor:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mlp_input</span> <span class="o">=</span> <span class="n">attention_part_output</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mlp_input</span> <span class="o">=</span> <span class="n">attention_output</span>
 <span class="n">mlp_residual</span> <span class="o">=</span> <span class="n">mlp_input</span>
 </pre></div>
 </div>
@@ -1881,7 +1644,8 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
 </section>
 <section id="the-other-gpt-blocks">
 <h2>The Other GPT Blocks<a class="headerlink" href="#the-other-gpt-blocks" title="Link to this heading">#</a></h2>
-<p>Now, we simply pass the hidden states through one block after the other, where the output of each block is the input to the next block:</p>
+<p>Now, we simply pass the hidden states through one block after the other, where the output of each block is the input to the next block.</p>
+<p>Note that we alredy passed the tensor through the first block, so we will only consider the other 11 blocks:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span> <span class="o">=</span> <span class="n">mlp_output</span>
@@ -1892,6 +1656,7 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
 </div>
 </div>
 </div>
+<p>Since every block only changes the values of the tensor, but not its shape, the shape of the final tensor is <em>unchanged</em> as well:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">hidden_states</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>

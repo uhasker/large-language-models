@@ -59,9 +59,10 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'chapter6/deep-dive-into-gpt-2';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapter6/deep_dive_into_gpt_2';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Attention" href="../chapter5/attention.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -124,8 +125,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -181,13 +180,13 @@
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../chapter1/high_level_overview.html">High-level overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter2/computational_graphs.html">Computational Graphs and Backpropagation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter3/basic_layers.html">Basic Layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter4/tokenization.html">Tokenization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../chapter5/attention.html">Attention</a></li>
-<li class="toctree-l1"><a class="reference internal" href="deep_dive_into_gpt_2.html">Deep Dive Into GPT-2</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Deep Dive Into GPT-2</a></li>
 </ul>
 
     </div>
@@ -259,7 +258,7 @@
       
       
       
-      <li><a href="https://github.com/uhasker/llm-book/issues/new?title=Issue%20on%20page%20%2Fchapter6/deep-dive-into-gpt-2.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/uhasker/llm-book/issues/new?title=Issue%20on%20page%20%2Fchapter6/deep_dive_into_gpt_2.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -289,7 +288,7 @@
       
       
       
-      <li><a href="../_sources/chapter6/deep-dive-into-gpt-2.ipynb" target="_blank"
+      <li><a href="../_sources/chapter6/deep_dive_into_gpt_2.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -1521,6 +1520,33 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
 </div>
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">layer_block</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2SdpaAttention(
+    (c_attn): Conv1D()
+    (c_proj): Conv1D()
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D()
+    (c_proj): Conv1D()
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+)
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 </section>
 
@@ -1554,6 +1580,15 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="../chapter5/attention.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Attention</p>
+      </div>
+    </a>
 </div>
                 </footer>
               

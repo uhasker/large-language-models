@@ -387,7 +387,8 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#naive-attention">Naive Attention</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-and-query-vectors">Key and Query Vectors</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#value-vectors">Value Vectors</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-a-self-attention-class">Implementing a Self-Attention Class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-batch-dimension">The Batch Dimension</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-a-selfattention-layer">Implementing a <code class="docutils literal notranslate"><span class="pre">SelfAttention</span></code> Layer</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-head-attention">Multi - Head Attention</a></li>
 </ul>
             </nav>
@@ -402,7 +403,8 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="attention">
 <h1>Attention<a class="headerlink" href="#attention" title="Link to this heading">#</a></h1>
-<p>At its core, attention is a mechanism that allows a token vector to include information about the context of that token (i.e. the surrounding token vectors).</p>
+<p>At its core, attention is a mechanism that allows a token vector to include information about the context of that token (i.e. the surrounding token vectors).
+This way the token vector can “pay attention” to the surrounding token vectors.</p>
 <p>As an example consider the token sequence <span class="math notranslate nohighlight">\(T_0, T_1, T_2\)</span> (like “an”, “example”, “sequence”).
 It seems sensible that token <span class="math notranslate nohighlight">\(T_2\)</span> should have some information about <span class="math notranslate nohighlight">\(T_0\)</span> and <span class="math notranslate nohighlight">\(T_1\)</span> if we want to model the sequence successfully.</p>
 <p>As usual, we will need a few imports from <code class="docutils literal notranslate"><span class="pre">torch</span></code>:</p>
@@ -417,7 +419,7 @@ It seems sensible that token <span class="math notranslate nohighlight">\(T_2\)<
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;torch._C.Generator at 0x7f9fdc6fa0b0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;torch._C.Generator at 0x7fe6e18e10b0&gt;
 </pre></div>
 </div>
 </div>
@@ -427,33 +429,34 @@ It seems sensible that token <span class="math notranslate nohighlight">\(T_2\)<
 <p>We will continue working with our example sequence <span class="math notranslate nohighlight">\(T_0, T_1, T_2\)</span>.
 We will call the vectors that represent the tokens <span class="math notranslate nohighlight">\(\mathbf{x_0}, \mathbf{x_1}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{x_2}\)</span> respectively.</p>
 <p>Let’s say that every token is represented by a vector of dimension <span class="math notranslate nohighlight">\(5\)</span>, i.e. the entire sequence is represented by a tensor of dimension <span class="math notranslate nohighlight">\(3\times 5\)</span>.</p>
-<p>We will use a random tensor throughout this section, in reality this would be the result of the layer that precedes the attention layer:</p>
+<p>We will use a random tensor throughout this section, in reality the tensor would be the result of the layer that comes before the attention layer:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="n">X</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.3367,  0.1288,  0.2345,  0.2303, -1.1229],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.3367,  0.1288,  0.2345,  0.2303, -1.1229],
         [-0.1863,  2.2082, -0.6380,  0.4617,  0.2674],
         [ 0.5349,  0.8094,  1.1103, -1.6898, -0.9890]])
 </pre></div>
 </div>
 </div>
 </div>
-<p>Now let’s say that we would like the token vectors to be able to “look” at each other.
-The simplest way would be to calculate averages.</p>
+<p>Now let’s say that we would like the token vectors to be able to “pay attention” to each other.
+The simplest way to accomplish this would be to calculate averages of the token vectors.</p>
 <p>For example, if we would like to get the information contained in <span class="math notranslate nohighlight">\(T_0\)</span> and <span class="math notranslate nohighlight">\(T_1\)</span>, we might compute the average of <span class="math notranslate nohighlight">\(\mathbf{x_0}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{x_1}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">avg</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">avg</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.0752,  1.1685, -0.2018,  0.3460, -0.4278])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.0752,  1.1685, -0.2018,  0.3460, -0.4278])
 </pre></div>
 </div>
 </div>
@@ -461,25 +464,27 @@ The simplest way would be to calculate averages.</p>
 <p>Similarly, if we would like to combine the information in <span class="math notranslate nohighlight">\(T_0, T_1\)</span> and <span class="math notranslate nohighlight">\(T_2\)</span> we might compute the average of <span class="math notranslate nohighlight">\(\mathbf{x_0}, \mathbf{x_1}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{x_2}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">avg</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">avg</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.2284,  1.0488,  0.2356, -0.3326, -0.6148])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.2284,  1.0488,  0.2356, -0.3326, -0.6148])
 </pre></div>
 </div>
 </div>
 </div>
 <p>This doesn’t look like a great idea, primarily because not every token is equally important for every token.
-Instead we want to have some kind of weights in our linear combinations which should be data-driven, i.e. we would like to compute arbitrary linear combinations:</p>
+For example, if we have the sentence “The bat flew out of the cave”, then “bat” should probably pay more attention to “cave” than to “of”.</p>
+<p>Therefore, we want to have <em>data-driven</em> weights in our linear combination, i.e. we would like to compute arbitrary linear combinations:</p>
 <p><span class="math notranslate nohighlight">\(w_0 \cdot \mathbf{x_0} + w_1 \cdot \mathbf{x_1} + w_2 \cdot \mathbf{x_2}\)</span></p>
-<p>where the weights <span class="math notranslate nohighlight">\(w_0, w_1\)</span> and <span class="math notranslate nohighlight">\(w_2\)</span> should be data-driven parameters.</p>
+<p>where the weights <span class="math notranslate nohighlight">\(w_0, w_1\)</span> and <span class="math notranslate nohighlight">\(w_2\)</span> are data-driven parameters.</p>
 <p>That is, the input of a hypothetical attention layer would be a tensor containing the vectors <span class="math notranslate nohighlight">\(\mathbf{x_0}, \mathbf{x_1}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{x_2}\)</span>, while the output would be another tensor containing new vectors of <span class="math notranslate nohighlight">\(\mathbf{y_0}, \mathbf{y_1}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{y_2}\)</span> that are certain linear combinations of the input vectors:</p>
 <p><span class="math notranslate nohighlight">\(w_{00} \cdot \mathbf{x_0} + w_{01} \cdot \mathbf{x_1} + w_{02} \cdot \mathbf{x_2} = \mathbf{y_0}\)</span></p>
 <p><span class="math notranslate nohighlight">\(w_{10} \cdot \mathbf{x_0} + w_{11} \cdot \mathbf{x_1} + w_{12} \cdot \mathbf{x_2} = \mathbf{y_1}\)</span></p>
 <p><span class="math notranslate nohighlight">\(w_{20} \cdot \mathbf{x_0} + w_{21} \cdot \mathbf{x_1} + w_{22} \cdot \mathbf{x_2} = \mathbf{y_2}\)</span></p>
-<p>We could represent this in terms of a matrix-vector</p>
+<p>Note that both <span class="math notranslate nohighlight">\(\mathbf{x_0}, \mathbf{x_1}, \mathbf{x_2}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{y_0}, \mathbf{y_1}, \mathbf{y_2}\)</span> are representations of the token sequence <span class="math notranslate nohighlight">\(T_0, T_1, T_2\)</span>, but <span class="math notranslate nohighlight">\(\mathbf{y_0}, \mathbf{y_1}, \mathbf{y_2}\)</span> is in some sense better than <span class="math notranslate nohighlight">\(\mathbf{x_0}, \mathbf{x_1}, \mathbf{x_2}\)</span> because the token vectors have more <em>context</em>.</p>
 <p>Put differently, attention “mixes” the input vectors together and gives us new output vectors that were able to “communicate” with each other in some sense.</p>
 <p>The big question is now how to compute the attention weights.</p>
 </section>
@@ -493,20 +498,20 @@ We could use the dot product for this:</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
         <span class="n">dot_product</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;attention(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">dot_product</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;attention(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">dot_product</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>attention(0, 0) = 1.4987846612930298
-attention(0, 1) = -0.12174583971500397
-attention(0, 2) = 1.265914797782898
-attention(1, 0) = -0.12174582481384277
-attention(1, 1) = 5.602515697479248
-attention(1, 2) = -0.06531322002410889
-attention(2, 0) = 1.2659146785736084
-attention(2, 1) = -0.06531322002410889
-attention(2, 2) = 6.007389068603516
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>attention(0, 0) = 1.5
+attention(0, 1) = -0.12
+attention(0, 2) = 1.27
+attention(1, 0) = -0.12
+attention(1, 1) = 5.6
+attention(1, 2) = -0.07
+attention(2, 0) = 1.27
+attention(2, 1) = -0.07
+attention(2, 2) = 6.01
 </pre></div>
 </div>
 </div>
@@ -515,114 +520,125 @@ attention(2, 2) = 6.007389068603516
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">S</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 1.4988, -0.1217,  1.2659],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 1.4988, -0.1217,  1.2659],
         [-0.1217,  5.6025, -0.0653],
         [ 1.2659, -0.0653,  6.0074]])
 </pre></div>
 </div>
 </div>
 </div>
-<p>This yields a matrix of “attention weights”.
-We now normalize this matrix using the softmax function to get a matrix of attention scores:</p>
+<p>This yields a matrix of <strong>attention scores</strong>.
+It would clearly be benefical if the attention scores would be between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span> and they would sum to <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<p>We can accomplish this using the softmax function, yielding a matrix of <strong>attention weights</strong>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">W</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">W</span>
-
-<span class="ne">NameError</span>: name &#39;W&#39; is not defined
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.5025, 0.0994, 0.3981],
+        [0.0032, 0.9933, 0.0034],
+        [0.0086, 0.0023, 0.9891]])
 </pre></div>
 </div>
 </div>
 </div>
-<p>Now we have a matrix of “attention scores” indicating how much attention vector <span class="math notranslate nohighlight">\(\mathbf{x_i}\)</span> should pay to vector <span class="math notranslate nohighlight">\(\mathbf{x_j}\)</span>.
-We can now compute a linear combination using data-driven weights.</p>
-<p><span class="math notranslate nohighlight">\(w_{00} \cdot \mathbf{x_0} + w_{01} \cdot \mathbf{x_1} + w_{02} \cdot \mathbf{x_2} = \mathbf{y_0}\)</span></p>
+<p>Now we have a matrix of “attention weights” indicating how much attention vector <span class="math notranslate nohighlight">\(\mathbf{x_i}\)</span> should pay to vector <span class="math notranslate nohighlight">\(\mathbf{x_j}\)</span>.
+These are our data-driven parameters - we can now compute the linear combination using these attention weights.</p>
+<p>Let’s start with <span class="math notranslate nohighlight">\(\mathbf{y_0}\)</span>.
+Remember that <span class="math notranslate nohighlight">\(\mathbf{y_0} = w_{00} \cdot \mathbf{x_0} + w_{01} \cdot \mathbf{x_1} + w_{02} \cdot \mathbf{x_2}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_0</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y_0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.3636,  0.6064,  0.4964, -0.5111, -0.9314])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.3636,  0.6064,  0.4964, -0.5111, -0.9314])
 </pre></div>
 </div>
 </div>
 </div>
-<p>Next: <span class="math notranslate nohighlight">\(w_{10} \cdot \mathbf{x_0} + w_{11} \cdot \mathbf{x_1} + w_{12} \cdot \mathbf{x_2} = \mathbf{y_1}\)</span></p>
+<p>Next we compute <span class="math notranslate nohighlight">\(\mathbf{y_1}\)</span>.
+Remember that <span class="math notranslate nohighlight">\(\mathbf{y_1} = w_{10} \cdot \mathbf{x_0} + w_{11} \cdot \mathbf{x_1} + w_{12} \cdot \mathbf{x_2}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_1</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y_1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-0.1822,  2.1967, -0.6292,  0.4535,  0.2585])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-0.1822,  2.1967, -0.6292,  0.4535,  0.2585])
 </pre></div>
 </div>
 </div>
 </div>
-<p>Next: <span class="math notranslate nohighlight">\(w_{20} \cdot \mathbf{x_0} + w_{21} \cdot \mathbf{x_1} + w_{22} \cdot \mathbf{x_2} = \mathbf{y_2}\)</span></p>
+<p>Finally, we compute <span class="math notranslate nohighlight">\(\mathbf{y_2}\)</span>.
+Remember that <span class="math notranslate nohighlight">\(\mathbf{y_2} = w_{20} \cdot \mathbf{x_0} + w_{21} \cdot \mathbf{x_1} + w_{22} \cdot \mathbf{x_2}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_2</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">W</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y_2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.5315,  0.8067,  1.0987, -1.6683, -0.9873])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.5315,  0.8067,  1.0987, -1.6683, -0.9873])
 </pre></div>
 </div>
 </div>
 </div>
-<p>Again we can realize this much more efficiently via matrix multiplication:</p>
+<p>Again we can realize this much more efficiently via matrix multiplication.
+For this, we define the matrix <span class="math notranslate nohighlight">\(W\)</span> to be the matrix containing the weights, the <span class="math notranslate nohighlight">\(X\)</span> the matrix where the row <span class="math notranslate nohighlight">\(i\)</span> is the vector <span class="math notranslate nohighlight">\(\mathbf{x_i}\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> the matrix where the row <span class="math notranslate nohighlight">\(i\)</span> is the vector <span class="math notranslate nohighlight">\(\mathbf{y_i}\)</span>.</p>
+<p>Then we have <span class="math notranslate nohighlight">\(Y = WX\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.3636,  0.6064,  0.4964, -0.5111, -0.9314],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.3636,  0.6064,  0.4964, -0.5111, -0.9314],
         [-0.1822,  2.1967, -0.6292,  0.4535,  0.2585],
         [ 0.5315,  0.8067,  1.0987, -1.6683, -0.9873]])
 </pre></div>
 </div>
 </div>
 </div>
-<p>Unfortunately this naive attention will not work well in practice.
+<p>We made some good progress!
+Theoretically, we could try to use this attention as is, however, unfortunately this naive attention will not work well in practice.
 The reason is that we need to be able to differentiate between “information that a token vector represents” and “information that a token vector is interested in”.</p>
 <p>For example, if a token vector encodes that it is the subject of a sentence it will currently pay high attention to other subjects of the sentence (mostly to itself).
 Instead, it should probably pay attention to e.g. token vectors that encode predicates of a sentence, articles etc.</p>
 <p>We note that this a hand-wavy intuition and token vectors represent mostly inscrutable high-dimensional concepts that often have no real analogy in linguistics.
-Despite this, the overall idea still works well in practice.</p>
+Despite this, the overall idea of differentiating etween “information that a token vector represents” and “information that a token vector is interested in” in practice works better than our current naive attention.</p>
 </section>
 <section id="key-and-query-vectors">
 <h2>Key and Query Vectors<a class="headerlink" href="#key-and-query-vectors" title="Link to this heading">#</a></h2>
 <p>We now introduce the first important component of the real self-attention mechanism - the <strong>key vectors</strong> and <strong>query vectors</strong>.</p>
 <p>Every token vector generates a key vector and a query vector.
-The key vector indicates the information that the token represents and the query vector contains the information the token is interested in.</p>
+The key vector represents the aforementioned “information that the token represents” and the query vector represents the aforementioned “information the token is interested in”.</p>
 <p>To continue our informal example, a token might have the key vector “I am the subject of the sentence” and the query vector “I am interested in the predicate of the sentence”.
-Of course in reality key and query vectors will not be this interpretable and will represent some instructable high-dimensional concepts that the language model learned during training.</p>
-<p>To borrow from databases:</p>
-<p>A “query” is analogous to a search query in a database. It represents the current item (e.g., a word or token in a sentence) the model focuses on or tries to understand. The query is used to probe the other parts of the input sequence to determine how much attention to pay to them.</p>
-<p>The “key” is like a database key used for indexing and searching. In the attention mechanism, each item in the input sequence (e.g., each word in a sentence) has an associated key. These keys are used to match with the query.</p>
-<p>The key vectors and query vectors are computed from the token vectors via simple linear layers.</p>
-<p>For our example, we will create random linear layers - in reality this would be parameters that our neural network would have to learn.
+Again, in reality, key and query vectors will not be this interpretable and will represent some instructable high-dimensional concepts that the language model learned during training.</p>
+<p>We can also use a different hand-wavy intuition to understand key and query vectors by borrowing concepts from databases.</p>
+<p>Here a “query” would be analogous to a search query in a database.
+It represents the current token the model is trying to understand.
+The query is then to probe (i.e. to “query”) the other parts of the input sequence to determine how much attention to pay to them.</p>
+<p>The “key” is like a database key.
+In the attention mechanism, each token then has an associated key which are used to match with the query.</p>
+<p>Basically, the query is used to look up the keys and determine how important they are for the query.</p>
+<p>The way we compute the key vectors and query vectors from the token vectors is surprisingly simple - we do this via linear layers.</p>
+<p>For our example, we will create random linear layers - in reality these would be parameters that our neural network would have to learn.
 Let’s call the matrix that will produce the key vectors <span class="math notranslate nohighlight">\(W_K\)</span> and the matrix that will produce the query vectors <span class="math notranslate nohighlight">\(W_Q\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -632,44 +648,61 @@ Let’s call the matrix that will produce the key vectors <span class="math notr
 </div>
 </div>
 </div>
-<p>We can now compute the key vectors:</p>
+<p>We can now compute the key vectors.
+Here is how we would compute key vector <span class="math notranslate nohighlight">\(\mathbf{k_0}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">W_K</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k_0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">W_K</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">k_0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.6023, -0.7260,  1.1799,  0.2383])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([ 0.6023, -0.7260,  1.1799,  0.2383])
 </pre></div>
 </div>
 </div>
 </div>
+<p>To compute all key vectors at the same time, we can again use matrix multiplication:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W_K</span><span class="p">)</span>
-<span class="n">K</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.6023, -0.7260,  1.1799,  0.2383],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.6023, -0.7260,  1.1799,  0.2383],
         [-0.6521,  4.4224, -3.7460, -1.2657],
         [-0.7106, -4.3429,  4.2984, -2.3664]])
 </pre></div>
 </div>
 </div>
 </div>
-<p>We can also compute the query vectors:</p>
+<p>We can also compute the query vectors. Here is how we would compute query vector <span class="math notranslate nohighlight">\(\mathbf{q_0}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W_Q</span><span class="p">)</span>
-<span class="n">Q</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">q_0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">W_Q</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">q_0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.6964,  1.3355, -0.5133,  0.0674],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([-1.6964,  1.3355, -0.5133,  0.0674])
+</pre></div>
+</div>
+</div>
+</div>
+<p>To compute all query vectors at the same time, we can use - you guessed it - matrix multiplication:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W_Q</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.6964,  1.3355, -0.5133,  0.0674],
         [ 1.6595, -0.4445, -0.1917,  1.7729],
         [-0.1650, -2.9899, -3.8893,  1.2756]])
 </pre></div>
@@ -681,80 +714,99 @@ The big difference is that instead of computing the similarity of the token vect
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">S</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-2.5809,  8.8498, -6.9600],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-2.5809,  8.8498, -6.9600],
         [ 1.5185, -4.5739, -4.2686],
         [-2.2135, -0.1601, -6.6347]])
 </pre></div>
 </div>
 </div>
 </div>
-<p>A minor, but important technical detail is that we will need to scale the attention scores to avoid numerical instability:</p>
+<p>A minor, but important technical detail is that we will need to scale the attention scores to avoid numerical instability.
+For boring mathematical reasons that we will not dive into right now, we scale by a factor of <span class="math notranslate nohighlight">\(\sqrt{d}\)</span> where <span class="math notranslate nohighlight">\(d\)</span> is the dimension of a key/query vector:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">S</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S_scaled</span> <span class="o">=</span> <span class="n">S</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S_scaled</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.2905,  4.4249, -3.4800],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.2905,  4.4249, -3.4800],
         [ 0.7593, -2.2869, -2.1343],
         [-1.1067, -0.0801, -3.3173]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>Now again we compute the attention weights from the scaled attention scores:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">W</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[3.2830e-03, 9.9635e-01, 3.6758e-04],
-        [9.0669e-01, 4.3103e-02, 5.0212e-02],
-        [2.5632e-01, 7.1558e-01, 2.8102e-02]])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1.0857e-05, 9.9999e-01, 1.3611e-07],
+        [9.9470e-01, 2.2480e-03, 3.0506e-03],
+        [1.1356e-01, 8.8508e-01, 1.3650e-03]])
 </pre></div>
 </div>
 </div>
 </div>
 <p>We still have one problem - right now our tokens can “look into the future”.
-For example token <span class="math notranslate nohighlight">\(T_0\)</span> can “see” <span class="math notranslate nohighlight">\(T_1\)</span> and <span class="math notranslate nohighlight">\(T_2\)</span>.</p>
+For example, token <span class="math notranslate nohighlight">\(T_0\)</span> can “see” <span class="math notranslate nohighlight">\(T_1\)</span> and <span class="math notranslate nohighlight">\(T_2\)</span>.</p>
 <p>But during inference time, this will not be possible - we can’t take into account tokens that haven’t been generated yet.
 Therefore we should disable this during training as well.</p>
-<p>We will “mask” the attention scores of future tokens:</p>
+<p>We will “mask” the attention scores of future tokens.</p>
+<p>To do this, we define the following mask:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-<span class="n">mask</span>
-<span class="c1">#S = S.masked_fill(trimat == 0, float(&quot;-inf&quot;))</span>
-<span class="c1">#S</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1., 0., 0.],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1., 0., 0.],
         [1., 1., 0.],
         [1., 1., 1.]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>Next, we set all the scores where <code class="docutils literal notranslate"><span class="pre">mask</span> <span class="pre">==</span> <span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">-inf</span></code>.
+That way, when we do the <code class="docutils literal notranslate"><span class="pre">softmax</span></code>, these entries will be set to <code class="docutils literal notranslate"><span class="pre">0</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masked_S</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
-<span class="n">masked_S</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S_masked</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S_masked</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.2905,    -inf,    -inf],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-2.5809,    -inf,    -inf],
+        [ 1.5185, -4.5739,    -inf],
+        [-2.2135, -0.1601, -6.6347]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Again, we need to normalize:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S_masked_scaled</span> <span class="o">=</span> <span class="n">S_masked</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S_masked_scaled</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-1.2905,    -inf,    -inf],
         [ 0.7593, -2.2869,    -inf],
         [-1.1067, -0.0801, -3.3173]])
 </pre></div>
@@ -763,35 +815,20 @@ Therefore we should disable this during training as well.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masked_S</span> <span class="o">=</span> <span class="n">masked_S</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
-<span class="n">masked_S</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W_masked</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">S_masked_scaled</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">W_masked</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-0.6452,    -inf,    -inf],
-        [ 0.3796, -1.1435,    -inf],
-        [-0.5534, -0.0400, -1.6587]])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1.0000, 0.0000, 0.0000],
+        [0.9546, 0.0454, 0.0000],
+        [0.2563, 0.7156, 0.0281]])
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masked_W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">masked_S</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">masked_W</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1.0000, 0.0000, 0.0000],
-        [0.8210, 0.1790, 0.0000],
-        [0.3331, 0.5566, 0.1103]])
-</pre></div>
-</div>
-</div>
-</div>
-<p>Additionally, we can apply Dropout:</p>
+<p>Additionally, it is common to apply dropout at this point:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
@@ -801,14 +838,14 @@ Therefore we should disable this during training as well.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dropout</span><span class="p">(</span><span class="n">masked_W</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dropout</span><span class="p">(</span><span class="n">W_masked</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[2.0000, 0.0000, 0.0000],
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.0000, 0.0000, 0.0000],
         [0.0000, 0.0000, 0.0000],
-        [0.0000, 1.1132, 0.2206]])
+        [0.5126, 0.0000, 0.0000]])
 </pre></div>
 </div>
 </div>
@@ -816,10 +853,11 @@ Therefore we should disable this during training as well.</p>
 </section>
 <section id="value-vectors">
 <h2>Value Vectors<a class="headerlink" href="#value-vectors" title="Link to this heading">#</a></h2>
-<p>Right now, we would apply the scores to the token vectors directly.</p>
-<p>It turns out that the attention mechanism performs even better if we introduce one more indirection and calculate <strong>value vectors</strong> from the token vectors and only then apply the scores.</p>
-<p>To borrow from databases:</p>
-<p>The “value” in this context is similar to the value in a key-value pair in a database. It represents the actual content or representation of the input items. Once the model determines which keys (and thus which parts of the input) are most relevant to the query (the current focus item), it retrieves the corresponding values.</p>
+<p>Right now, we would apply the weights to the token vectors directly.</p>
+<p>It turns out that the attention mechanism performs even better if we introduce one more indirection and calculate <strong>value vectors</strong> from the token vectors and apply the weights to the value vectors.</p>
+<p>To borrow from databases one more time:</p>
+<p>The “value” in this context is similar to the value in a key-value pair in a database (representing the actual content of the items).
+Once we determine which keys (and thus which parts of the input) are most relevant to the query (the item we are currently looking at), we retrieve the corresponding values.</p>
 <p>The computation of the value vectors works exactly like the computation of the key and query vectors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -831,141 +869,198 @@ Therefore we should disable this during training as well.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">V</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W_V</span><span class="p">)</span>
-<span class="n">V</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[-0.9285,  0.3301,  1.8359, -1.3448],
-        [ 0.4676, -0.1512, -0.5678,  0.8648],
-        [ 0.6143,  2.6772, -1.3256, -3.2423]])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.3301,  1.8359, -1.3448,  0.7947],
+        [-0.1512, -0.5678,  0.8648,  4.8368],
+        [ 2.6772, -1.3256, -3.2423, -0.3151]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>We can now apply the attention weights to the values to get the final result:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
-<span class="n">R</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">W_masked</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.4630, -0.1485, -0.5602,  0.8561],
-        [-0.7909,  0.4272,  1.5735, -1.3448],
-        [ 0.1138,  0.0517,  0.0270,  0.1831]])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.3301,  1.8359, -1.3448,  0.7947],
+        [ 0.3082,  1.7268, -1.2445,  0.9781],
+        [ 0.0517,  0.0270,  0.1831,  3.6559]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>This particular attention mechanism is called <strong>scaled dot product attention</strong> and is the by far most common attention these days.</p>
+<p>Let’s verify that our understanding of scaled dot product attention is correct by using the <code class="docutils literal notranslate"><span class="pre">scaled_dot_product_attention</span></code> function from PyTorch:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.nn.functional</span> <span class="kn">import</span> <span class="n">scaled_dot_product_attention</span>
+
+<span class="n">R_torch</span> <span class="o">=</span> <span class="n">scaled_dot_product_attention</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">is_causal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">R_torch</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.3301,  1.8359, -1.3448,  0.7947],
+        [ 0.3082,  1.7268, -1.2445,  0.9781],
+        [ 0.0517,  0.0270,  0.1831,  3.6559]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Looks good!</p>
 </section>
-<section id="implementing-a-self-attention-class">
-<h2>Implementing a Self-Attention Class<a class="headerlink" href="#implementing-a-self-attention-class" title="Link to this heading">#</a></h2>
-<p>Note that we need to take care because we will also have a batch dimension:</p>
+<section id="the-batch-dimension">
+<h2>The Batch Dimension<a class="headerlink" href="#the-batch-dimension" title="Link to this heading">#</a></h2>
+<p>There is one more detail that we are missing right now.
+Namely, we need to incorporate the batch dimension in our calculations.</p>
+<p>While not particularly exiting, we will still go through the calculations, since this is a nice example that the batch dimension doesn’t complicate things conceptually - you just need to get used to the fact that you always have an additional dimension in front of your tensors.</p>
+<p>Let’s initialize a random tensor that represents a situation where we have a batch size of <code class="docutils literal notranslate"><span class="pre">2</span></code>, each batch element has <code class="docutils literal notranslate"><span class="pre">3</span></code> tokens and each token is represented by a vector of size <code class="docutils literal notranslate"><span class="pre">5</span></code>.</p>
+<p>Note that in this section we will postfix all variables with <code class="docutils literal notranslate"><span class="pre">_b</span></code> to emphasize that we are dealing with an additional batch dimension here:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="n">X</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[-0.4249,  0.9442, -0.1849,  1.0608,  0.2083],
-         [-0.5778,  0.3255, -0.8146, -0.7599, -2.0461],
-         [-1.5295,  0.4049,  0.6319,  0.3125,  1.9892]],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.3449, -1.4241, -0.1163, -0.9727,  0.9585],
+         [ 1.6192,  1.4506,  0.2695,  0.2625, -1.4391],
+         [ 0.5214,  0.3488,  0.9676, -0.4657,  1.1179]],
 
-        [[-0.4611, -0.0639, -1.3667,  0.3298, -0.9827],
-         [ 0.3018,  0.1787,  0.4097, -1.5754,  2.2508],
-         [ 1.0012,  1.3642,  0.6333,  0.4050,  0.3416]]])
+        [[-1.2956,  0.0503, -0.5855, -0.3900,  0.0358],
+         [ 0.1206, -0.8057,  0.2080, -1.1586, -0.9637],
+         [-0.3750,  0.8033, -0.5188, -1.5013, -1.9267]]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>Next, we need to create the weights for the queries, keys and values.
+Instead of initializing matrices and then doing the calculations manually, lets initialize <em>linear layers</em> and then call the layers (since this will be closer to what we will do in the end):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W_Q</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">W_K</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">W_V</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">K</span> <span class="o">=</span> <span class="n">W_K</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="n">Q</span> <span class="o">=</span> <span class="n">W_Q</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="n">V</span> <span class="o">=</span> <span class="n">W_V</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W_Q_b</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">W_K_b</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">W_V_b</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">K_b</span> <span class="o">=</span> <span class="n">W_K_b</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
+<span class="n">Q_b</span> <span class="o">=</span> <span class="n">W_Q_b</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
+<span class="n">V_b</span> <span class="o">=</span> <span class="n">W_V_b</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
 
-<span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">V</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">K_b</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">Q_b</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">V_b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(torch.Size([2, 3, 4]), torch.Size([2, 3, 4]), torch.Size([2, 3, 4]))
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 4]) torch.Size([2, 3, 4]) torch.Size([2, 3, 4])
 </pre></div>
 </div>
 </div>
 </div>
+<p>Finally, we calculate the attention scores.
+Note that we need to be careful when we transpose the key matrix, since our actual token dimensions are now the dimensions <code class="docutils literal notranslate"><span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">2</span></code> (as <code class="docutils literal notranslate"><span class="pre">0</span></code> is the batch dimension):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="n">S</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S_b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Q_b</span><span class="p">,</span> <span class="n">K_b</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S_b</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.1268,  0.1442,  0.5098],
-         [-0.1395, -0.4737, -0.1583],
-         [-0.0595,  0.8114,  0.3408]],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.0351,  0.3447,  0.2260],
+         [ 0.1568, -2.1882, -0.7753],
+         [ 0.0279, -0.2793, -0.1115]],
 
-        [[ 0.0802,  0.3535,  0.3662],
-         [-0.1526,  0.1022, -0.3185],
-         [ 0.0630,  0.1827, -0.6134]]], grad_fn=&lt;UnsafeViewBackward0&gt;)
+        [[-0.1849,  0.3218,  0.4802],
+         [ 0.4504, -0.5067, -0.4989],
+         [ 0.9851, -1.1174, -1.2743]]], grad_fn=&lt;UnsafeViewBackward0&gt;)
 </pre></div>
 </div>
 </div>
 </div>
+<p>We initialize the mask as usual:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">mask</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mask_b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mask_b</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1., 0., 0.],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1., 0., 0.],
         [1., 1., 0.],
         [1., 1., 1.]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>We mask the respective scores:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masked_S</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
-<span class="n">masked_S</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S_masked_b</span> <span class="o">=</span> <span class="n">S_b</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask_b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S_masked_b</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.1268,    -inf,    -inf],
-         [-0.1395, -0.4737,    -inf],
-         [-0.0595,  0.8114,  0.3408]],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ 0.0351,    -inf,    -inf],
+         [ 0.1568, -2.1882,    -inf],
+         [ 0.0279, -0.2793, -0.1115]],
 
-        [[ 0.0802,    -inf,    -inf],
-         [-0.1526,  0.1022,    -inf],
-         [ 0.0630,  0.1827, -0.6134]]], grad_fn=&lt;MaskedFillBackward0&gt;)
+        [[-0.1849,    -inf,    -inf],
+         [ 0.4504, -0.5067,    -inf],
+         [ 0.9851, -1.1174, -1.2743]]], grad_fn=&lt;MaskedFillBackward0&gt;)
 </pre></div>
 </div>
 </div>
 </div>
+<p>Finally, we normalize the scores and apply softmax:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S_masked_scaled_b</span> <span class="o">=</span> <span class="n">S_masked_b</span> <span class="o">/</span> <span class="n">K_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span>
+<span class="n">W_b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">S_masked_scaled_b</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">W_b</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 4])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[1.0000, 0.0000, 0.0000],
+         [0.7636, 0.2364, 0.0000],
+         [0.3584, 0.3074, 0.3343]],
+
+        [[1.0000, 0.0000, 0.0000],
+         [0.6174, 0.3826, 0.0000],
+         [0.5979, 0.2090, 0.1932]]], grad_fn=&lt;SoftmaxBackward0&gt;)
 </pre></div>
 </div>
 </div>
 </div>
-<p>Also softmax along dim -1</p>
+<p>And the output is:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">R_b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">W_b</span><span class="p">,</span> <span class="n">V_b</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">R_b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 4])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="implementing-a-selfattention-layer">
+<h2>Implementing a <code class="docutils literal notranslate"><span class="pre">SelfAttention</span></code> Layer<a class="headerlink" href="#implementing-a-selfattention-layer" title="Link to this heading">#</a></h2>
+<p>Let’s now package our calculations into a nice self-contained <code class="docutils literal notranslate"><span class="pre">SelfAttention</span></code> layer:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -987,9 +1082,9 @@ Therefore we should disable this during training as well.</p>
         <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_V</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
         <span class="n">S</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="n">masked_S</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
-        <span class="n">masked_S</span> <span class="o">=</span> <span class="n">masked_S</span> <span class="o">/</span> <span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span>
-        <span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">masked_S</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">S_masked</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
+        <span class="n">S_masked_scaled</span> <span class="o">=</span> <span class="n">S_masked</span> <span class="o">/</span> <span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">S_masked_scaled</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
         
@@ -1002,15 +1097,16 @@ Therefore we should disable this during training as well.</p>
 </div>
 </div>
 </div>
+<p>Let’s test that the layer works as expected:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 5])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 5])
 </pre></div>
 </div>
 </div>
@@ -1018,31 +1114,34 @@ Therefore we should disable this during training as well.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Y</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 4])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 4])
 </pre></div>
 </div>
 </div>
 </div>
 <p>Note that in practice the number of input dimensions and output dimensions will usually be the same, i.e. the self-attention layer doesn’t change the dimensionality of the tensor, it only “mixes” the elements of the tensor together.</p>
+<p>This has the nice benefit that we can stack lots of self-attention on top of each other without needing to think about shapes.</p>
 </section>
 <section id="multi-head-attention">
 <h2>Multi - Head Attention<a class="headerlink" href="#multi-head-attention" title="Link to this heading">#</a></h2>
 <p>The final piece we are missing is the multi-head attention.</p>
-<p>Basically instead of having a single self-attention layer, we use multiple self-attention layers, each with its own weights and combine their outputs.</p>
+<p>Basically instead of having a single self-attention layer, we use multiple self-attention layers, each with its own weights and combine their outputs.
+This allows the model to learn different features in different heads, allowing for richer capabilities:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d_in</span> <span class="o">=</span> <span class="mi">5</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="n">d_in</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">d_out</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">c_len</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">dropout</span> <span class="o">=</span> <span class="mf">0.5</span>
-
 <span class="n">n_heads</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">heads</span> <span class="o">=</span> <span class="p">[</span><span class="n">SelfAttention</span><span class="p">(</span><span class="n">d_in</span><span class="p">,</span> <span class="n">d_out</span><span class="p">,</span> <span class="n">c_len</span><span class="p">,</span> <span class="n">dropout</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_heads</span><span class="p">)]</span>
+
+<span class="n">heads</span> <span class="o">=</span> <span class="p">[</span><span class="n">SelfAttention</span><span class="p">(</span><span class="n">d_in</span><span class="p">,</span> <span class="n">d_out</span><span class="p">,</span> <span class="n">c_len</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_heads</span><span class="p">)]</span>
 
 <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">head</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">head</span> <span class="ow">in</span> <span class="n">heads</span><span class="p">]</span>
 </pre></div>
@@ -1051,72 +1150,51 @@ Therefore we should disable this during training as well.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">head_out</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">head_out</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">([</span><span class="n">head_out</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">head_out</span> <span class="ow">in</span> <span class="n">result</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[torch.Size([2, 3, 4]), torch.Size([2, 3, 4])]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[torch.Size([2, 3, 4]), torch.Size([2, 3, 4])]
 </pre></div>
 </div>
 </div>
 </div>
-<p>Next we combine them:</p>
+<p>Next we combine the head results:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">head_out_combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">head_out_combined</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">head_out_combined</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 8])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 8])
 </pre></div>
 </div>
 </div>
 </div>
 <p>Note that in practice we don’t want the multi-head attention layer to blow up the size of the tensor.</p>
-<p>Therefore we reduce the value of <span class="math notranslate nohighlight">\(d_{out}\)</span> and set it to this:</p>
+<p>Therefore we reduce the value of <span class="math notranslate nohighlight">\(d_{out}\)</span> and set it to in such a way that the multi-head self-attention layer will not change the dimension of the incoming tensor:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d_out</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">heads</span> <span class="o">=</span> <span class="p">[</span><span class="n">SelfAttention</span><span class="p">(</span><span class="n">d_in</span><span class="p">,</span> <span class="n">d_out</span><span class="p">,</span> <span class="n">c_len</span><span class="p">,</span> <span class="n">dropout</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_heads</span><span class="p">)]</span>
+<span class="n">heads</span> <span class="o">=</span> <span class="p">[</span><span class="n">SelfAttention</span><span class="p">(</span><span class="n">d_in</span><span class="p">,</span> <span class="n">d_out</span><span class="p">,</span> <span class="n">c_len</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_heads</span><span class="p">)]</span>
 
 <span class="n">head_out_combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">head</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">head</span> <span class="ow">in</span> <span class="n">heads</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">head_out_combined</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">head_out_combined</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 4])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 4])
 </pre></div>
 </div>
 </div>
 </div>
 <p>While this technically already works, it is computationally expensive since we process the heads sequentially.
-Instead we can process them in parallel by computing the outputs for all attention heads at the same time:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MultiHeadSelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_in</span><span class="p">,</span> <span class="n">d_out</span><span class="p">,</span> <span class="n">context_len</span><span class="p">,</span> <span class="n">dropout</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span> <span class="o">=</span> <span class="n">d_out</span> <span class="o">//</span> <span class="n">n_heads</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">W_K</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_in</span><span class="p">,</span> <span class="n">d_out</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">W_Q</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_in</span><span class="p">,</span> <span class="n">d_out</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">W_V</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_in</span><span class="p">,</span> <span class="n">d_out</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_tokens</span><span class="p">,</span> <span class="n">d_in</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
-
-        <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_Q</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_V</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
+Instead we can process them in parallel by computing the outputs for all attention heads at the same time.</p>
+<p>Here is how the entire process looks like:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_tokens</span> <span class="o">=</span> <span class="mi">3</span>
@@ -1128,6 +1206,7 @@ Instead we can process them in parallel by computing the outputs for all attenti
 </div>
 </div>
 </div>
+<p>Let <code class="docutils literal notranslate"><span class="pre">X</span></code> be the input tensor:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_tokens</span><span class="p">,</span> <span class="n">d_in</span><span class="p">)</span>
@@ -1141,29 +1220,32 @@ Instead we can process them in parallel by computing the outputs for all attenti
 </div>
 </div>
 </div>
+<p>We initialize weight matrices for <code class="docutils literal notranslate"><span class="pre">W_K</span></code>, <code class="docutils literal notranslate"><span class="pre">W_Q</span></code> and <code class="docutils literal notranslate"><span class="pre">W_V</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W_K</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_out</span><span class="p">,</span>  <span class="n">d_in</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W_K</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_out</span><span class="p">,</span> <span class="n">d_in</span><span class="p">)</span>
 <span class="n">W_Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_out</span><span class="p">,</span> <span class="n">d_in</span><span class="p">)</span>
 <span class="n">W_V</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_out</span><span class="p">,</span> <span class="n">d_in</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>We compute the key and query matrices:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W_K</span><span class="p">)</span>
 <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W_Q</span><span class="p">)</span>
-<span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(torch.Size([2, 3, 4]), torch.Size([2, 3, 4]))
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 4]) torch.Size([2, 3, 4])
 </pre></div>
 </div>
 </div>
 </div>
+<p>We reshape the key and query matrices in such a way that we get multiple heads:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K_view</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_tokens</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
@@ -1173,12 +1255,12 @@ Instead we can process them in parallel by computing the outputs for all attenti
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K_view</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">K_view</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 2, 2])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 2, 2])
 </pre></div>
 </div>
 </div>
@@ -1192,12 +1274,12 @@ Instead we can process them in parallel by computing the outputs for all attenti
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Q_view</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">Q_view</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 2, 2])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 3, 2, 2])
 </pre></div>
 </div>
 </div>
@@ -1205,12 +1287,12 @@ Instead we can process them in parallel by computing the outputs for all attenti
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K_view</span> <span class="o">=</span> <span class="n">K_view</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">K_view</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">K_view</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 2, 3, 2])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 2, 3, 2])
 </pre></div>
 </div>
 </div>
@@ -1218,56 +1300,58 @@ Instead we can process them in parallel by computing the outputs for all attenti
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Q_view</span> <span class="o">=</span> <span class="n">Q_view</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">Q_view</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Q_view</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 2, 3, 2])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 2, 3, 2])
 </pre></div>
 </div>
 </div>
 </div>
+<p>We obtain the attention scores:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Q_view</span><span class="p">,</span> <span class="n">K_view</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">S</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 2, 3, 3])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 2, 3, 3])
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ -2.7366,  -1.1301,  -2.7070],
-         [  2.1529,   0.7935,   1.6183],
-         [ -6.5526,  -2.3705,  -4.6866]],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ -2.8630,  -0.1614,   1.2478],
+         [-10.0620,   0.9408,   3.7090],
+         [  2.8880,   0.4650,  -1.3942]],
 
-        [[ -0.3216,   3.0144, -13.2677],
-         [ -0.6322,  -1.1477,  -0.0831],
-         [ -0.2841,   1.0993,  -5.9737]]])
+        [[ 11.3074,   4.0007,  -6.2850],
+         [ -4.6397,  -7.2396,   3.7868],
+         [ -4.1246,  -0.4083,   2.0658]]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>We obtain the mask and use it to mask out the future scores:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_tokens</span><span class="p">,</span> <span class="n">n_tokens</span><span class="p">))</span>
-<span class="n">mask</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1., 0., 0.],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1., 0., 0.],
         [1., 1., 0.],
         [1., 1., 1.]])
 </pre></div>
@@ -1276,66 +1360,77 @@ Instead we can process them in parallel by computing the outputs for all attenti
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masked_S</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
-<span class="n">masked_S</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S_masked</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S_masked</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[-2.7366,    -inf,    -inf],
-         [ 2.1529,  0.7935,    -inf],
-         [-6.5526, -2.3705, -4.6866]],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ -2.8630,     -inf,     -inf],
+         [-10.0620,   0.9408,     -inf],
+         [  2.8880,   0.4650,  -1.3942]],
 
-        [[-0.3216,    -inf,    -inf],
-         [-0.6322, -1.1477,    -inf],
-         [-0.2841,  1.0993, -5.9737]]])
+        [[ 11.3074,     -inf,     -inf],
+         [ -4.6397,  -7.2396,     -inf],
+         [ -4.1246,  -0.4083,   2.0658]]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>We scale the scores:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masked_S</span> <span class="o">=</span> <span class="n">masked_S</span> <span class="o">/</span> <span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span>
-<span class="n">masked_S</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">S_masked_scaled</span> <span class="o">=</span> <span class="n">S_masked</span> <span class="o">/</span> <span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S_masked_scaled</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[-0.6841,    -inf,    -inf],
-         [ 0.5382,  0.1984,    -inf],
-         [-1.6381, -0.5926, -1.1716]],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[[-1.4315,    -inf,    -inf],
+          [-5.0310,  0.4704,    -inf],
+          [ 1.4440,  0.2325, -0.6971]],
 
-        [[-0.0804,    -inf,    -inf],
-         [-0.1581, -0.2869,    -inf],
-         [-0.0710,  0.2748, -1.4934]]])
+         [[ 5.6537,    -inf,    -inf],
+          [-2.3198, -3.6198,    -inf],
+          [-2.0623, -0.2041,  1.0329]]],
+
+
+        [[[ 5.0593,    -inf,    -inf],
+          [-1.4993,  0.2439,    -inf],
+          [ 5.9892, -1.2553,  1.5600]],
+
+         [[-4.6679,    -inf,    -inf],
+          [ 0.5341,  0.3049,    -inf],
+          [-3.2725, -0.4792, -0.8532]]]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>We apply the softmax to get the normalized attention weights:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">masked_S</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">S_masked_scaled</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[1.0000, 0.0000, 0.0000],
-         [0.5842, 0.4158, 0.0000],
-         [0.1838, 0.5230, 0.2931]],
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[1.0000, 0.0000, 0.0000],
+         [0.0041, 0.9959, 0.0000],
+         [0.7066, 0.2104, 0.0830]],
 
         [[1.0000, 0.0000, 0.0000],
-         [0.5322, 0.4678, 0.0000],
-         [0.3767, 0.5324, 0.0908]]])
+         [0.7858, 0.2142, 0.0000],
+         [0.0339, 0.2173, 0.7488]]])
 </pre></div>
 </div>
 </div>
 </div>
+<p>We calculate the values and reshape the value matrix.
+Finally, we get the result:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Apply droput normally</span>
-
-<span class="n">V</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W_V</span><span class="p">)</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">V</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W_V</span><span class="p">)</span> 
 <span class="n">V_view</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_tokens</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
 <span class="n">V_view</span> <span class="o">=</span> <span class="n">V_view</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">R</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">V_view</span><span class="p">)</span>
@@ -1345,28 +1440,30 @@ Instead we can process them in parallel by computing the outputs for all attenti
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">V_view</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">V_view</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(torch.Size([2, 2, 3, 2]), torch.Size([2, 2, 3, 3]))
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 2, 3, 2]) torch.Size([2, 2, 3, 3])
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">R</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 2, 3, 2])
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 2, 3, 2])
 </pre></div>
 </div>
 </div>
 </div>
+<p>Next, we reshape the result back to three dimensions.
+The resulting tensor can now be fed into another layer:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -1470,7 +1567,8 @@ Instead we can process them in parallel by computing the outputs for all attenti
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#naive-attention">Naive Attention</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-and-query-vectors">Key and Query Vectors</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#value-vectors">Value Vectors</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-a-self-attention-class">Implementing a Self-Attention Class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-batch-dimension">The Batch Dimension</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-a-selfattention-layer">Implementing a <code class="docutils literal notranslate"><span class="pre">SelfAttention</span></code> Layer</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-head-attention">Multi - Head Attention</a></li>
 </ul>
   </nav></div>

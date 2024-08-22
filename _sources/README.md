@@ -2,7 +2,7 @@
 
 ## What is this?
 
-This is the repository for the book "Large Language Models", a book about Python aimed primarily at beginners.
+This is the repository for the book "Large Language Models", a book about Large Language Models (LLMs).
 
 You can find the book itself [here](https://uhasker.github.io/large-language-models).
 

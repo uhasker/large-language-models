@@ -1,124 +1,205 @@
-# High-level overview
+# High-Level Overview
 
 This chapter contains a very high-level overview of the topics discussed in this book. It serves both as an introduction for this book as well as a standalone text for those who don't care about technical details, but want to get a general feel for the field.
 
-## Machine learning
+## Executive Summary
 
-Consider the problem of sorting a list of numbers. For example given the list [1, 3, 4, 2, 5] you might want to output the list [1, 2, 3, 4, 5]. It is relatively easy to come up with a series of steps that solves this problem. For example we could repeatedly swap numbers in multiple passes through the list until the list is sorted (this is what BubbleSort does). Sorting a list is therefore a *classical problem* - you can formally define a series of steps (an *algorithm*) that solves the problem.
+First of all, Large Language Models are **next token predictors**.
 
-On the other hand consider the problem of recognizing the category of a document. For example, given an email we might want to tell whether it is spam or not spam. While (*most*) humans are capable of solving such problems with little effort, it is not at all clear how one would specify a formal series of steps in this case. Imagine trying to explain to someone *why* you recognized that particular email as a spam. Any description you could come up with would be very fuzzy and informal. You can't just say that e.g. the presence of "viagra" indicates spam (although such a classifier would probably be not *all* that terrible). This means that - contrary to the sorting problem - we can't easily translate such a description into an algorithm. We need a different angle of attack.
+What do we mean by that?
+At its core, you give an LLM a text and it predicts the next token.
+A token is basically just a part of a text (for example a token might be “an” or “123” or “this” or “th”).
 
-Let us rethink this whole process. When we recognize a spam email, we don't actually go through a giant checklist that someone specified for us and think "well, yeah there was word X in position Y, therefore since word A is also present in position B the email is spam". Instead we have *learned* how spam looks like, because we have observed a lot of spam. This is how we came up with that fuzzy mental image of spam that is so hard to formalize. Basically we think "well this email is very similar to a bunch of spam emails I saw previously and also I learned that these combinations of words might indicate spam, so it is probably spam".
+For example, the input text could be the text “What is a Large Language”.
+Then the LLM might predict that the next token should be “ Model”.
+The resulting text would then be “What is a Large Language Model”.
 
-Can we replicate something like this when trying to solve such a problem using a computer? It turns out, we can! This is where the area of **machine learning** comes in.
+<img src="images/llm.png" alt="LLM" width="400">
 
-The basic idea behind machine learning is to solve tasks for which there is no clear solution description by feeding a bunch of *data* into a mathematical model and letting the model *learn* the solution. This process is called *training* the model (or *fitting* the data). It's like showing a bunch of cats to a baby and hoping that the baby learns to recognize a cat.
+However, if ever you talked to something like ChatGPT, you know that LLMs don’t just give the next token, but instead respond with complete texts.
+How do they do that?
 
-In order to perform machine learning, we therefore need the following components:
+The answer is embarrassingly simple - _LLMs generate texts one token at a time_.
 
-1. A mathematical *model* that specifies how to transform a given input into the desired output
-2. The *data* we use for training the mathematical *model*
-3. A *learning algorithm* that tells us how to train the model given the data we have
+Again, let’s say that the text to be completed is “What is a Large Language”.
 
-Very roughly, the learning algorithm looks like this:
-```
-initialize a model
+The LLM might predict “ Model” as the next token.
+Now you would take the text together with the next token (“What is a Large Language Model”) and feed it into the model again, asking it to predict the next token which might be “?”.
+You can now again take the text together with the next token (“What is a Large Language Model?”) and feed it into the model.
 
-for every data point in our data:
-    update the parameters of the model such that
-    the model performs better on that example
-```
+This process continues until either a maximum number of tokens has been reached or the predicted token is a special EOS (end of sequence) token which basically stands for “this sequence is over, stop generating”.
+For example, if upon feeding the text “What is Large Language Model?” the model predicts the EOS token as the next token, the generation would end.
 
-This is only a very rough outline. In reality we often feed multiple examples at the same time (to improve the training speed). We also often do multiple passes on the dataset. Nevertheless, the above process is a useful mental model to have when you think about the way machine learning models are trained.
+<img src="images/llm2.png" alt="LLM" width="400">
 
-After training is complete, we can then perform *inference*. This just means that we feed the model examples that is hasn't potentially seen before and ask it to output predictions for the examples. Of course this means that we can't just blindly memorize the training data - our model has to actually learn something.
+Ok, so LLMs complete texts by repeatedly predicting the next token.
+But how do they predict the next token?
+To adequately explain that, we need to introduce a concept called “embeddings” first.
 
-From the above description you can probably already see a potential problem you should be aware of when throwing machine learning at your problems. Your model is only going to be *as good as the data you give it*. Consider training a document classification model on a bunch of books from the seventeenth century. It will probably perform poorly if you then give it a bunch of tweets. Machine learning can't do magic - it will learn based on the data you give it - no less, no more.
+## It’s Numbers All The Way Down
 
-Another thing about machine learning is that you should use it when appropriate. Applying it to problems where there already is a formal solution is not a good idea. If you can solve a problem without machine learning, you should!
+LLMs consist of mathematical functions (more on this later).
+Mathematical functions tend to work with numbers instead of texts, so to apply functions to texts, we usually need to convert the texts to numbers first.
 
-## Types of machine learning
+However, we don’t want to convert texts to arbitrary numbers.
+Instead, these numbers should have some meaning.
 
-There are a lot of fancy words being thrown around whenever people talk about machine learning. However most of them actually represent very simple concepts. Note that we focus on the types of machine learning we actually discuss in this book.
+This is the core insight behind embeddings - an embedding is a point in some high-dimensional space that represents some piece of a text in a meaningful way.
 
-A **supervised learning** task is a task where we need to predict labels given inputs. Therefore the training data has been *labeled* (or *annotated*) by a human. For example if we want to differentiate spam from no spam, we would create a dataset containing a bunch of emails labeled "spam" and a bunch of images labeled "no spam". Then we could train a model on this data set. At inference time such a model could then predict whether an email is "spam" or "no spam".
+How can we make this more concrete?
+Let’s say you would like to represent the words “cat”, “dog”, “pet”, “car”, “automobile”, “vehicle”, “apple”, “banana” and “fruit” using points in two-dimensional space.
 
-**Classification** is a subfield of supervised learning where the labels represent categories. Given a data point, we then want to predict the category of that data point. Our spam recognition problem is an example of **binary classification**, since two classes are present ("spam" or "no spam"). If more than two classes are present, we are dealing with **multiclass classification**. Consider the problem of predicting the class of a news article as either "business", "sport", "entertainment" or "politics". Here we have a multiclass classification problem with four possible classes.
+It seems that in order for our representation to be meaningful the words “cat”, “dog” and “pet” should be close to each other.
+The same should probably be true for “car”, “automobile” and “vehicle”.
+Finally, “apple”, “fruit” and “banana” should be close to each other as well.
+However, “cat” and “car” should be far apart, because they are semantically different (even though there is only a one-letter difference between them).
 
-In **unsupervised learning** the data is not *labeled* and we want to learn or find useful relationships in the data. For example, given a bunch of documents, we could cluster them according to their similarity. Such clusterization could e.g. reveal different document categories.
+Here is how this could look like:
 
-## Deep learning
+<img src="images/embeddings.png" alt="Embeddings" width="400">
 
-**Deep learning** sounds very - well - *deep*. However it is nothing more that a subfield of machine learning, where the mathematical model is a so-called **neural network**.
+Mathematically, a point is just a list of numbers (for example, the word “cat” is represented by the point (1, 2) in this example), i.e. a vector.
 
-A **neural network** is a *differentiable computational graph*. If you a limited technical background, this sounds very scary. But the basic idea is actually fairly simple. Let us walk through the terms one by one.
+Therefore, embeddings of texts are vectors with the property that two embeddings are close to each other if the underlying texts are semantically similar.
 
-A **graph** consists of nodes and edges. The edges connect the nodes. A classical example is a transportation network. Here the nodes might represent cities and the edges roads between the cities. This is how we could visualize such a graph:
+We can apply this concepts to more than just words.
+Embeddings can be created for sentences, paragraphs, articles and any arbitrary pieces of text (i.e. any tokens).
 
-<img src="images/cities.png" alt="drawing" width="400"/>
+The concept of semantic similarity is usually formalized using the distributional hypothesis:
 
-A **computational graph** is a graph where each node represents a mathematical *calculation* and each edge represents a value. Here is an example of a very simple computational graph:
+**Words (more generally, tokens) are similar if they appear in similar contexts.**
 
-<img src="images/compgraph.png" alt="drawing" width="300"/>
+This is why we would say that “cat” and “dog” are semantically similar (even though obviously cats and dogs are very different pets) - because they appear in similar contexts (namely, when we talk about pets).
 
-The neat thing about computational graphs is that they can represent extremely complicated mathematical functions. After all, no matter how complex the function is, we can (almost) always decompose it into a bunch of simple computations and construct the computational graph from that.
+One final important thing to note is that, in practice, embeddings have much more dimensions than just two - for example, embeddings that are utilized in modern LLMs have anywhere from hundreds to thousands of dimensions.
 
-The final touch is that neural networks are not just any computational graphs, but *differentiable* computational graphs. This means that if we discover that our neural network makes errors on certain data points, we can calculate the *contribution of every value to the error*. Therefore we are able to update the values of the network in such a way that the error is reduced.
+## The Four Components of a Large Language Model
 
-This is what makes neural networks extremely powerful! We can show them a bunch of data, figure out the errors the network makes on that data and then update the network values in such a way that those errors are as small as possible.
+Armed with this newfound knowledge, we can sketch out the four fundamental components of most Large Language Models.
 
-Chapter 2 explains how all this functions in great technical detail.
+The first component is the tokenizer.
+The tokenizer is responsible for splitting the texts into tokens.
 
-## Evaluating a model
+For example, the tokenizer used by GPT-4 would take the text “What is a Large Language Model?” and split it into the following tokens:
 
-Unless the task at hand is relatively simple, our model is certainly not going to be perfect. Therefore we need to quantify how good it is using an **evaluation metric**. If we have such an evaluation metric we can compare models against each other and pick the best one.
+- “What”
+- “ is”
+- “ a”
+- “ Large”
+- “ Language”
+- “ Model”
+- “?”
 
-A very simple (yet very common) evaluation metric used with classification tasks is **accuracy**. We obtain the accuracy of a model on a dataset by simply dividing the number of correct classifications on the dataset by the total number of points in the dataset.
+Here is how you could visualize this:
 
-The astute reader may notice a problem here - *which dataset should we use for evaluation*? If we use the same dataset we trained on, we run into the problem that such an evaluation is meaningless. Consider a machine learning model that simply remembers all the classes it saw at training time. Such a model would have a perfect accuracy of 1.0 under our definition of accuracy! But of course, as soon it sees data is hasn't seen before (which is the *whole point* of doing machine learning), this model will crash and burn. This is an extreme example of **overfitting**. In general overfitting occurs when we accidentally fit a model too close to the idiosyncrasies of a training dataset instead of learning the more general patterns which are present.
+<img src="images/tokenize.png" alt="Embeddings" width="400">
 
-In order to avoid this problem, we split the dataset into a **training dataset** and a **test dataset**. We use the training dataset for - well - training and the testing dataset for performing evalution. That way we model the real world, where the model has to perform well on examples it has never seen before. Of course, it is extremely important to *never* let the model see the test dataset during training.
+Note that the GPT-4 tokenizer would not always split the text into word tokens.
+For example, if you would take the english word “overfitting”, the resulting tokens would be “over”, “fit” and “ting”.
 
-Sometimes we need to split the dataset even more. Let's say we want to train multiple machine learning models and use the best one. If we do the selection using the test dataset, we have the same problem as above - our final evaluation will be too biased towards a particular dataset (the test dataset this time). In such a situation we need to split the dataset into a **training dataset**, a **validation dataset** and a **test dataset**. We train the models on the training dataset. Then we select the model which performs best on the validation dataset. Finally we report the accuracy of that model on the test dataset.
+> Technical Completeness Note: In reality, the tokenizer produces token IDs which are special numbers that represent the tokens. However, this is not particularly relevant for high-level understanding.
 
-## Natural Language Processing
+The second component is an **embedding layer**.
+The embedding layer takes the list of tokens produced by the tokenizer and produces an embedding for each token.
+Consider the list of tokens from our example:
 
-Deep Learning has been applied to many fields, but in this book we will focus exclusively on the field of **Natural Language Processing** (NLP for short). After all the title of this book is "Large *Language* Models" (and not, say "Large *Vision* Models"). As the name already says, NLP concerns itself with stuying natural language using methods from mathematics and computer science.
+- “What”
+- “ is”
+- “ a”
+- “ Large”
+- “ Language”
+- “ Model”
+- “?” 
 
-There are many NLP tasks to which deep learning has been applied successfully in the past decades.
+Here we have seven tokens.
+This means that the embedding layer would produce seven embeddings (one embedding per token).
 
-We have already discussed the task of **document classification**, where we want to find the category a document belongs to.
+The first embedding would be a vector representing the token “What”, the second embedding a vector representing the token “ is” and so on until we arrive at the last embedding representing the token “?”.
 
-For the task of **text summarization** we are given a text and are tasked with giving a useful summary of that text. As you can easily see, coming up with a precise algorithm for this task is even more impossible than for document classification.
+Remember that embeddings are lists of numbers (vectors) that represent points in high-dimensional space in a semantically meaningful way.
+Therefore the output of the embedding layer would be seven lists of numbers which have some semantic meaning.
 
-A task millions of people have to solve every day is the task of **machine translation**, where you need to translate a text from one language to another. While the field used to be dominated by linguistic and statistical methods, in the past few years it has been completely overrun by Deep Learning. This happened for a simple reason - on average, Deep Learning methods perform *much* better than their counterparts.
+> Technical Completeness Note: In addition to token embeddings, there are also positional embeddings and more.
+> We will gloss over them, since these are mostly technical optimizations and - again - not particularly relevant for the high-level understanding.
 
-Another task is the task of **question answering**. Given a text and a question about that text, a model is supposed to output the correct answer.
+The third component is the **transformer**.
+The transformer is really the core component of modern LLMs.
+It basically takes the embeddings and mixes them together to provide context.
 
-These are only a few examples of problems NLP tries to address. Others include **named entity recognition** (recognizing named entities such as organizations, locations etc), **part-of-speech tagging** (marking words with their corresponding part of speech, like "noun" or "verb"), **semantic similarity** (measuring how close the meaning of two texts is) and many more.
+Why is this important?
+Consider the two sentences “The bat flew out of the cave” and “He hit the ball with his bat”.
+In both texts, the token “bat” is present, however it has a completely different meaning in each sentence.
+Therefore, the embedding layer would produce the same embeddings for the “bat” token in both cases.
 
-## Language models
+The transformer now introduces context using something called the attention mechanism.
+This allows the other tokens to - well - pay attention to other relevant tokens.
+For example, “bat” might “pay attention” to “flew” and “cave” in the first sentence and “pay attention” to “hit” and “ball” in the second sentence.
 
-We will use a very general definition of the term "language model" in this book, namely as a model that takes a text and produces a *useful (numerical) representation* of that text. As a side note, a lot of other literature uses the term "language model" exclusively for models which are capable of predicting the probabilities of text given some other text. Both definitions are totally fine, just keep in mind that we will stick to the first one.
+Let’s consider the sentence “The bat flew out of the cave”.
+Then attention scores for this sentence might look like this:
 
-This is how it would look like in an image: 
+<img src="images/attention1.png" alt="Attention" width="400">
 
-<img src="images/llm1.png" alt="drawing" width="400"/>
+Here we have a high attention score between “flew” and “bat”, as well as a high attention score between “bat” and “cave”. This means that the transformer knows that the most relevant tokens for “bat” are “flew” and “cave”, i.e. this is the type of bat that flies out of caves.
 
-What could a useful numerical representation be? Well that depends on the task at hand. For a document classification problem this could be a list of probabilities of the various classes: 
+Now let’s consider the sentence “He hit the ball with his bat”:
 
-<img src="images/llm2.png" alt="drawing" width="400"/>
+<img src="images/attention2.png" alt="Attention" width="400">
 
-If we have a multiclass problem, the list of probabilities would be longer. Here is how a language model for classifying a news article could look like: 
+Here we have a high attention score between “bat” and “hit”, as well as a high attention score between “bat” and “ball”.
+In this case, the transformer knows that the most relevant tokens for “bat” are “hit” and “ball”, i.e. this is completely different type of bat - the type that can be used to hit balls.
 
-<img src="images/llm3.png" alt="drawing" width="400"/>
+The transformer would now mix the “bat” embedding with the “flew” and “cave” embeddings in the first sentence.
+In the second sentence however, the transformer would mix the “bat” embedding with the “hit” and “ball” embeddings.
 
-We would train a language model by taking a dataset and learning the task. However it turns out that such datasets need to be very large. This is mainly because natural language is complicated (ever tried to learn a foreign language?) and therefore we need huge amounts of data to learn its basic principles before we can actually solve the given task.
+The embeddings for “bat” would therefore be completely different in each sentence, because they now have context - we call these contextualized embeddings.
 
-But what if instead of learning the English language from scratch every time we want to do some simple document classification we could create a big model that already *understands* English language and then just *fine-tune* it for the respective tasks?
+> Technical Completeness Note: The attention mechanism is relatively complicated and traditionally involves converting the embeddings to key and query vectors, computing attention scores and then using the attention scores to combine value vectors.
+> Since this a high-level overview, we will not dive into the computations here.
 
-## Transfer learning
+The fourth component is a prediction layer.
+This takes the embeddings created by the transformer and produces a huge list of probabilities for the next token.
+For example, if the input text was “What is a Large Language” then the token “ Model” would have a high probability, but the tokens “homework” or “fngrl” would probably have a low probability.
 
-The core idea behind **transfer learning** is to pretrain the model on a very large general language corpus to give it language understanding and then fine-tune it for the specific task. We essentially do this by splitting the model into a body and a head. The body takes a bunch of text and produces an *intermediate numerical representation* that is useful for any language task. Such a representation should have a bunch of desirable properties, such as similar texts being mapped to similar representations. This intermediate representation then gets fed into the model head.
+The interesting thing here is that you can use this list of probabilities in different ways.
+You could of course just always select the most probable token.
+However, this often leads to boring and repetitive texts.
+Instead, LLMs usually sample from this distribution.
+This means that they randomly select a token in such a way that tokens with higher probabilities have a higher chance to be generated.
 
-<img src="images/transfer1.png" alt="drawing" width="600"/>
+To sum it up - here is how an LLM predicts the next token given a text:
+
+First, the tokenizer splits the text into tokens.
+Second, the embedding layer generates an embedding for every token.
+Third, the transformer improves the the embeddings by mixing them together.
+Finally, the prediction layer generates a list of probabilities for all possible next tokens and samples the next token.
+
+## Training a Large Language Model
+
+Ok, so far, so good.
+But why do companies like OpenAI and Antrophic have to spend tens of millions of dollars on their Large Language Models?
+
+Well, remember all those mathematical functions from the previous paragraphs?
+These functions usually have billions upon billions of parameters.
+
+And these parameters have to be learned - we call that "training the model".
+
+To train the model, we need to collect a giant dataset first.
+And by giant I mean giant.
+For example, the RedPajama-Data-v2 dataset (one of the most well-known open datasets) has 20 billion documents consisting of 30 trillion tokens.
+This is a lot of tokens.
+
+The way the actual training works is conceptually simple:
+First, we initialize the model with random parameters.
+Next, we split our text corpus into tokens.
+Then we iterate over all the tokens and at each token, we ask the model to give the probabilities for the next token (this is the output of the prediction layer, remember?).
+Finally, we adjust the parameters of the model in such a way that the actual next token becomes more probable and all other tokens become less probable.
+
+This is really it, although quite often after the initial training is done, models are usually finetuned (i.e. trained further) on special datasets that make the model less likely to produce undesired outputs, allow the model to chat with a user etc.
+
+> Technical Completeness Note: We necessarily glossed over a lot of technical details in this section.
+> For example, we don't really train models token by token. Instead, the model is fed batches of training data and processes multiple examples at the same time.
+
+While conceptually simple, the mathematical details and technical execution can get quite complicated.
+For example, just recently Meta announced two 24k GPU clusters to manage model training.
+As you can guess, managing these clusters and running the training requires a high degree of technical sophistication and a lot of resources - not many companies can do something like this.

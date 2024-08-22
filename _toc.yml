@@ -1,0 +1,11 @@
+# Table of contents
+
+format: jb-book
+root: preface
+chapters:
+  - file: chapter1/high_level_overview
+  - file: chapter2/computational_graphs
+  - file: chapter3/basic_layers
+  - file: chapter4/tokenization
+  - file: chapter5/attention
+  - file: chapter6/deep_dive_into_gpt_2

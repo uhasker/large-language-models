@@ -1,6 +1,6 @@
 # High-Level Overview
 
-This chapter contains a very high-level overview of the topics discussed in this book. It serves both as an introduction for this book as well as a standalone text for those who don't care about technical details, but want to get a general feel for the field.
+This chapter contains a very high-level overview of the topics discussed in this book. It serves both as an introduction for this book as well as a standalone text for those who don't care about technical details but want to get a general feel for the field.
 
 ## Executive Summary
 
@@ -16,7 +16,7 @@ The resulting text would then be “What is a Large Language Model”.
 
 <img src="images/llm.png" alt="LLM" width="400">
 
-However, if ever you talked to something like ChatGPT, you know that LLMs don’t just give the next token, but instead respond with complete texts.
+However, if you've ever talked to something like ChatGPT, you know that LLMs don’t just give the next token but instead respond with complete texts.
 How do they do that?
 
 The answer is embarrassingly simple - _LLMs generate texts one token at a time_.
@@ -62,7 +62,7 @@ Mathematically, a point is just a list of numbers (for example, the word “cat�
 
 Therefore, embeddings of texts are vectors with the property that two embeddings are close to each other if the underlying texts are semantically similar.
 
-We can apply this concepts to more than just words.
+We can apply this concept to more than just words.
 Embeddings can be created for sentences, paragraphs, articles and any arbitrary pieces of text (i.e. any tokens).
 
 The concept of semantic similarity is usually formalized using the distributional hypothesis:
@@ -95,7 +95,7 @@ Here is how you could visualize this:
 <img src="images/tokenize.png" alt="Embeddings" width="400">
 
 Note that the GPT-4 tokenizer would not always split the text into word tokens.
-For example, if you would take the english word “overfitting”, the resulting tokens would be “over”, “fit” and “ting”.
+For example, if you would take the English word “overfitting”, the resulting tokens would be “over”, “fit” and “ting”.
 
 > Technical Completeness Note: In reality, the tokenizer produces token IDs which are special numbers that represent the tokens. However, this is not particularly relevant for high-level understanding.
 
@@ -114,10 +114,10 @@ Consider the list of tokens from our example:
 Here we have seven tokens.
 This means that the embedding layer would produce seven embeddings (one embedding per token).
 
-The first embedding would be a vector representing the token “What”, the second embedding a vector representing the token “ is” and so on until we arrive at the last embedding representing the token “?”.
+The first embedding would be a vector representing the token “What”, the second embedding would represent the token “ is” and so on until we arrive at the last embedding representing the token “?”.
 
 Remember that embeddings are lists of numbers (vectors) that represent points in high-dimensional space in a semantically meaningful way.
-Therefore the output of the embedding layer would be seven lists of numbers which have some semantic meaning.
+Therefore, the output of the embedding layer would be seven lists of numbers that have some semantic meaning.
 
 > Technical Completeness Note: In addition to token embeddings, there are also positional embeddings and more.
 > We will gloss over them, since these are mostly technical optimizations and - again - not particularly relevant for the high-level understanding.
@@ -128,7 +128,7 @@ It basically takes the embeddings and mixes them together to provide context.
 
 Why is this important?
 Consider the two sentences “The bat flew out of the cave” and “He hit the ball with his bat”.
-In both texts, the token “bat” is present, however it has a completely different meaning in each sentence.
+In both texts, the token “bat” is present, however, it has a completely different meaning in each sentence.
 Therefore, the embedding layer would produce the same embeddings for the “bat” token in both cases.
 
 The transformer now introduces context using something called the attention mechanism.
@@ -140,38 +140,38 @@ Then attention scores for this sentence might look like this:
 
 <img src="images/attention1.png" alt="Attention" width="400">
 
-Here we have a high attention score between “flew” and “bat”, as well as a high attention score between “bat” and “cave”. This means that the transformer knows that the most relevant tokens for “bat” are “flew” and “cave”, i.e. this is the type of bat that flies out of caves.
+Here, we have a high attention score between “flew” and “bat”, as well as a high attention score between “bat” and “cave”. This means that the transformer knows that the most relevant tokens for “bat” are “flew” and “cave”, i.e. this is the type of bat that flies out of caves.
 
-Now let’s consider the sentence “He hit the ball with his bat”:
+Now, let’s consider the sentence “He hit the ball with his bat”:
 
 <img src="images/attention2.png" alt="Attention" width="400">
 
-Here we have a high attention score between “bat” and “hit”, as well as a high attention score between “bat” and “ball”.
-In this case, the transformer knows that the most relevant tokens for “bat” are “hit” and “ball”, i.e. this is completely different type of bat - the type that can be used to hit balls.
+Here, we have a high attention score between “bat” and “hit” as well as a high attention score between “bat” and “ball”.
+In this case, the transformer knows that the most relevant tokens for “bat” are “hit” and “ball”, i.e. this is a completely different type of bat - the type that can be used to hit balls.
 
 The transformer would now mix the “bat” embedding with the “flew” and “cave” embeddings in the first sentence.
-In the second sentence however, the transformer would mix the “bat” embedding with the “hit” and “ball” embeddings.
+In the second sentence, however, the transformer would mix the “bat” embedding with the “hit” and “ball” embeddings.
 
 The embeddings for “bat” would therefore be completely different in each sentence, because they now have context - we call these contextualized embeddings.
 
 > Technical Completeness Note: The attention mechanism is relatively complicated and traditionally involves converting the embeddings to key and query vectors, computing attention scores and then using the attention scores to combine value vectors.
-> Since this a high-level overview, we will not dive into the computations here.
+> Since this is a high-level overview, we will not dive into the computations here.
 
 The fourth component is a prediction layer.
 This takes the embeddings created by the transformer and produces a huge list of probabilities for the next token.
 For example, if the input text was “What is a Large Language” then the token “ Model” would have a high probability, but the tokens “homework” or “fngrl” would probably have a low probability.
 
 The interesting thing here is that you can use this list of probabilities in different ways.
-You could of course just always select the most probable token.
+You could, of course, just always select the most probable token.
 However, this often leads to boring and repetitive texts.
 Instead, LLMs usually sample from this distribution.
-This means that they randomly select a token in such a way that tokens with higher probabilities have a higher chance to be generated.
+This means that they randomly select a token in such a way that tokens with higher probabilities have a higher chance of being generated.
 
 To sum it up - here is how an LLM predicts the next token given a text:
 
 First, the tokenizer splits the text into tokens.
 Second, the embedding layer generates an embedding for every token.
-Third, the transformer improves the the embeddings by mixing them together.
+Third, the transformer improves the embeddings by mixing them together.
 Finally, the prediction layer generates a list of probabilities for all possible next tokens and samples the next token.
 
 ## Training a Large Language Model
@@ -192,10 +192,10 @@ This is a lot of tokens.
 The way the actual training works is conceptually simple:
 First, we initialize the model with random parameters.
 Next, we split our text corpus into tokens.
-Then we iterate over all the tokens and at each token, we ask the model to give the probabilities for the next token (this is the output of the prediction layer, remember?).
+Then, we iterate over all the tokens, and at each token, we ask the model to provide the probabilities for the next token (this is the output of the prediction layer, remember?).
 Finally, we adjust the parameters of the model in such a way that the actual next token becomes more probable and all other tokens become less probable.
 
-This is really it, although quite often after the initial training is done, models are usually finetuned (i.e. trained further) on special datasets that make the model less likely to produce undesired outputs, allow the model to chat with a user etc.
+This is really it! Although quite often, after the initial training is done, models are usually fine-tuned (i.e., trained further) on special datasets that make the model less likely to produce undesired outputs and allow the model to chat with a user, etc.
 
 > Technical Completeness Note: We necessarily glossed over a lot of technical details in this section.
 > For example, we don't really train models token by token. Instead, the model is fed batches of training data and processes multiple examples at the same time.

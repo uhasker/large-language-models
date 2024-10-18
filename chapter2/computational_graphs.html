@@ -405,7 +405,7 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="computational-graphs-and-backpropagation">
 <h1>Computational Graphs and Backpropagation<a class="headerlink" href="#computational-graphs-and-backpropagation" title="Link to this heading">#</a></h1>
-<p>In this chapter we will introduce the fundamental concepts that underpin all of deep learning - computational graphs and backpropagation.
+<p>In this chapter, we will introduce the fundamental concepts that underpin all of deep learning - computational graphs and backpropagation.
 To showcase these ideas we will create and train a neural network from scratch which will solve a <em>very simple</em> classification task.</p>
 <p>If you want to follow along, you will need to execute the following imports:</p>
 <div class="cell docutils container">
@@ -429,38 +429,38 @@ In a <em>computational graph</em> the <em>nodes represent functions</em>.
 These functions take input values and produce (compute) output values.
 The <em>edges carry</em> these <em>values</em> (which are either input values to the graph or results of preceding computations).
 Thus, computational graphs allow for simple representations of complex functions.</p>
-<p>Let’s respresent an example function <span class="math notranslate nohighlight">\(f: \mathbb{R}^3 \rightarrow \mathbb{R}, f(x, y, z) = (x + y) \cdot z\)</span> using a computational graph.
+<p>Let’s represent an example function <span class="math notranslate nohighlight">\(f: \mathbb{R}^3 \rightarrow \mathbb{R}, f(x, y, z) = (x + y) \cdot z\)</span> using a computational graph.
 We will write <span class="math notranslate nohighlight">\(f = (x + y) \cdot z\)</span> to simplify notation.</p>
-<p>This function really consists of two functions.
+<p>This function actually consists of two functions.
 The first function calculates <span class="math notranslate nohighlight">\(x + y\)</span>. The second function multiplies the result of <span class="math notranslate nohighlight">\(x + y\)</span> by <span class="math notranslate nohighlight">\(z\)</span>.
 Put more formally, we first compute <span class="math notranslate nohighlight">\(g = x + y\)</span> and then calculate <span class="math notranslate nohighlight">\(f = g \cdot z\)</span>.</p>
-<p>This is how the visual representation of the computational graph representing <span class="math notranslate nohighlight">\(f\)</span> would look like:</p>
+<p>This is what the visual representation of the computational graph for <span class="math notranslate nohighlight">\(f\)</span> would look like:</p>
 <a class="reference internal image-reference" href="../_images/compgraph.png"><img alt="drawing" src="../_images/compgraph.png" style="width: 300px;" /></a>
 <blockquote>
 <div><p>Do note that this is not the most common visualization of computational graphs.
-Nevertheless we will stick to it, since it drives home most of the important ideas quite nicely.</p>
+Nevertheless, we will stick to it since it drives home most of the important ideas quite nicely.</p>
 </div></blockquote>
 <p>We can see that the graph has two nodes.
 The first node represents an addition function.
 It takes the values <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> and outputs the value <span class="math notranslate nohighlight">\(g\)</span>.
 The second node represents a multiplication function.
 It takes the values <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(z\)</span> and outputs the value <span class="math notranslate nohighlight">\(f\)</span>.
-Note that here one of the inputs to the multiplication node (namely <span class="math notranslate nohighlight">\(g\)</span>) is the output of a previous node (namely the addition node).</p>
-<p>By decomposing arbitrary functions into simple components we can create computational graphs that represent very complex functions.
-In fact <strong>neural networks</strong> are nothing more than just certain kinds of computational graphs, namely computational graphs which are <em>differentiable</em>.
-This means that every node function has a gradient (or more technically a subgradient, but this distinction largely doesn’t matter right now).
+Note that in this case, one of the inputs to the multiplication node (specifically <span class="math notranslate nohighlight">\(g\)</span>) is the output of a previous node, the addition node.</p>
+<p>By decomposing arbitrary functions into simple components, we can create computational graphs that represent very complex functions.
+In fact, <strong>neural networks</strong> are nothing more than just certain kinds of computational graphs, namely computational graphs that are <em>differentiable</em>.
+This means that every node function has a gradient (or more technically, a subgradient, though this distinction doesn’t really matter right now).
 If all of this sounds like wizardry, don’t worry - we will get into this in a few minutes.</p>
 <p>We just saw that the edges carry values.
-But which values do they carry?
+But what values do they carry?
 There aren’t many restrictions here.
-While in the above examples we had numbers, there is nothing that prevents us from passing vectors, matrices or even more complicated objects around.
+While in the above examples, we had numbers, there is nothing that prevents us from passing vectors, matrices, or even more complicated objects around.
 In fact, this is what we will usually do!</p>
 <p>Consider the function <span class="math notranslate nohighlight">\(f: \mathbb{R}^{n} \rightarrow \mathbb{R}^{m}, f(\vec{x}) = \max(W\vec{x} + \vec{b}, \vec{0})\)</span> where <span class="math notranslate nohighlight">\(W \in \mathbb{R}^{m \times n}\)</span>, <span class="math notranslate nohighlight">\(\vec{b} \in \mathbb{R}^{m}\)</span> and <span class="math notranslate nohighlight">\(\max\)</span> is the elementwise maximum.</p>
 <blockquote>
 <div><p>The form of this function is no accident.
 It represents a (very simple) neural network.</p>
 </div></blockquote>
-<p>We can break this function up as following:</p>
+<p>We can break this function up as follows:</p>
 <p><span class="math notranslate nohighlight">\(\vec{c} = W\vec{x}\)</span></p>
 <p><span class="math notranslate nohighlight">\(\vec{d} = \vec{c} + \vec{b}\)</span></p>
 <p><span class="math notranslate nohighlight">\(\vec{f} = \max(\vec{d}, \vec{0})\)</span></p>
@@ -471,7 +471,7 @@ It represents a (very simple) neural network.</p>
 <section id="tensor">
 <h2>Tensor<a class="headerlink" href="#tensor" title="Link to this heading">#</a></h2>
 <p>There are different definitions of tensors depending on the mathematical branch you’re in.
-For the purposes of deep learning, a <strong>tensor</strong> is nothing else than a <em>multidimensional array</em> (if you’ve ever used numpy arrays, this is very similar).</p>
+For the purposes of deep learning, a <strong>tensor</strong> is nothing else but a <em>multidimensional array</em> (if you’ve ever used numpy arrays, this is very similar).</p>
 <p>For example, a zero-dimensional tensor is just a number:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -550,12 +550,12 @@ For the purposes of deep learning, a <strong>tensor</strong> is nothing else tha
 Consider an NLP task where each <em>word is represented by a high-dimensional vector</em> (this is the <em>first</em> dimension).
 A <em>text consists of multiple words</em> (this is the <em>second</em> dimension).
 To decrease training time, we often pass <em>multiple texts at the same time</em> through a neural network (this is the <em>third</em> dimension).
-I want to reiterate, that this is <em>not</em> some theoretical construction, but in fact a very common setup.
+I want to reiterate that this is <em>not</em> some theoretical construction, but in fact, a very common setup.
 So the earlier you get used to high-dimensional tensors, the better.</p>
 <p>This is not meant to intimidate you (of course we <em>would</em> say that, wouldn’t we).
-High-dimensional tensors sound scary (mostly because people associate them with quantum mechanics and the like), but for our purposes we don’t care about most of that scariness.
+High-dimensional tensors sound scary (mostly because people associate them with quantum mechanics and the like), but for our purposes, we don’t care about most of that scariness.
 In fact, a lot of concepts concerning vectors and matrices generalize quite nicely to tensors.</p>
-<p>For example <strong>tensor addition</strong> and <strong>tensor-constant multiplication</strong> are done componentwise (just like with vectors and matrices):</p>
+<p>For example, <strong>tensor addition</strong> and <strong>tensor-constant multiplication</strong> are done componentwise (just like with vectors and matrices):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
@@ -589,12 +589,13 @@ Do note that we will introduce a very particular tensor product (which is someti
 Depending on your background, you may be familiar with other tensor products.</p>
 <blockquote>
 <div><p>This is nothing unusual.
-Consider matrix products for example.
+Consider matrix products, for example.
 There is the matrix multiplication and the Hadamard product (which is the element-wise multiplication of two matrices).
-In fact, PyTorch has a multitude of functions for computing tensor products (for example matmul and tensordot, which do different things). &gt; I want to stress - we introduce the tensor product the way we do because that is what is useful for us in deep learning - no more, no less.</p>
+In fact, PyTorch has a multitude of functions for computing tensor products (for example, matmul and tensordot that do different things).
+I want to stress - we introduce the tensor product the way we do because it is what is useful for us in deep learning - no more, no less.</p>
 </div></blockquote>
 <p>The product of two one-dimensional tensors is essentially the dot product.
-For example if <span class="math notranslate nohighlight">\(\vec{v} = \begin{bmatrix} 1 \\ 2 \\ 3 \\ 4 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(\vec{w} = \begin{bmatrix} 5 \\ 6 \\ 7 \\ 8 \end{bmatrix}\)</span>, then <span class="math notranslate nohighlight">\(\vec{v} \otimes \vec{w} = 1 \cdot 5 + 2 \cdot 6 + 3 \cdot 7 + 4 \cdot 8 = 70\)</span>.
+For example, if <span class="math notranslate nohighlight">\(\vec{v} = \begin{bmatrix} 1 \\ 2 \\ 3 \\ 4 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(\vec{w} = \begin{bmatrix} 5 \\ 6 \\ 7 \\ 8 \end{bmatrix}\)</span>, then <span class="math notranslate nohighlight">\(\vec{v} \otimes \vec{w} = 1 \cdot 5 + 2 \cdot 6 + 3 \cdot 7 + 4 \cdot 8 = 70\)</span>.
 This is where you might have a first clash with the tensor product as it is known in other areas (where <span class="math notranslate nohighlight">\(\vec{v} \otimes \vec{w}\)</span> may be the <em>outer</em> product of <span class="math notranslate nohighlight">\(\vec{v}\)</span> and <span class="math notranslate nohighlight">\(\vec{w}\)</span>).</p>
 <p>To compute this in pytorch, we could use the dot function:</p>
 <div class="cell docutils container">
@@ -611,7 +612,7 @@ This is where you might have a first clash with the tensor product as it is know
 </div>
 </div>
 </div>
-<p>We could also use the matmul function, which also generalizes to higher-dimensional tensors:</p>
+<p>We could also use the matmul function that also generalizes to higher-dimensional tensors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
@@ -626,8 +627,8 @@ This is where you might have a first clash with the tensor product as it is know
 </div>
 </div>
 </div>
-<p>The product of a one-dimensional tensor and a two-dimensional tensor is just regular matrix-vector multiplication. For example if <span class="math notranslate nohighlight">\(W = \begin{bmatrix} 1 &amp; 3 \\ 5 &amp; 7 \\ 9 &amp; 11 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(\vec{x} = \begin{bmatrix} 2 \\ 4 \end{bmatrix}\)</span>, then <span class="math notranslate nohighlight">\(W \otimes \vec{x} = W \cdot \vec{x} = \begin{bmatrix} 1 \cdot 2 + 3 \cdot 4 \\ 5 \cdot 2 + 7 \cdot 4 \\ 9 \cdot 2 + 11 \cdot 4 \end{bmatrix} = \begin{bmatrix} 14 \\ 38 \\ 62 \end{bmatrix}\)</span>.</p>
-<p>Let us reproduce this with pytorch:</p>
+<p>The product of a one-dimensional tensor and a two-dimensional tensor is just regular matrix-vector multiplication. For example, if <span class="math notranslate nohighlight">\(W = \begin{bmatrix} 1 &amp; 3 \\ 5 &amp; 7 \\ 9 &amp; 11 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(\vec{x} = \begin{bmatrix} 2 \\ 4 \end{bmatrix}\)</span>, then <span class="math notranslate nohighlight">\(W \otimes \vec{x} = W \cdot \vec{x} = \begin{bmatrix} 1 \cdot 2 + 3 \cdot 4 \\ 5 \cdot 2 + 7 \cdot 4 \\ 9 \cdot 2 + 11 \cdot 4 \end{bmatrix} = \begin{bmatrix} 14 \\ 38 \\ 62 \end{bmatrix}\)</span>.</p>
+<p>Let’s reproduce this with pytorch:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">11</span><span class="p">]])</span>
@@ -642,7 +643,7 @@ This is where you might have a first clash with the tensor product as it is know
 </div>
 </div>
 </div>
-<p>Similarly the product of two two-dimensional tensors is just regular matrix-matrix multiplication. For example if <span class="math notranslate nohighlight">\(U = \begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \\ 5 &amp; 6 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(V = \begin{bmatrix} 2 &amp; 1 \\ 1 &amp; 3 \end{bmatrix}\)</span>, then <span class="math notranslate nohighlight">\(U \otimes V = U \cdot V = \begin{bmatrix} 1 \cdot 2 + 2 \cdot 1 &amp; 1 \cdot 1 + 2 \cdot 3 \\ 3 \cdot 2 + 4 \cdot 1 &amp; 3 \cdot 1 + 4 \cdot 3 \\ 5 \cdot 2 + 6 \cdot 1 &amp; 5 \cdot 1 + 6 \cdot 3 \end{bmatrix} = \begin{bmatrix} 4 &amp; 7 \\ 10 &amp; 15 \\ 16 &amp; 23 \end{bmatrix}\)</span></p>
+<p>Similarly, the product of two two-dimensional tensors is just regular matrix-matrix multiplication. For example, if <span class="math notranslate nohighlight">\(U = \begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \\ 5 &amp; 6 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(V = \begin{bmatrix} 2 &amp; 1 \\ 1 &amp; 3 \end{bmatrix}\)</span>, then <span class="math notranslate nohighlight">\(U \otimes V = U \cdot V = \begin{bmatrix} 1 \cdot 2 + 2 \cdot 1 &amp; 1 \cdot 1 + 2 \cdot 3 \\ 3 \cdot 2 + 4 \cdot 1 &amp; 3 \cdot 1 + 4 \cdot 3 \\ 5 \cdot 2 + 6 \cdot 1 &amp; 5 \cdot 1 + 6 \cdot 3 \end{bmatrix} = \begin{bmatrix} 4 &amp; 7 \\ 10 &amp; 15 \\ 16 &amp; 23 \end{bmatrix}\)</span></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">U</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
@@ -660,17 +661,17 @@ This is where you might have a first clash with the tensor product as it is know
 </div>
 </div>
 <p>But what about products of tensors with more than two dimensions?
-The tensor product generalizes in a straighforward fashion.
+The tensor product generalizes in a straightforward fashion.
 Consider the multiplication of a three-dimensional tensor <span class="math notranslate nohighlight">\(Q\)</span> of dimension <span class="math notranslate nohighlight">\(m \times n \times d\)</span> (i.e. <span class="math notranslate nohighlight">\(Q \in \mathbb{R}^{m \times n \times d}\)</span>) with a one-dimensional tensor <span class="math notranslate nohighlight">\(\vec{x}\)</span> of dimension <span class="math notranslate nohighlight">\(d\)</span> (i.e. <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^d\)</span>).
 We can treat <span class="math notranslate nohighlight">\(Q\)</span> as a list of <span class="math notranslate nohighlight">\(m\)</span> matrices of dimension <span class="math notranslate nohighlight">\(n \times d\)</span> each.
-Then we simply compute <span class="math notranslate nohighlight">\(m\)</span> vector-matrix products.
+Then, we simply compute <span class="math notranslate nohighlight">\(m\)</span> vector-matrix products.
 Each such product is a product of a matrix <span class="math notranslate nohighlight">\(Q_i \in \mathbb{R}^{n \times d}\)</span> and the vector <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^d\)</span>.
-Therefore each product results in vector of dimension <span class="math notranslate nohighlight">\(n\)</span>.
+Therefore, each product results in a vector of dimension <span class="math notranslate nohighlight">\(n\)</span>.
 We can stack these vectors back into a matrix resulting in a matrix of dimension <span class="math notranslate nohighlight">\(\mathbb{R}^{m \times n}\)</span>.</p>
 <p>Consider the tensor <span class="math notranslate nohighlight">\(Q = \begin{bmatrix} \begin{bmatrix} 1 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 0 \\ 1 &amp; 0 &amp; 1 \\ 1 &amp; 1 &amp; 1\end{bmatrix}, \begin{bmatrix} 0 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 1 \\ 1 &amp; 1 &amp; 1 \\ 1 &amp; 0 &amp; 0 \end{bmatrix} \end{bmatrix}\)</span> and the vector <span class="math notranslate nohighlight">\(\vec{x} = \begin{bmatrix} 5 \\ 6 \\ 7 \end{bmatrix}\)</span>.
 We can think of <span class="math notranslate nohighlight">\(Q\)</span> as a list of two matrices <span class="math notranslate nohighlight">\(Q = \begin{bmatrix} Q_1 &amp; Q_2 \end{bmatrix}\)</span> where <span class="math notranslate nohighlight">\(Q_1 = \begin{bmatrix} 1 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 0 \\ 1 &amp; 0 &amp; 1 \\ 1 &amp; 1 &amp; 1 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(Q_2 = \begin{bmatrix} 0 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 1 \\ 1 &amp; 1 &amp; 1 \\ 1 &amp; 0 &amp; 0 \end{bmatrix}\)</span>.</p>
-<p>Now we have <span class="math notranslate nohighlight">\(Q \otimes \vec{x} = \begin{bmatrix} (Q_1 \cdot \vec{x})^\intercal \\ (Q_2 \cdot \vec{x})^\intercal \end{bmatrix}\)</span> (note that we need to transpose the individual dot products). Now we easily obtain <span class="math notranslate nohighlight">\(Q_1 \cdot \vec{x} = \begin{bmatrix} 12 \\ 6 \\ 12 \\ 18 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(Q_2 \cdot \vec{x} = \begin{bmatrix} 7 \\ 13 \\ 18 \\ 5 \end{bmatrix}\)</span>. Stacking these vectors together, we get that <span class="math notranslate nohighlight">\(Q \otimes \vec{x} = \begin{bmatrix} 12 &amp; 6 &amp; 12 &amp; 18 \\ 7 &amp; 13 &amp; 18 &amp; 5 \end{bmatrix}\)</span>.</p>
-<p>Let’s confirm this in code.
+<p>Now, we have <span class="math notranslate nohighlight">\(Q \otimes \vec{x} = \begin{bmatrix} (Q_1 \cdot \vec{x})^\intercal \\ (Q_2 \cdot \vec{x})^\intercal \end{bmatrix}\)</span> (note that we need to transpose the individual dot products). Now, we easily obtain <span class="math notranslate nohighlight">\(Q_1 \cdot \vec{x} = \begin{bmatrix} 12 \\ 6 \\ 12 \\ 18 \end{bmatrix}\)</span> and <span class="math notranslate nohighlight">\(Q_2 \cdot \vec{x} = \begin{bmatrix} 7 \\ 13 \\ 18 \\ 5 \end{bmatrix}\)</span>. Stacking these vectors together, we get that <span class="math notranslate nohighlight">\(Q \otimes \vec{x} = \begin{bmatrix} 12 &amp; 6 &amp; 12 &amp; 18 \\ 7 &amp; 13 &amp; 18 &amp; 5 \end{bmatrix}\)</span>.</p>
+<p>Let’s confirm this with code.
 First, we initialize the tensors <code class="docutils literal notranslate"><span class="pre">Q</span></code> and <code class="docutils literal notranslate"><span class="pre">x</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -731,10 +732,10 @@ First, we initialize the tensors <code class="docutils literal notranslate"><spa
 </section>
 <section id="our-first-neural-network">
 <h2>Our First Neural Network<a class="headerlink" href="#our-first-neural-network" title="Link to this heading">#</a></h2>
-<p>Armed with the concepts we just learned, we can now construct our first very simple neural network.</p>
+<p>Armed with the concepts we have just learned, we can now construct our first, very simple neural network.</p>
 <p>We will attempt to fit a toy classification dataset.
 Recall from the high-level overview chapter that the neural network <em>fits</em> the data if it labels all points from a dataset (more or less) correctly.
-Note that will not worry about concepts like validation or testing in this chapter.
+Note that we won’t worry about concepts like validation or testing in this chapter.
 The only thing we <em>will</em> worry about is the training (fitting) process.</p>
 <p>Let’s create a toy dataset:</p>
 <div class="cell docutils container">
@@ -758,17 +759,17 @@ x1=1.0, x2=1.0, t=1
 </div>
 </div>
 <p>If you are familiar with basic logic, this is just the truth table for the <em>AND</em> function.</p>
-<p>Of course we can fit such a trivial dataset without fancy deep learning techniques.
-Nevertheless this is a very nice example that will allow us to showcase a few important concepts.</p>
+<p>Of course, we can fit such a trivial dataset without using fancy deep learning techniques.
+Nevertheless, this is a very nice example that will allow us to showcase a few important concepts.</p>
 <p>Let’s think about the simplest meaningful computational graph we could construct here.
 This would obviously be some kind of affine function, i.e. something that has the form <span class="math notranslate nohighlight">\(f(x) = x_1 \cdot w_1 + x_2 \cdot w_2 + b\)</span>.
 However, the output of an affine function can be arbitrary, but our classes can only take the values 0 and 1 (i.e. we are dealing with binary classification here).
 We would therefore like to squash the outputs of our function to the range <span class="math notranslate nohighlight">\([0, 1]\)</span>.
-Then we can interpret the squashed value as the probability of the class represented by 1.
-For example if the squashed output is <span class="math notranslate nohighlight">\(0.7\)</span>, then we would say that the data point has the class 1 with probability <span class="math notranslate nohighlight">\(0.7\)</span>.
+Then, we can interpret the squashed value as the probability of the class represented by 1.
+For example, if the squashed output is <span class="math notranslate nohighlight">\(0.7\)</span>, then we would say that the data point has the class 1 with probability <span class="math notranslate nohighlight">\(0.7\)</span>.
 This has the added benefit that we can assign a <em>confidence</em> to our predictions.
 If the probability is very high (or very low), we have more confidence regarding our prediction than if the probability is e.g. <span class="math notranslate nohighlight">\(0.5\)</span>.</p>
-<p>A commonly used squashing function is the so called <em>sigmoid</em> function defined by <span class="math notranslate nohighlight">\(\sigma(z) = \frac{1}{1 + \exp(-z)}\)</span>.
+<p>A commonly used squashing function is the so-called <em>sigmoid</em> function defined by <span class="math notranslate nohighlight">\(\sigma(z) = \frac{1}{1 + \exp(-z)}\)</span>.
 It looks like this:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -782,7 +783,7 @@ It looks like this:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f39cb8b22b0&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f7300abc190&gt;]
 </pre></div>
 </div>
 <img alt="../_images/b0a5d26999c81223f61200b11f14ef5b95d3b991742925a0b9de879edc31f843.png" src="../_images/b0a5d26999c81223f61200b11f14ef5b95d3b991742925a0b9de879edc31f843.png" />
@@ -790,12 +791,12 @@ It looks like this:</p>
 </div>
 <p>We can see the very small values essentially become 0, very large values essentially become 1 and everything in between is mapped to an appropriate value between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span> in a monotonous way (with <span class="math notranslate nohighlight">\(\sigma(0) = 0.5\)</span>).
 This looks like a function that accomplishes what we intended.</p>
-<p>Therefore we define our first neural network by <em>applying a sigmoid function to an affine function</em>.
+<p>Therefore, we define our first neural network by <em>applying a sigmoid function to an affine function</em>.
 Yes, that’s really all we are going to do!
-Note that while this is the simplest meaningful setup for a classification task, it is still a <em>pratically useful</em> setup that is used for certain tasks.</p>
+Note that, while this is the simplest meaningful setup for a classification task, it is still a <em>practically useful</em> setup that is used for certain tasks.</p>
 <p>Formally speaking, our network is defined as <span class="math notranslate nohighlight">\(y = f(\vec{x}) = f(x_1, x_2) = \sigma(x_1 \cdot w_1 + x_2 \cdot w_2 + b)\)</span>.</p>
-<p>Let us represent this function using a computational graph.</p>
-<p>First we split <span class="math notranslate nohighlight">\(f\)</span> into its respective computations:</p>
+<p>Let’s represent this function using a computational graph.</p>
+<p>First, we split <span class="math notranslate nohighlight">\(f\)</span> into its respective computations:</p>
 <p><span class="math notranslate nohighlight">\(h_1 = x_1 \cdot w_1\)</span></p>
 <p><span class="math notranslate nohighlight">\(h_2 = x_2 \cdot w_2\)</span></p>
 <p><span class="math notranslate nohighlight">\(h = h_1 + h_2\)</span></p>
@@ -806,7 +807,7 @@ Note that while this is the simplest meaningful setup for a classification task,
 <p>Note that this computational graph is indeed <em>differentiable</em> since every function has a derivative.</p>
 <p>Recall that the basic idea behind the training of (any) machine learning model is quite simple.
 We start with randomly initialized parameters (we will discuss initialization schemes later).
-Then we iterate through all the examples and update the parameters in such a way that we improve our performance on those examples.
+Then, we iterate through all the examples and update the parameters in such a way that we improve our performance on those examples.
 We often do multiple iterations on the dataset.
 Each iteration is called an <strong>epoch</strong>.
 In its simplest form, the training loop therefore looks like this:</p>
@@ -816,7 +817,7 @@ In its simplest form, the training loop therefore looks like this:</p>
         <span class="n">model</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>There are a few pratical considerations missing here - we will talk about them later.</p>
+<p>A few practical considerations are missing here - we will talk about them later.</p>
 <p>The big question we will discuss next is how the update should be performed.
 Intuitively, we would like to update the model parameters in such a way that the network “performs” a bit better on the example <span class="math notranslate nohighlight">\(x\)</span> labeled with the target value <span class="math notranslate nohighlight">\(t\)</span>.</p>
 </section>
@@ -825,35 +826,35 @@ Intuitively, we would like to update the model parameters in such a way that the
 <p>How could we accomplish that?</p>
 <p>First of all, we need to specify what we mean by “better performance”.
 That is we need to quantify how  well a neural network performs on an example <span class="math notranslate nohighlight">\(x\)</span> labeled with the target value <span class="math notranslate nohighlight">\(t\)</span>.</p>
-<p>To achieve that, we define a <strong>loss function</strong> which is the measure of how far the output of the network is from the correct target.
+<p>To achieve this, we define a <strong>loss function</strong>, which measures how far the output of the network is from the correct target.
 We then simply update our parameters in such a way that the <em>loss decreases</em>.
 Put differently, we want to <em>minimize the loss</em>.</p>
-<p>In this particular case we will use a loss function called <strong>binary crossentropy</strong> which is defined as <span class="math notranslate nohighlight">\(BCE(y, t) = -t \cdot log(y) - (1 - t) \cdot log(1 - y)\)</span>. Here <span class="math notranslate nohighlight">\(y\)</span> is the value produced by our network and <span class="math notranslate nohighlight">\(t\)</span> is the target value.</p>
-<p>Binary crossentropy is a concept deep learning shamelessly stole (a.k.a. <em>borrowed</em>) from information theory, but we will not go into all that and instead motivate it with very simple intuition.
-Basically if <span class="math notranslate nohighlight">\(t = 1\)</span>, then we want the loss to be proportional to <span class="math notranslate nohighlight">\(-\log(y)\)</span>.
-This is because a lower <span class="math notranslate nohighlight">\(y\)</span> in our interpretation means a higher probability of <span class="math notranslate nohighlight">\(t = 0\)</span> which is bad if in reality <span class="math notranslate nohighlight">\(t = 1\)</span>.
+<p>In this particular case, we will use a loss function called <strong>binary cross-entropy</strong>, which is defined as <span class="math notranslate nohighlight">\(BCE(y, t) = -t \cdot log(y) - (1 - t) \cdot log(1 - y)\)</span>. Here, <span class="math notranslate nohighlight">\(y\)</span> is the value produced by our network and <span class="math notranslate nohighlight">\(t\)</span> is the target value.</p>
+<p>Binary cross-entropy is a concept deep learning shamelessly stole (a.k.a. <em>borrowed</em>) from information theory, but we won’t go into all that and instead motivate it with a very simple intuition.
+Basically, if <span class="math notranslate nohighlight">\(t = 1\)</span>, then we want the loss to be proportional to <span class="math notranslate nohighlight">\(-\log(y)\)</span>.
+This is because a lower <span class="math notranslate nohighlight">\(y\)</span> in our interpretation means a higher probability of <span class="math notranslate nohighlight">\(t = 0\)</span>, which is bad if, in reality, <span class="math notranslate nohighlight">\(t = 1\)</span>.
 Similarly, if <span class="math notranslate nohighlight">\(t = 0\)</span>, we want the loss to be proportional to <span class="math notranslate nohighlight">\(-\log(1 - y)\)</span>.
-Now we simply combine this into one expression which gets us the formula from above.</p>
+Now, we simply combine this into one expression which gets us the formula from above.</p>
 <p>How does the loss fit into the computational graph?
-Even deep learning practicioners sometimes get confused about that, but the simple truth is that the loss is just another node put on top of the network:</p>
+Even deep learning practitioners sometimes get confused about that, but the simple truth is that the loss is just another node put on top of the network:</p>
 <a class="reference internal image-reference" href="../_images/simple_net_loss.png"><img alt="drawing" src="../_images/simple_net_loss.png" style="width: 600px;" /></a>
-<p>Let us take our simple neural net and set <span class="math notranslate nohighlight">\(w_1 = w_2 = 0.5\)</span>, <span class="math notranslate nohighlight">\(b = 0\)</span>.
+<p>Let’s take our simple neural net and set <span class="math notranslate nohighlight">\(w_1 = w_2 = 0.5\)</span>, <span class="math notranslate nohighlight">\(b = 0\)</span>.
 A quick calculation yields an output value of <span class="math notranslate nohighlight">\(y = 0.6225\)</span> for <span class="math notranslate nohighlight">\(x_1 = 0\)</span>, <span class="math notranslate nohighlight">\(x_2 = 1\)</span>.
 We see that the output value is not quite right.
 It should be <span class="math notranslate nohighlight">\(t = 0\)</span> and not <span class="math notranslate nohighlight">\(y = 0.6225\)</span>.
-Therefore we want to update the parameters of the network (i.e. <span class="math notranslate nohighlight">\(w_1, w_2\)</span> and <span class="math notranslate nohighlight">\(b\)</span>) in such a way that the output <span class="math notranslate nohighlight">\(y\)</span> becomes a bit closer to the target <span class="math notranslate nohighlight">\(t\)</span>.</p>
+Therefore, we want to update the parameters of the network (i.e. <span class="math notranslate nohighlight">\(w_1, w_2\)</span> and <span class="math notranslate nohighlight">\(b\)</span>) in such a way that the output <span class="math notranslate nohighlight">\(y\)</span> becomes a bit closer to the target <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <p>What this really means is that we have to update our weights in such a way that the loss (let us call it <span class="math notranslate nohighlight">\(L\)</span>) becomes smaller.
 How could we approach this?</p>
 <p>If you have some basic knowledge of optimization theory, you are probably smirking right now.
 This is what gradient descent (and a bunch of other optimization algorithms) are for!
-However, even if you do not know any numerical optimization, you can still easily develop an idea for what we should do.</p>
+However, even if you don’t know any numerical optimization, you can still easily develop an idea for what we should do.</p>
 <p>Remember from high school that the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b}\)</span> tells you the way <span class="math notranslate nohighlight">\(L\)</span> changes if we change <span class="math notranslate nohighlight">\(b\)</span>.
-For example, if <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} &gt; 0\)</span> then increasing <span class="math notranslate nohighlight">\(b\)</span> would lead to an increase in <span class="math notranslate nohighlight">\(L\)</span>.
-If <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} &lt; 0\)</span> then an increase in <span class="math notranslate nohighlight">\(b\)</span> would lead to a decrease in <span class="math notranslate nohighlight">\(L\)</span>.</p>
-<p>Now assume that we somehow get our hands on <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b}\)</span>.
+For example, if <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} &gt; 0\)</span>, then increasing <span class="math notranslate nohighlight">\(b\)</span> would lead to an increase in <span class="math notranslate nohighlight">\(L\)</span>.
+If <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} &lt; 0\)</span>, then an increase in <span class="math notranslate nohighlight">\(b\)</span> would lead to a decrease in <span class="math notranslate nohighlight">\(L\)</span>.</p>
+<p>Now, assume that we somehow get our hands on <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b}\)</span>.
 We want to change <span class="math notranslate nohighlight">\(b\)</span> in such a way that <span class="math notranslate nohighlight">\(L\)</span> decreases.
 After all, we want to <em>minimize</em> the loss.
-Therefore we should update <span class="math notranslate nohighlight">\(b\)</span> by a value proportionate to <span class="math notranslate nohighlight">\(-\frac{\partial L}{\partial b}\)</span>.
+Therefore, we should update <span class="math notranslate nohighlight">\(b\)</span> by a value proportionate to <span class="math notranslate nohighlight">\(-\frac{\partial L}{\partial b}\)</span>.
 Put differently, we want to update <span class="math notranslate nohighlight">\(b\)</span> by <span class="math notranslate nohighlight">\(-\alpha \cdot \frac{\partial L}{\partial b}\)</span> where <span class="math notranslate nohighlight">\(\alpha\)</span> is some parameter that controls how big our update should be.
 More formally, the update step looks as follows:</p>
 <p><span class="math notranslate nohighlight">\(b^{(t+1)} = b^{(t)} - \alpha \cdot \frac{\partial L}{\partial b^{(t)}}\)</span></p>
@@ -864,7 +865,7 @@ More formally, the update step looks as follows:</p>
 <p>After such an update the loss would become smaller.
 But how could we could calculate the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b}\)</span>?
 Calculating e.g. the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span> would be easy - we would simply need to take the derivative of the loss function.
-But <span class="math notranslate nohighlight">\(b\)</span> does not influence the loss directly, it influences the loss through <span class="math notranslate nohighlight">\(y\)</span>.</p>
+But <span class="math notranslate nohighlight">\(b\)</span> doesn’t influence the loss directly, it influences the loss through <span class="math notranslate nohighlight">\(y\)</span>.</p>
 <p>There is no reason to despair here, as we can use the <em>chain rule</em>.
 We know that <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b}\)</span> can be calculated as <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial b}\)</span>.
 But now we have the same problem.
@@ -874,20 +875,20 @@ How do we get <span class="math notranslate nohighlight">\(\frac{\partial y}{\pa
 We see that <span class="math notranslate nohighlight">\(y\)</span> depends on <span class="math notranslate nohighlight">\(b\)</span> through <span class="math notranslate nohighlight">\(z\)</span>.
 By the chain rule we have <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial b} = \frac{\partial y}{\partial z} \frac{\partial z}{\partial b}\)</span>.</p>
 <p>We therefore have: <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial z} \frac{\partial z}{\partial b}\)</span>.
-Now we only need to calculate the individual derivatives using our knowledge of basic differentiation and we are all set.</p>
+Now, we only need to calculate the individual derivatives using our knowledge of basic differentiation, and then we are all set.</p>
 <p>Let’s calculate the individual derivatives:</p>
 <ol class="arabic simple">
-<li><p>We begin with <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span>. Since <span class="math notranslate nohighlight">\(L = -t \cdot log(y) - (1 - t) \cdot log(1 - y)\)</span> we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} = \frac{y - t}{(1 - y)y}\)</span>.</p></li>
-<li><p>Similarly we get <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z} = \frac{\exp(-z)}{(1 + \exp(-z))^2}\)</span>.</p></li>
+<li><p>We begin with <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span>. Since <span class="math notranslate nohighlight">\(L = -t \cdot log(y) - (1 - t) \cdot log(1 - y)\)</span>, we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} = \frac{y - t}{(1 - y)y}\)</span>.</p></li>
+<li><p>Similarly, we get <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z} = \frac{\exp(-z)}{(1 + \exp(-z))^2}\)</span>.</p></li>
 <li><p>Finally, we have <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial b} = 1\)</span>.</p></li>
 </ol>
-<p>Therefore <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} = \frac{y - t}{(1 - y)y} \cdot \frac{\exp(-z)}{(1 + \exp(-z))^2}\)</span></p>
+<p>Therefore, <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial b} = \frac{y - t}{(1 - y)y} \cdot \frac{\exp(-z)}{(1 + \exp(-z))^2}\)</span></p>
 <p>The same logic holds for <span class="math notranslate nohighlight">\(w_1\)</span> and <span class="math notranslate nohighlight">\(w_2\)</span>.</p>
-<p>Here we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial z} \frac{\partial z}{\partial h} \frac{\partial h}{\partial h_1} \frac{\partial h_1}{\partial w_1}\)</span>.</p>
-<p>Since <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} = -\frac{t}{y} + \frac{1 - t}{1 - y}\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z} = \frac{\exp(-z)}{(1 + \exp(-z))^2}\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial h} = 1\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial h}{\partial h_1} = 1\)</span> and <span class="math notranslate nohighlight">\(\frac{\partial h_1}{\partial w_1} = x_1\)</span> we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial w_1} = \frac{y - t}{(1 - y)y} \cdot \frac{\exp(-z)}{(1 + \exp(-z))^2} \cdot x_1\)</span>.</p>
+<p>Here, we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial z} \frac{\partial z}{\partial h} \frac{\partial h}{\partial h_1} \frac{\partial h_1}{\partial w_1}\)</span>.</p>
+<p>Since <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} = -\frac{t}{y} + \frac{1 - t}{1 - y}\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z} = \frac{\exp(-z)}{(1 + \exp(-z))^2}\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial h} = 1\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial h}{\partial h_1} = 1\)</span> and <span class="math notranslate nohighlight">\(\frac{\partial h_1}{\partial w_1} = x_1\)</span>, we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial w_1} = \frac{y - t}{(1 - y)y} \cdot \frac{\exp(-z)}{(1 + \exp(-z))^2} \cdot x_1\)</span>.</p>
 <p>You <em>should</em> verify all of this.
 It’s a nice and simple, but <em>very relevant</em> exercise in calculating derivatives.</p>
-<p>In a similar fashion we obtain <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial w_2} = \frac{y - t}{(1 - y)y} \cdot \frac{\exp(-z)}{(1 + \exp(-z))^2} \cdot x_2\)</span></p>
+<p>In a similar fashion, we obtain <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial w_2} = \frac{y - t}{(1 - y)y} \cdot \frac{\exp(-z)}{(1 + \exp(-z))^2} \cdot x_2\)</span></p>
 <p>Let’s write all of this down in code:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -929,7 +930,7 @@ It’s a nice and simple, but <em>very relevant</em> exercise in calculating der
 </div>
 </div>
 </div>
-<p>While this is pretty long, it’s really just our above formulas written in Python.</p>
+<p>While this may be a bit long, it’s really just the formulas we discussed above written in Python.</p>
 <p>Let’s take the first example from the dataset:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -960,7 +961,7 @@ It’s a nice and simple, but <em>very relevant</em> exercise in calculating der
 </div>
 </div>
 </div>
-<p>Now we execute an update:</p>
+<p>Now, we execute an update:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
@@ -973,7 +974,7 @@ It’s a nice and simple, but <em>very relevant</em> exercise in calculating der
 </div>
 </div>
 </div>
-<p>We can see that <span class="math notranslate nohighlight">\(w_1\)</span>, <span class="math notranslate nohighlight">\(w_2\)</span> and <span class="math notranslate nohighlight">\(b\)</span> changed:</p>
+<p>We can see that <span class="math notranslate nohighlight">\(w_1\)</span>, <span class="math notranslate nohighlight">\(w_2\)</span> and <span class="math notranslate nohighlight">\(b\)</span> have changed:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">b</span>
@@ -1006,7 +1007,7 @@ It’s a nice and simple, but <em>very relevant</em> exercise in calculating der
 </div>
 </div>
 </div>
-<p>This looks good! Now all we have to do is to repeatedly iterate over the dataset and do updates:</p>
+<p>This looks good! Now, all we have to do is repeatedly iterate over the dataset and do updates:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">SimpleNet</span><span class="p">()</span>
@@ -1020,9 +1021,9 @@ It’s a nice and simple, but <em>very relevant</em> exercise in calculating der
 </div>
 <p>That’s it!
 We’ve successfully trained our first neural network.
-If you understood the preceding section, you’ve come a <em>tremendously long</em> way to understanding how neural networks operate.
-The rest of this chapter is really just about coming up with a more efficient algorithm for doing this (as calculating all the derivatives by hand is very tedious).</p>
-<p>Before we move on, let us verify that we indeed get useful predictions:</p>
+If you understood the preceding section, you’ve come a <em>tremendously long</em> way toward understanding how neural networks operate.
+The rest of this chapter is mainly about coming up with a more efficient algorithm for achieving this (as calculating all the derivatives by hand is very tedious).</p>
+<p>Before we move on, let’s verify that we indeed get useful predictions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
@@ -1042,7 +1043,7 @@ The rest of this chapter is really just about coming up with a more efficient al
 </div>
 <p>Incredible!
 We can see that loss has become very small for every point.
-Let us have a look at the learned parameters and try to gain an intuition for what the network learned:</p>
+Let’s have a look at the learned parameters and try to gain an intuition for what the network learned:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">b</span>
@@ -1055,30 +1056,30 @@ Let us have a look at the learned parameters and try to gain an intuition for wh
 </div>
 </div>
 </div>
-<p>Basically we learned the function <span class="math notranslate nohighlight">\(y = f(x_1, x_2) = \sigma(5.94 \cdot x_1 + 5.88 \cdot x_2 - 8.94)\)</span>.
+<p>Basically, we learned the function <span class="math notranslate nohighlight">\(y = f(x_1, x_2) = \sigma(5.94 \cdot x_1 + 5.88 \cdot x_2 - 8.94)\)</span>.
 This makes sense.
-Essentially the network arrived at the scheme “<span class="math notranslate nohighlight">\(x_1\)</span> and <span class="math notranslate nohighlight">\(x_2\)</span> both need to make a contribution to produce a large value, otherwise the bias will pull the total value down”.
+Essentially, the network arrived at the scheme “<span class="math notranslate nohighlight">\(x_1\)</span> and <span class="math notranslate nohighlight">\(x_2\)</span> both need to contribute to produce a large value; otherwise, the bias will pull the total value down”.
 This is just a (slightly convoluted) description for the <em>AND</em> function.</p>
 </section>
 <section id="the-backpropagation-algorithm">
 <h2>The Backpropagation Algorithm<a class="headerlink" href="#the-backpropagation-algorithm" title="Link to this heading">#</a></h2>
-<p>Manual updates work fine, but involve calculating lots of derivatives.
-This would mean that for every new model we would need to recalculate all the derivatives by hand which is going to get quite annoying for <em>Large</em> Language Models.
-We want to be able to do this more effectively.</p>
+<p>Manual updates work fine but require calculating a lot of derivatives.
+This would mean that for every new model, we would need to recalculate all the derivatives by hand, which is going to get quite annoying for <em>Large</em> Language Models.
+We want to be able to do this more efficiently.</p>
 <p>Let’s closely examine the flow of derivatives through the network:</p>
 <a class="reference internal image-reference" href="../_images/backprop.png"><img alt="drawing" src="../_images/backprop.png" style="width: 800px;" /></a>
 <p>As you can see the derivatives flow <em>backwards</em>.</p>
-<p>Additionally, the flow is very well structured.</p>
+<p>Additionally, the flow is very well-structured.</p>
 <p>Consider the sigmoid node.
-The derivative that <em>flows out</em> of the node (<span class="math notranslate nohighlight">\(\frac{\partial L}{\partial z}\)</span>) only depends on the derivative that <em>flows in</em> (<span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span>) and the <em>local derivative at the node</em> <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z}\)</span>.
+The derivative that <em>flows out</em> of the node (<span class="math notranslate nohighlight">\(\frac{\partial L}{\partial z}\)</span>) depends only on the derivative that <em>flows in</em> (<span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span>) and the <em>local derivative at the node</em> <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z}\)</span>.
 After all, the chain rule tells us that <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial z} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial z}\)</span>.</p>
 <p>The same holds true for all the other nodes!
-<em>Given the derivative flowing in each node can calculate the derivative flowing out.</em></p>
+<em>Given the derivative flowing in, each node can calculate the derivative flowing out.</em></p>
 <p>This has an interesting consequence.
 Instead of calculating the derivatives for every network from scratch, we can specify the nodes and give every node a <code class="docutils literal notranslate"><span class="pre">forward</span></code> and a <code class="docutils literal notranslate"><span class="pre">backward</span></code> function.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">forward</span></code> function takes inputs to the node and produces outputs from the node.
 The <code class="docutils literal notranslate"><span class="pre">backward</span></code> function takes the <em>derivative</em> flowing in and produces the <em>derivative</em> flowing out.
-We can then execute approximately the following <strong>backpropagation</strong> algorithm :</p>
+We can then execute the following <strong>backpropagation</strong> algorithm approximately:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">forward_sorted_nodes</span> <span class="o">=</span> <span class="n">sort_forward</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">forward_sorted_nodes</span><span class="p">:</span>
     <span class="n">input_values</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_input_values</span><span class="p">()</span>
@@ -1091,16 +1092,16 @@ We can then execute approximately the following <strong>backpropagation</strong>
     <span class="n">node</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="n">local_grad</span> <span class="o">*</span> <span class="n">output_node</span><span class="o">.</span><span class="n">grad</span>
 </pre></div>
 </div>
-<p>Let us now implement a bunch of nodes in pytorch.
+<p>Let’s now implement a bunch of nodes in pytorch.
 Note that we usually do not have to do that (the PyTorch authors already implemented most of the important nodes).
 Nevertheless, this is an extremely useful exercise that will teach you a great deal about how neural networks <em>really work</em>.</p>
 <p>We begin by implementing the addition node.
 The forward function would simply be <span class="math notranslate nohighlight">\(z = x + y\)</span>.
-For the backward function we would need to return two gradients - one for <span class="math notranslate nohighlight">\(x\)</span> and one for <span class="math notranslate nohighlight">\(y\)</span>.</p>
+For the backward function, we would need to return two gradients - one for <span class="math notranslate nohighlight">\(x\)</span> and one for <span class="math notranslate nohighlight">\(y\)</span>.</p>
 <p>They are pretty simple.
 We see that <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x} = \frac{\partial L}{\partial z}\frac{\partial z}{\partial x}\)</span>.
-Since <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial x} = 1\)</span> we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x} = \frac{\partial L}{\partial z}\)</span>.
-Similarly <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} = \frac{\partial L}{\partial z}\)</span>.</p>
+Since <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial x} = 1\)</span>, we have <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x} = \frac{\partial L}{\partial z}\)</span>.
+Similarly, <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} = \frac{\partial L}{\partial z}\)</span>.</p>
 <p>Let’s put this in code.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1116,13 +1117,13 @@ Similarly <span class="math notranslate nohighlight">\(\frac{\partial L}{\partia
 </div>
 </div>
 </div>
-<p>Now we turn to multiplication.
+<p>Now, we turn to multiplication.
 The forward function is <span class="math notranslate nohighlight">\(z = x \cdot y\)</span>.
-The backward pass again needs to calculate <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x} = \frac{\partial L}{\partial z}\frac{\partial z}{\partial x}\)</span>.</p>
+The backward pass again needs calculating <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x} = \frac{\partial L}{\partial z}\frac{\partial z}{\partial x}\)</span>.</p>
 <p>However, now the local gradients are different.
 We have <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial x} = y\)</span> and <span class="math notranslate nohighlight">\(\frac{\partial z}{\partial y} = x\)</span>.</p>
 <p>This means that the backward pass is dependent on the forward pass.
-This is no problem however, as we can store the values from the forward pass using the <code class="docutils literal notranslate"><span class="pre">ctx</span></code> object:</p>
+This is no problem, however, as we can store the values from the forward pass using the <code class="docutils literal notranslate"><span class="pre">ctx</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Mul</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
@@ -1178,7 +1179,7 @@ This is no problem however, as we can store the values from the forward pass usi
 </div>
 </div>
 </div>
-<p>Let us sanity check this. We pass the following values:</p>
+<p>Let’s do a sanity check on this. We pass the following values:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
@@ -1190,7 +1191,7 @@ This is no problem however, as we can store the values from the forward pass usi
 </div>
 </div>
 </div>
-<p>Now we execute the forward pass:</p>
+<p>Now, we execute the forward pass:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h1</span> <span class="o">=</span> <span class="n">Mul</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
@@ -1216,7 +1217,7 @@ This is no problem however, as we can store the values from the forward pass usi
 </div>
 </div>
 <p>Looks good so far.
-Now if we call the <code class="docutils literal notranslate"><span class="pre">backward</span></code> function on the loss node, PyTorch will automatically calculate the gradients using the algorithm from above:</p>
+Now, if we call the <code class="docutils literal notranslate"><span class="pre">backward</span></code> function on the loss node, PyTorch will automatically calculate the gradients using the algorithm from above:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">L</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
@@ -1237,7 +1238,7 @@ Now if we call the <code class="docutils literal notranslate"><span class="pre">
 </div>
 </div>
 <p>This is the same as the result we got in the manual version from above.
-Let us define the forward and update functions, but now using our nodes instead of doing manual derivative calculations:</p>
+Let’s define the forward and update functions, but this time using our nodes instead of doing manual derivative calculations:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AutoSimpleNet</span><span class="p">:</span>
@@ -1311,7 +1312,7 @@ Let us define the forward and update functions, but now using our nodes instead 
 </div>
 </div>
 </div>
-<p>That looks great! Let us perform an additional sanity check by confirming that <span class="math notranslate nohighlight">\(w_1\)</span>, <span class="math notranslate nohighlight">\(w_2\)</span> and <span class="math notranslate nohighlight">\(b\)</span> have the same values as in the manual version:</p>
+<p>That looks great! Let’s perform an additional sanity check by confirming that <span class="math notranslate nohighlight">\(w_1\)</span>, <span class="math notranslate nohighlight">\(w_2\)</span> and <span class="math notranslate nohighlight">\(b\)</span> have the same values as in the manual version:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
@@ -1325,13 +1326,13 @@ Let us define the forward and update functions, but now using our nodes instead 
 </div>
 </div>
 <p>Incredibly enough, there is not much more than this to backpropagation.</p>
-<p>You now understand the algorithm which underpins basically all of deep learning - from the simplest perceptrons to the fanciest state of the art models out there.</p>
+<p>You now understand the algorithm that underpins basically all of deep learning - from the simplest perceptrons to the fanciest state-of-the-art models out there.</p>
 </section>
 <section id="backpropagation-in-pytorch">
 <h2>Backpropagation in PyTorch<a class="headerlink" href="#backpropagation-in-pytorch" title="Link to this heading">#</a></h2>
-<p>Of course in reality we do not actually go around implementing all the backward functions from scratch.
+<p>Of course, in reality, we don’t actually go around implementing all the backward functions from scratch.
 As we already mentioned, the PyTorch team has already done that for <em>a lot</em> of functions.
-We can therefore simply declare the computational graph using those builtin functions, call <code class="docutils literal notranslate"><span class="pre">backward</span></code> and then do the gradient updates.</p>
+We can therefore simply declare the computational graph using those built-in functions, call <code class="docutils literal notranslate"><span class="pre">backward</span></code>, and then do the gradient updates.</p>
 <p>Along the way, we will also simplify the <code class="docutils literal notranslate"><span class="pre">forward</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1414,7 +1415,7 @@ We can therefore simply declare the computational graph using those builtin func
 </div>
 </div>
 </div>
-<p>Let us also sanity check the resulting values:</p>
+<p>Let’s also sanity check the resulting values:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
@@ -1427,7 +1428,7 @@ We can therefore simply declare the computational graph using those builtin func
 </div>
 </div>
 </div>
-<p>This is a very basic and simple, but <em>complete</em> example of a neural network.</p>
+<p>This is a very basic and simple yet <em>complete</em> example of a neural network.</p>
 </section>
 <section id="optimizers">
 <h2>Optimizers<a class="headerlink" href="#optimizers" title="Link to this heading">#</a></h2>
@@ -1498,21 +1499,21 @@ tensor(5.9416, requires_grad=True) tensor(5.8847, requires_grad=True) tensor(-8.
 </section>
 <section id="vanishing-and-exploding-gradients">
 <h2>Vanishing and Exploding Gradients<a class="headerlink" href="#vanishing-and-exploding-gradients" title="Link to this heading">#</a></h2>
-<p>If we look at the backpropagation algorithm we can quickly see that if our network is very deep and we chain a lot of multiplications two problems can occur.</p>
+<p>If we look at the backpropagation algorithm, we can quickly see that if our network is very deep and we chain many multiplications, two problems can occur.</p>
 <p><strong>Vanishing gradients</strong> occur when the gradients of the loss function with respect to the network’s parameters become very small as they propagate backward through the layers.
-Indeed, if we multiply many small numbers with each other, we will get an increasingly smaller (vanishing) number resulting in very small gradients and therefore very small updates.
+Indeed, if we multiply many small numbers with each other, we will get an increasingly smaller (vanishing) number resulting in very small gradients, and therefore, very small updates.
 As a result, the layers will learn extremely slowly (if at all).</p>
 <p><strong>Exploding gradients</strong>, on the other hand, occur when the gradients become excessively large during backpropagation.
-Indeed, if we multiply many lage numbers with each other, we will get an increasingly large (exploding) number resulting in very large updates and therefore unstable updates.</p>
+Indeed, if we multiply many large numbers with each other, we will get an increasingly large (exploding) number resulting in very large updates, and therefore, unstable updates.</p>
 <p>There are various strategies to mitigate this (which we will discuss in the later chapters).
 Most importantly, we have to carefully initialize the model weights (luckily, PyTorch already implements that out of the box).</p>
-<p>However, you should be aware that this is a problem and this problem occurs because of the way backpropagation works.</p>
+<p>However, you should be aware that this is a problem, and this problem occurs because of the way backpropagation works.</p>
 </section>
 <section id="overfitting-and-regularization">
 <h2>Overfitting and Regularization<a class="headerlink" href="#overfitting-and-regularization" title="Link to this heading">#</a></h2>
 <p>Overfitting is a common challenge in machine learning where a model “fits” the data too closely.
-Basically, instead of generalizing from underlying patterns, the models tries to just memorize the data set.
-As a result, the model performs exceptionally well on the training data, but terribly at new, unseen data (because the model has essentially memorized the training data rather than learning the broader patterns).</p>
+Basically, instead of generalizing from underlying patterns, the model tries to just memorize the data set.
+As a result, the model performs exceptionally well on the training data but terribly at new, unseen data (because the model has essentially memorized the training data rather than learning the broader patterns).</p>
 <p>Regularization is a set of techniques used to prevent overfitting by imposing constraints on the complexity of the model.
 Some forms of regularization add a penalty to the loss function based on the magnitude of the model’s weights.
 However, there are other forms of regularization as well (which we will look at in later chapters).</p>

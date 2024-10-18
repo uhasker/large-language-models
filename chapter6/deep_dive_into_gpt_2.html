@@ -405,8 +405,8 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="deep-dive-into-gpt-2">
 <h1>Deep Dive Into GPT-2<a class="headerlink" href="#deep-dive-into-gpt-2" title="Link to this heading">#</a></h1>
-<p>In this chapter we take a deep dive into the architecture of one of the first truly <em>Large</em> Language Models - <strong>GPT-2</strong>.
-GPT-2 is an LLM that was released by OpenAI in 2019 and was followed by widespread public discussion about the potentials and dangers of LLMs.</p>
+<p>In this chapter, we take a deep dive into the architecture of one of the first truly <em>Large</em> Language Models - <strong>GPT-2</strong>.
+GPT-2 is an LLM that was released by OpenAI in 2019, which sparked widespread public discussion about the potential benefits and dangers of LLMs.</p>
 <p>The reason we chose GPT-2 is simple.
 The model is not too large (“just” 1.5 billion parameters), so you will be able to load it into the memory of your local machine without having to provision a GPU instance on some cloud provider.</p>
 <p>As usual, we need to import a few things:</p>
@@ -421,7 +421,7 @@ The model is not too large (“just” 1.5 billion parameters), so you will be a
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.9.19/x64/lib/python3.9/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.9.20/x64/lib/python3.9/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
 </pre></div>
 </div>
@@ -438,7 +438,7 @@ The model is not too large (“just” 1.5 billion parameters), so you will be a
 </div>
 </div>
 <p>Note that we use <code class="docutils literal notranslate"><span class="pre">torch==2.4.0</span></code> and <code class="docutils literal notranslate"><span class="pre">transformers==4.44.0</span></code>.
-If you want to follow along, you should also probably have these versions installed, otherwise you might need to change some of the code:</p>
+If you want to follow along, you should also probably have these versions installed. Otherwise, you might need to change some of the code:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
@@ -463,12 +463,12 @@ If you want to follow along, you should also probably have these versions instal
 </div>
 </div>
 </div>
-<p>The code in this chapter is written in such a way that it closely mimicks the code of the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> codebase.
+<p>The code in this chapter is written in such a way that it closely mimicks the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> codebase.
 Generally, we highly encourage you to read the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> codebase - it is well-written and easy to understand.</p>
 <p>The most relevant file for the purposes of this chapter is <a class="reference external" href="https://github.com/huggingface/transformers/blob/v4.44-release/src/transformers/models/gpt2/modeling_gpt2.py"><code class="docutils literal notranslate"><span class="pre">models/gpt2/modeling_gpt2.py</span></code></a> (especially the <code class="docutils literal notranslate"><span class="pre">GPT2LMHeadModel</span></code>, <code class="docutils literal notranslate"><span class="pre">GPT2Block</span></code>, <code class="docutils literal notranslate"><span class="pre">GPT2SdpaAttention</span></code> and <code class="docutils literal notranslate"><span class="pre">GPT2MLP</span></code> classes).</p>
 <section id="loading-the-model-and-performing-inference">
 <h2>Loading the Model and Performing Inference<a class="headerlink" href="#loading-the-model-and-performing-inference" title="Link to this heading">#</a></h2>
-<p>First, let us load the <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> tokenizer and the <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> model:</p>
+<p>First, let’s load the <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> tokenizer and the <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span>
@@ -503,7 +503,7 @@ Generally, we highly encourage you to read the <code class="docutils literal not
 </div>
 </div>
 </div>
-<p>Next let us perform some inference using an example text:</p>
+<p>Next, let’s perform some inference using an example text:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;This is an example sentence&quot;</span>
@@ -549,8 +549,8 @@ Generally, we highly encourage you to read the <code class="docutils literal not
 </div>
 </div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">output</span></code> of the model is a <code class="docutils literal notranslate"><span class="pre">CausalLMOutputWithCrossAttentions</span></code> object which has (among other things) a <code class="docutils literal notranslate"><span class="pre">logits</span></code> attribute.
-This is basically the list of probabilities we discussed in chapter 1 except that it has the logits of the probabilities (for numerical reasons):</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">output</span></code> of the model is a <code class="docutils literal notranslate"><span class="pre">CausalLMOutputWithCrossAttentions</span></code> object that has (among other things) a <code class="docutils literal notranslate"><span class="pre">logits</span></code> attribute.
+This is basically the list of probabilities we discussed in Chapter 1, except that it contains the logits of the probabilities (for numerical reasons):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -585,14 +585,14 @@ This is basically the list of probabilities we discussed in chapter 1 except tha
 </div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">output.logits</span></code> is a tensor with three dimensions.</p>
-<p>The first dimension is the batch size.
-Since we only have a single text, the batch size is just <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>The first dimension represents the batch size.
+Since we only have a single text, the batch size is simply <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
 <p>The second dimension is the number of tokens in the sequence.
-We have five tokens, therefore the second dimension has the size <code class="docutils literal notranslate"><span class="pre">5</span></code>.</p>
-<p>Finally, the third dimension is the size of the vocabulary (since we output a probability for every token).
+We have five tokens, and therefore, the second dimension has the size <code class="docutils literal notranslate"><span class="pre">5</span></code>.</p>
+<p>Finally, the third dimension is the size of the vocabulary (as we output a probability for every token).
 Since the vocabulary size is <code class="docutils literal notranslate"><span class="pre">50257</span></code>, the third dimension has the size  <code class="docutils literal notranslate"><span class="pre">50257</span></code>.</p>
 <p>We want to predict the token that follows the last token.
-Therefore care about the probabilities of the tokens after the <em>last</em> token, so let’s extract that:</p>
+Therefore, we are interested in the probabilities of the tokens that come after the <em>last</em> token, so let’s extract those:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">last_logits</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">logits</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
@@ -641,7 +641,7 @@ Therefore care about the probabilities of the tokens after the <em>last</em> tok
 </div>
 </div>
 <p>Finally, we sample the next token from this probability distribution.
-There are many different ways to do that - the simplest is to just get the token with the highest probability:</p>
+There are many different ways to accomplish this; the simplest is to select the token with the highest probability:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">next_token_id</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">probas</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -696,9 +696,9 @@ Token:  and (ID = 290), Probability: 0.02
 </div>
 </div>
 </div>
-<p>We see that all of these tokens are reasonable next tokens for the sentence <code class="docutils literal notranslate"><span class="pre">&quot;This</span> <span class="pre">is</span> <span class="pre">an</span> <span class="pre">example</span> <span class="pre">sentence&quot;</span></code>.</p>
-<p>In fact, instead of simply selecting the most probably next token at every step (which often leads to repetitive and boring texts), we could <em>sample</em> from the probability distribution.
-Here we would choose a random token weighted by the probabilities of the tokens (i.e. tokens with higher probabilities are more likely to be sampled):</p>
+<p>We can see that all of these tokens are reasonable candidates for the next token in the sentence <code class="docutils literal notranslate"><span class="pre">&quot;This</span> <span class="pre">is</span> <span class="pre">an</span> <span class="pre">example</span> <span class="pre">sentence&quot;</span></code>.</p>
+<p>In fact, instead of simply selecting the most probable next token at every step (which often leads to repetitive and boring texts), we could <em>sample</em> from the probability distribution.
+Here, we would choose a random token weighted by the probabilities of the tokens (i.e. tokens with higher probabilities are more likely to be sampled):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set a random seed for reproducibility</span>
@@ -733,12 +733,12 @@ Here we would choose a random token weighted by the probabilities of the tokens 
 </div>
 </div>
 </div>
-<p>Now that we have seen how to automatically compute the probabilities of the next token, let’s redo the calculations manually - layer by layer.
+<p>Now, that we have seen how to automatically compute the probabilities of the next token, let’s redo the calculations manually - layer by layer.
 Before we do that, we will inspect the architecture of the model first to see what layers are actually present.</p>
 </section>
 <section id="the-architecture">
 <h2>The Architecture<a class="headerlink" href="#the-architecture" title="Link to this heading">#</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">model</span></code> we have loaded is actually a <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> which is the PyTorch base class for all neural network modules:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">model</span></code> we have loaded is actually a <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> that is the PyTorch base class for all neural network modules:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">))</span>
@@ -751,7 +751,7 @@ Before we do that, we will inspect the architecture of the model first to see wh
 </div>
 </div>
 </div>
-<p>There are many ways to inspect the architecture of a <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>, here we simply <code class="docutils literal notranslate"><span class="pre">print</span></code> the model:</p>
+<p>There are many ways to inspect the architecture of a <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>. One straightforward method is to simply <code class="docutils literal notranslate"><span class="pre">print</span></code> the model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
@@ -790,10 +790,10 @@ Before we do that, we will inspect the architecture of the model first to see wh
 </div>
 </div>
 </div>
-<p>The model has two parts - a <code class="docutils literal notranslate"><span class="pre">transformer</span></code> and an <code class="docutils literal notranslate"><span class="pre">lm_head</span></code>.
-Two things should be noted here.</p>
+<p>The model consists of two parts: a <code class="docutils literal notranslate"><span class="pre">transformer</span></code> and an <code class="docutils literal notranslate"><span class="pre">lm_head</span></code>.
+Two important points should be noted here:</p>
 <p>First, the tokenizer is not part of the <code class="docutils literal notranslate"><span class="pre">model</span></code> as it is already represented by the <code class="docutils literal notranslate"><span class="pre">tokenizer</span></code> variable.
-Second, the <code class="docutils literal notranslate"><span class="pre">transformer</span></code> object has both the embedding block and the transformer (in terms of the terminology introduced in chapter 1).</p>
+Second, the <code class="docutils literal notranslate"><span class="pre">transformer</span></code> object includes both the embedding block and the transformer (in terms of the terminology introduced in Chapter 1).</p>
 <p>Looking closely, we see that the model has two embedding layers at the beginning - <code class="docutils literal notranslate"><span class="pre">wte</span></code> and <code class="docutils literal notranslate"><span class="pre">wpe</span></code>.
 The <code class="docutils literal notranslate"><span class="pre">wte</span></code> layer is the embedding layer for the tokens:</p>
 <div class="cell docutils container">
@@ -859,7 +859,7 @@ The <code class="docutils literal notranslate"><span class="pre">wte</span></cod
 </div>
 </div>
 </div>
-<p>Each block is a so called <code class="docutils literal notranslate"><span class="pre">GPT2Block</span></code> object:</p>
+<p>Each block is a so-called <code class="docutils literal notranslate"><span class="pre">GPT2Block</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
@@ -872,7 +872,7 @@ The <code class="docutils literal notranslate"><span class="pre">wte</span></cod
 </div>
 </div>
 </div>
-<p>Looking inside such a <code class="docutils literal notranslate"><span class="pre">GPT2Block</span></code>, we will see a lot of very familiar things:</p>
+<p>When we look inside a <code class="docutils literal notranslate"><span class="pre">GPT2Block</span></code>, we will encounter many familiar components:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -926,7 +926,7 @@ The <code class="docutils literal notranslate"><span class="pre">wte</span></cod
 </div>
 </div>
 </div>
-<p>Generally speaking - whenever you want to find out how a particular LLM model works, it is extremely instructive to print out its architecture to get a basic view of the components it has.</p>
+<p>Generally speaking, whenever you want to understand how a particular LLM model works, printing its architecture is extremely instructive as it provides a basic overview of the components it has.</p>
 <p>Now let’s see how the tensors actually flow through the model.</p>
 <p>We will start with the embeddings.</p>
 </section>
@@ -952,7 +952,7 @@ The <code class="docutils literal notranslate"><span class="pre">wte</span></cod
 </div>
 </div>
 </div>
-<p>Let’s also get the attention mask for later:</p>
+<p>We also obtain the attention mask for later:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">attention_mask</span> <span class="o">=</span> <span class="n">encoded_input</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">]</span>
@@ -972,8 +972,8 @@ The <code class="docutils literal notranslate"><span class="pre">wte</span></cod
 </div>
 </div>
 </div>
-<p>Let’s also generate the position IDs.</p>
-<p>For every token ID we need a corresponding position ID.
+<p>Next, we need to generate the position IDs.</p>
+<p>For each token ID, we require a corresponding position ID.
 The position ID sequence is constructed by simply starting at <code class="docutils literal notranslate"><span class="pre">0</span></code> and then counting up to <code class="docutils literal notranslate"><span class="pre">len(token_ids)</span> <span class="pre">-</span> <span class="pre">1</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -993,7 +993,7 @@ This is just a matter of applying the token embedding layer (i.e. <code class="d
 </div>
 <p>We can do a quick dimensionality check.
 The <code class="docutils literal notranslate"><span class="pre">token_ids</span></code> is a sequence of dimension <code class="docutils literal notranslate"><span class="pre">1x5</span></code> (batch size <code class="docutils literal notranslate"><span class="pre">1</span></code> and sequence length of <code class="docutils literal notranslate"><span class="pre">5</span></code>).
-For every token we compute an embedding of dimension <code class="docutils literal notranslate"><span class="pre">768</span></code> - therefore the output tensor should have a dimension of <code class="docutils literal notranslate"><span class="pre">1x5x768</span></code>.
+For each token, we compute an embedding of dimension <code class="docutils literal notranslate"><span class="pre">768</span></code>, and therefore, the output tensor should have a dimension of <code class="docutils literal notranslate"><span class="pre">1x5x768</span></code>.
 This is indeed the case:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1016,9 +1016,9 @@ This calculation is very similar to the calculation of the token embeddings, exc
 </div>
 </div>
 </div>
-<p>Again, we do a quick dimensionality check.
-The <code class="docutils literal notranslate"><span class="pre">position_ids</span></code> sequence is a sequence of dimension <code class="docutils literal notranslate"><span class="pre">1x5</span></code> (batch size <code class="docutils literal notranslate"><span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">5</span></code> position IDs).
-For every position we compute an embedding of dimension <code class="docutils literal notranslate"><span class="pre">768</span></code> and so the resulting output tensor should have a dimension of <code class="docutils literal notranslate"><span class="pre">1x5x768</span></code>:</p>
+<p>Again, we perform a quick dimensionality check.
+The <code class="docutils literal notranslate"><span class="pre">position_ids</span></code> sequence has a dimension of <code class="docutils literal notranslate"><span class="pre">1x5</span></code> (with a batch size <code class="docutils literal notranslate"><span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">5</span></code> position IDs).
+For each position, we compute an embedding of dimension <code class="docutils literal notranslate"><span class="pre">768</span></code>, so the resulting output tensor should have a dimension of <code class="docutils literal notranslate"><span class="pre">1x5x768</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">position_embeds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -1032,8 +1032,8 @@ For every position we compute an embedding of dimension <code class="docutils li
 </div>
 </div>
 <p>To get the final embeddings we simply <em>add</em> the token embeddings and the positional embeddings.</p>
-<p>These final embeddings will also be what we pass to the module block as the first layer input.
-Since the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> codebase refers to the intermediate tensors in the module block as “hidden states”, we will stick to that convention:</p>
+<p>These final embeddings will be passed to the module block as the input to the first layer.
+Since the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> codebase refers to the intermediate tensors in the module block as “hidden states”, we will adopt that terminology:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span> <span class="o">=</span> <span class="n">token_embeds</span> <span class="o">+</span> <span class="n">position_embeds</span>
@@ -1053,7 +1053,7 @@ Since the <code class="docutils literal notranslate"><span class="pre">transform
 <section id="the-first-gpt2-block">
 <h2>The First GPT2 Block<a class="headerlink" href="#the-first-gpt2-block" title="Link to this heading">#</a></h2>
 <p>Let’s now have a look at the module list, specifically its first “GPT block”.</p>
-<p>First, we will give both the module list and the GPT block more meaningful names than <code class="docutils literal notranslate"><span class="pre">h</span></code> and <code class="docutils literal notranslate"><span class="pre">h[0]</span></code>:</p>
+<p>First, we will assign more meaningful names to both the module list and the GPT block instead of using <code class="docutils literal notranslate"><span class="pre">h</span></code> and <code class="docutils literal notranslate"><span class="pre">h[0]</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">layer_blocks</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">h</span>
@@ -1090,7 +1090,7 @@ Since the <code class="docutils literal notranslate"><span class="pre">transform
 </div>
 </div>
 </div>
-<p>Basically, a <code class="docutils literal notranslate"><span class="pre">GPT2Block</span></code> has two parts - an attention part and a MLP part.</p>
+<p>Basically, a <code class="docutils literal notranslate"><span class="pre">GPT2Block</span></code> has two components: an attention part and an MLP part.</p>
 <p>The attention part consists of a <code class="docutils literal notranslate"><span class="pre">LayerNorm</span></code> layer, followed by a <code class="docutils literal notranslate"><span class="pre">GPT2SdpaAttention</span></code> block which contains the attention mechanism.</p>
 <p>The MLP part consists of a <code class="docutils literal notranslate"><span class="pre">LayerNorm</span></code> layer, followed by a <code class="docutils literal notranslate"><span class="pre">GPT2MLP</span></code> block which contains a simple MLP with two linear layers separated by a non-linear activation function.</p>
 <p>We will now look at both parts in detail.</p>
@@ -1106,7 +1106,7 @@ Since the <code class="docutils literal notranslate"><span class="pre">transform
 <section id="the-attention-part">
 <h3>The Attention Part<a class="headerlink" href="#the-attention-part" title="Link to this heading">#</a></h3>
 <p>First, we perform layer normalization on our tensor using the <code class="docutils literal notranslate"><span class="pre">LayerNorm</span></code> layer.</p>
-<p>Remember that this operation does not change the dimension of the tensor:</p>
+<p>Remember that this operation doesn’t change the dimension of the tensor:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">normalized_attention_input</span> <span class="o">=</span> <span class="n">layer_block</span><span class="o">.</span><span class="n">ln_1</span><span class="p">(</span><span class="n">attention_input</span><span class="p">)</span>
@@ -1135,10 +1135,10 @@ Since the <code class="docutils literal notranslate"><span class="pre">transform
 </div>
 </div>
 </div>
-<p>Again, the first dimension of the tensor is the batch size (which is <code class="docutils literal notranslate"><span class="pre">1</span></code>) and the second dimension the number of tokens (which is <code class="docutils literal notranslate"><span class="pre">5</span></code>).</p>
+<p>Again, the first dimension of the tensor is the batch size (which is <code class="docutils literal notranslate"><span class="pre">1</span></code>), while the second dimension represents the number of tokens (which is <code class="docutils literal notranslate"><span class="pre">5</span></code>).</p>
 <p>The third dimension is more complicated.
-Basically in the <code class="docutils literal notranslate"><span class="pre">transformer</span></code> codebase the calculation of the queries, keys and values are combined in a single operation.
-Therefore the output tensor contains the queries, keys and value all in one object.
+In the <code class="docutils literal notranslate"><span class="pre">transformer</span></code> codebase, the calculation of the queries, keys and values are combined in a single operation.
+Therefore, the output tensor contains the queries, keys and value all in one object.
 This is why the third dimension is <code class="docutils literal notranslate"><span class="pre">2304</span> <span class="pre">=</span> <span class="pre">768</span> <span class="pre">*</span> <span class="pre">3</span></code> (since we store queries <em>and</em> keys <em>and</em> values and each of these has <code class="docutils literal notranslate"><span class="pre">768</span></code> items).</p>
 <p>Since we want to work with these tensors separately, we need to split them out using the <code class="docutils literal notranslate"><span class="pre">split</span></code> function.
 We have three dimensions and the queries, keys and values are split across the dimension number 2, so we need to <code class="docutils literal notranslate"><span class="pre">split</span></code> across <code class="docutils literal notranslate"><span class="pre">dim=2</span></code>.</p>
@@ -1223,7 +1223,7 @@ We have three dimensions and the queries, keys and values are split across the d
 </div>
 </div>
 </div>
-<p>Now its time to merge the attention heads back together:</p>
+<p>Now, its time to merge the attention heads back together:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sdpa_output_transposed</span> <span class="o">=</span> <span class="n">sdpa_output</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
@@ -1276,13 +1276,13 @@ We have three dimensions and the queries, keys and values are split across the d
 </div>
 <p>This is called a <strong>residual connection</strong>.</p>
 <p>Generally, we speak of residual connections if there is some function of the form <span class="math notranslate nohighlight">\(y = f(x) + x\)</span> (in this case <code class="docutils literal notranslate"><span class="pre">x</span></code> is the input hidden state).
-Residual connections essentially helps with propagating the “signal” across layers (both in the forward and the backward pass).</p>
-<p>Especially for the backward pass, such connections can help addressing the vanishing gradient problem (discussed in the chapter on computational graphs).
+Residual connections essentially help with propagating the “signal” across layers (both in the forward and the backward pass).</p>
+<p>Especially for the backward pass, such connections can help address the vanishing gradient problem (discussed in the chapter on computational graphs).
 We can see this by comparing the derivative of a hypothetical loss function (with respect to the input <span class="math notranslate nohighlight">\(x\)</span>) with a residual connection and without a residual connection.</p>
 <p>Let’s compute <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x}\)</span>:</p>
 <p><span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial x} = \frac{\partial L}{\partial y} (1 + \frac{\partial}{\partial x} f(x)) = \frac{\partial L}{\partial y} + \frac{\partial L}{\partial y} \frac{\partial}{\partial x} f(x)\)</span></p>
-<p>Without the residual connection the derivative would simply be <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} \frac{\partial}{\partial x} f(x)\)</span>.
-With the residual connection however, we directly <em>add</em> the term <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span> on top of that.
+<p>Without the residual connection, the derivative would simply be <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y} \frac{\partial}{\partial x} f(x)\)</span>.
+With the residual connection, however, we directly <em>add</em> the term <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span> on top of that.
 This means that even if the gradient of <code class="docutils literal notranslate"><span class="pre">f</span></code> is vanishingly small, this won’t be true for the gradient <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial x}\)</span> and there should be a meaningful update when we perform gradient descent.</p>
 <p>Let’s print the shape of <code class="docutils literal notranslate"><span class="pre">attention_output</span></code>.
 Note that the attention part of the GPT block did not change the <em>shape</em> of the tensor, only its <em>values</em>:</p>
@@ -1368,7 +1368,7 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
 </div>
 </div>
 <p>Next, we pass the hidden states through the MLP block.</p>
-<p>The MLP block contains a linear layer, followed by a non-linear activation function, followed by another linear layer:</p>
+<p>The MLP block consists of a linear layer, followed by a non-linear activation function, and then another linear layer:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">layer_block</span><span class="o">.</span><span class="n">mlp</span><span class="p">)</span>
@@ -1452,7 +1452,7 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
 <section id="the-other-gpt-blocks">
 <h2>The Other GPT Blocks<a class="headerlink" href="#the-other-gpt-blocks" title="Link to this heading">#</a></h2>
 <p>Now, we simply pass the hidden states through one block after the other, where the output of each block is the input to the next block.</p>
-<p>Note that we alredy passed the tensor through the first block, so we will only consider the other 11 blocks:</p>
+<p>Note that we already passed the tensor through the first block, so we will only consider the other 11 blocks:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_states</span> <span class="o">=</span> <span class="n">mlp_output</span>
@@ -1507,7 +1507,7 @@ Note that the attention part of the GPT block did not change the <em>shape</em> 
 </div>
 </div>
 </div>
-<p>Let’s verify that our calculations are correct by checking if the <code class="docutils literal notranslate"><span class="pre">logits</span></code> tensor we computed manually is the same as <code class="docutils literal notranslate"><span class="pre">output.logits</span></code>:</p>
+<p>Let’s verify that our calculations are correct by checking if the <code class="docutils literal notranslate"><span class="pre">logits</span></code> tensor, which we computed manually, is the same as <code class="docutils literal notranslate"><span class="pre">output.logits</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">((</span><span class="n">output</span><span class="o">.</span><span class="n">logits</span> <span class="o">==</span> <span class="n">logits</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>

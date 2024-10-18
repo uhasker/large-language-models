@@ -401,7 +401,7 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="basic-layers">
 <h1>Basic Layers<a class="headerlink" href="#basic-layers" title="Link to this heading">#</a></h1>
-<p>Apart from the basic nodes we encountered in the previous chapter, PyTorch also provides us more complex <em>layers</em> which encapsulate groups of nodes.
+<p>Apart from the basic nodes we encountered in the previous chapter, PyTorch also provides us with more complex <em>layers</em> that encapsulate groups of nodes.
 From the perspective of the computational graph, a layer is basically a subgraph of the computational graph.</p>
 <p>However, it is usually more helpful to treat layers as mathematical functions that take input tensors and produce output tensors.</p>
 <p>Layers are located in the <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> package, so we need to import it along with a few other packages:</p>
@@ -424,12 +424,12 @@ From the perspective of the computational graph, a layer is basically a subgraph
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;torch._C.Generator at 0x7fc75b3475b0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;torch._C.Generator at 0x7fd53c6c3d70&gt;
 </pre></div>
 </div>
 </div>
 </div>
-<p>We will also disable printing in scientific mode to simplify how our tensors are output to the console:</p>
+<p>We will also disable scientific mode for printing to simplify how our tensors are output to the console:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">sci_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -442,11 +442,11 @@ From the perspective of the computational graph, a layer is basically a subgraph
 <p>One of the simplest and most important layers is the <strong>linear layer</strong>.</p>
 <p>The linear layer represents the function <span class="math notranslate nohighlight">\(f(\vec{x}) = W\vec{x} + \vec{b}\)</span>.
 Put differently, the linear layer takes an input tensor <span class="math notranslate nohighlight">\(\vec{x}\)</span> and produces an output tensor <span class="math notranslate nohighlight">\(\vec{y} = W\vec{x} + \vec{b}\)</span>.</p>
-<p>Usually the matrix <code class="docutils literal notranslate"><span class="pre">W</span></code> is called the <em>weight matrix</em> and the vector <code class="docutils literal notranslate"><span class="pre">b</span></code> the <em>bias</em>.</p>
-<p>Whenever you are thinking about a layer, it is very helpful to think about the dimensions of the tensors involved.
-Consider an example, where <span class="math notranslate nohighlight">\(\vec{x}\)</span> has <span class="math notranslate nohighlight">\(3\)</span> features, i.e. <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^{3}\)</span>.
+<p>Usually, the matrix <code class="docutils literal notranslate"><span class="pre">W</span></code> is referred to as the <em>weight matrix</em>, and the vector <code class="docutils literal notranslate"><span class="pre">b</span></code> as the <em>bias</em>.</p>
+<p>When thinking about a layer, it helps to consider the dimensions of the tensors involved.
+Let’s look at an example where <span class="math notranslate nohighlight">\(\vec{x}\)</span> has <span class="math notranslate nohighlight">\(3\)</span> features, i.e. <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^{3}\)</span>.
 Let <span class="math notranslate nohighlight">\(\vec{y}\)</span> represent a probability distribution over <span class="math notranslate nohighlight">\(4\)</span> classes, i.e. <span class="math notranslate nohighlight">\(\vec{y} \in \mathbb{R}^{4}\)</span>.
-Then we have <span class="math notranslate nohighlight">\(W \in \mathbb{R}^{4 \times 3}\)</span> and <span class="math notranslate nohighlight">\(\vec{b} \in \mathbb{R}^{4}\)</span> (otherwise the dimensions won’t match).</p>
+Then, we have <span class="math notranslate nohighlight">\(W \in \mathbb{R}^{4 \times 3}\)</span> and <span class="math notranslate nohighlight">\(\vec{b} \in \mathbb{R}^{4}\)</span> (otherwise, the dimensions won’t match).</p>
 <p>This is how the above example would look in code:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -570,7 +570,7 @@ tensor([-0.2660, -0.0677, -0.2345,  0.3830], requires_grad=True)
 </div>
 </div>
 </div>
-<p>Put more generally if we have an input vector <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^d\)</span>, the linear layer with parameters <span class="math notranslate nohighlight">\(W \in \mathbb{R}^{k \times d}\)</span> and <span class="math notranslate nohighlight">\(\vec{b} \in \mathbb{R}^k\)</span> will compute an output vector <span class="math notranslate nohighlight">\(\vec{y} \in \mathbb{R}^k\)</span>.
+<p>Put more generally, if we have an input vector <span class="math notranslate nohighlight">\(\vec{x} \in \mathbb{R}^d\)</span>, the linear layer with parameters <span class="math notranslate nohighlight">\(W \in \mathbb{R}^{k \times d}\)</span> and <span class="math notranslate nohighlight">\(\vec{b} \in \mathbb{R}^k\)</span> will compute an output vector <span class="math notranslate nohighlight">\(\vec{y} \in \mathbb{R}^k\)</span>.
 Always keep thinking about tensor dimensionalities - this is really helpful when you are trying to understand a layer.</p>
 <p>Let’s also check that the linear layer indeed performs the calculation <span class="math notranslate nohighlight">\(f(\vec{x}) = W\vec{x} + \vec{b}\)</span>:</p>
 <div class="cell docutils container">
@@ -604,7 +604,7 @@ Always keep thinking about tensor dimensionalities - this is really helpful when
 </div>
 </div>
 </div>
-<p>Redoing the calculations of a layer manually is not something you will do in production, but it’s a really helpful way to make sure that your understanding is correct.</p>
+<p>Redoing the calculations of a layer manually is not something you will do in production, but it’s a great way to ensure that your understanding is correct.</p>
 <p>Note that we can pass a batch through the linear layer:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -641,8 +641,8 @@ Always keep thinking about tensor dimensionalities - this is really helpful when
 </div>
 </div>
 <p>Compared to the vectors <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> from before, the tensors <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> now have an additional dimension - the batch dimension.
-Basically, we can perform the calculation of the linear layer for multiple vectors <em>at the same time</em> greatly speeding up the computation.</p>
-<p>We can verify that <code class="docutils literal notranslate"><span class="pre">Y</span></code> just contains the result of applying the linear function <span class="math notranslate nohighlight">\(f(\vec{x}) = W\vec{x} + \vec{b}\)</span> to every row of <code class="docutils literal notranslate"><span class="pre">X</span></code> at the same time:</p>
+Basically, we can compute the linear layer for multiple vectors <em>at the same time</em>, which greatly speeds up the computation.</p>
+<p>We can verify that <code class="docutils literal notranslate"><span class="pre">Y</span></code> contains the result of applying the linear function <span class="math notranslate nohighlight">\(f(\vec{x}) = W\vec{x} + \vec{b}\)</span> to every row of <code class="docutils literal notranslate"><span class="pre">X</span></code> at the same time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">manual_y_0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">layer</span><span class="o">.</span><span class="n">bias</span>
@@ -693,8 +693,8 @@ Basically, we can perform the calculation of the linear layer for multiple vecto
 </div>
 </div>
 <p>As discussed in the chapter on computational graphs, when we train a neural network we really <em>update its parameters</em>.
-Now that we have layers, we update the parameters of the layers.
-In the case of the linear layer these are <code class="docutils literal notranslate"><span class="pre">W</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>.</p>
+Now, that we have layers, we update the parameters of the layers.
+In the case of the linear layer, these are <code class="docutils literal notranslate"><span class="pre">W</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>.</p>
 <p>We can view all learnable parameters of a layer using the <code class="docutils literal notranslate"><span class="pre">parameters()</span></code> and <code class="docutils literal notranslate"><span class="pre">named_parameters()</span></code> methods:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -737,25 +737,25 @@ tensor([-0.2660, -0.0677, -0.2345,  0.3830], requires_grad=True)
 </section>
 <section id="activation-functions">
 <h2>Activation Functions<a class="headerlink" href="#activation-functions" title="Link to this heading">#</a></h2>
-<p>So far our learning hasn’t been really <em>deep</em> which is kind of a shame given that the field this book is about is called <em>deep learning</em>.</p>
-<p>Instead of having a single layer, with modern neural networks we have multiple layers on top of each other.
+<p>So far our learning hasn’t been really <em>deep</em>, which is kind of a shame given that the field this book is about is called <em>deep learning</em>.</p>
+<p>Instead of having a single layer, with modern neural networks, we have multiple layers on top of each other.
 The idea here is that each layer learns progressively more complex features.
 For example, the first layer might learn how individual words interact with each other, the second layer might look at word groups and the third layer might look at sentences.
-Note that this just an example - in practice the layers learn much more complicated features that can’t be easily described (this is also one of their drawbacks).</p>
+Note that this is just an example - in practice, the layers learn much more complicated features that can’t be easily described (this is also one of their drawbacks).</p>
 <p>How would we go about constructing such a <em>deep</em> network?</p>
 <p>Unfortunately, we can’t just put linear layers on top of each other.
-Consider two linear layers which compute <span class="math notranslate nohighlight">\(\vec{h} = W\vec{x} + \vec{b}\)</span> and <span class="math notranslate nohighlight">\(\vec{y} = V\vec{h} + \vec{c}\)</span> respectively.
-Then we would have <span class="math notranslate nohighlight">\(\vec{y} = V\vec{h} + \vec{c} = V(W\vec{x} + \vec{b} + \vec{c}) = VW\vec{x} + V\vec{b} + \vec{c}\)</span>.
-Let <span class="math notranslate nohighlight">\(U = VW\)</span> and <span class="math notranslate nohighlight">\(\vec{d} = V\vec{b} + \vec{c}\)</span> and we can see that <span class="math notranslate nohighlight">\(\vec{y} = U\vec{x} + \vec{c}\)</span>.
-Therefore the composition of two linear layers is again a linear layer!</p>
+Consider two linear layers that compute <span class="math notranslate nohighlight">\(\vec{h} = W\vec{x} + \vec{b}\)</span> and <span class="math notranslate nohighlight">\(\vec{y} = V\vec{h} + \vec{c}\)</span> respectively.
+Then, we would have <span class="math notranslate nohighlight">\(\vec{y} = V\vec{h} + \vec{c} = V(W\vec{x} + \vec{b} + \vec{c}) = VW\vec{x} + V\vec{b} + \vec{c}\)</span>.
+Let <span class="math notranslate nohighlight">\(U = VW\)</span> and <span class="math notranslate nohighlight">\(\vec{d} = V\vec{b} + \vec{c}\)</span>, and we can see that <span class="math notranslate nohighlight">\(\vec{y} = U\vec{x} + \vec{c}\)</span>.
+Therefore, the composition of two linear layers is again a linear layer!</p>
 <p>If you know your linear algebra, the above computation was a trivial exercise, but it reveals an important truth.
 <em>We need to go beyond linearities to obtain models with rich capabilities.</em></p>
 <p>To solve this problem, we introduce a <em>nonlinear activation function</em> between the layers to break the linearity.
-That is, the first layer computes <span class="math notranslate nohighlight">\(\vec{h} = f(W\vec{x} + \vec{b})\)</span> where <span class="math notranslate nohighlight">\(f\)</span> is some nonlinear function and is usually applied elementwise to the vector <span class="math notranslate nohighlight">\(W\vec{x} + \vec{b}\)</span>.</p>
-<p>If we have two linear layers separated by a nonlinear activation function, the resulting function is <em>no longer linear</em> and we can build impressively capable models.
+That is, the first layer computes <span class="math notranslate nohighlight">\(\vec{h} = f(W\vec{x} + \vec{b})\)</span>, where <span class="math notranslate nohighlight">\(f\)</span> is some nonlinear function and is usually applied elementwise to the vector <span class="math notranslate nohighlight">\(W\vec{x} + \vec{b}\)</span>.</p>
+<p>If we have two linear layers separated by a nonlinear activation function, the resulting function is <em>no longer linear</em>, and we can build impressively capable models.
 With the idea clear, we need to actually <em>define</em> the activation function.</p>
 <p>We could use the sigmoid from the chapter on computational graphs.
-However, this function has a problem which we can see if we look at the graph of its derivative:</p>
+However, this function has a problem that becomes evident when we examine the graph of its derivative:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigmoid_derivative_xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
@@ -765,22 +765,22 @@ However, this function has a problem which we can see if we look at the graph of
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fc6ac256bb0&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fd48cf0aac0&gt;]
 </pre></div>
 </div>
 <img alt="../_images/d1178daa712e0417e85bf36d38079bc659bd0ea5cf5a4ee7e5b08783418ffa55.png" src="../_images/d1178daa712e0417e85bf36d38079bc659bd0ea5cf5a4ee7e5b08783418ffa55.png" />
 </div>
 </div>
-<p>The derivative of the sigmoid function is very close to <span class="math notranslate nohighlight">\(0\)</span> outside of a relatively small input range.
+<p>The derivative of the sigmoid function is very close to <span class="math notranslate nohighlight">\(0\)</span> outside a relatively small input range.
 Why is this a problem?</p>
 <p>Let’s say that during backpropagation the sigmoid node receives a derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial y}\)</span> (where <span class="math notranslate nohighlight">\(y\)</span> is the output of the sigmoid node).
 It will then backpropagate the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial z} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial z}\)</span>.
 But if <span class="math notranslate nohighlight">\(\frac{\partial y}{\partial z}\)</span> is approximately <span class="math notranslate nohighlight">\(0\)</span>, the derivative <span class="math notranslate nohighlight">\(\frac{\partial L}{\partial z}\)</span> will be approximately <span class="math notranslate nohighlight">\(0\)</span> as well.
-The derivative (and therefore the error signal) is now lost.</p>
-<p>Just as a side note, the above explanation is an example for why it is so important to actually understand what backpropagation does on a technical level even though you will probably never need to implement it.
+The derivative (and therefore, the error signal) is now lost.</p>
+<p>Just as a side note, the above explanation is an example of why it is so important to actually understand what backpropagation does on a technical level even though you will probably never need to implement it.
 It would be very hard to grasp why sigmoids are a bad idea for activation functions unless you are <em>actually capable of doing the math</em> (luckily the math <em>to do</em> is really not that complicated).
 This is not the last time we will encounter a problem that has its roots in the way backpropagation operates.</p>
-<p>Executive summary - we need a different activation function that does not have such a small “good” range of inputs. A very simple way to address this is to simply take the identity function and cut off half the input range resulting in <span class="math notranslate nohighlight">\(f(x) = \max(0, x)\)</span>:</p>
+<p>Executive summary - we need a different activation function that doesn’t have such a small “good” range of inputs. A very simple way to address this is to take the identity function and cut off half the input range resulting in <span class="math notranslate nohighlight">\(f(x) = \max(0, x)\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">relu_xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
@@ -790,17 +790,17 @@ This is not the last time we will encounter a problem that has its roots in the 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fc6aa14b2e0&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fd48ae09d30&gt;]
 </pre></div>
 </div>
 <img alt="../_images/5e246e894c97d60548189ef3d7285426611dc7a94d6304e654fc8d473e699965.png" src="../_images/5e246e894c97d60548189ef3d7285426611dc7a94d6304e654fc8d473e699965.png" />
 </div>
 </div>
 <p>The derivative of this function is <span class="math notranslate nohighlight">\(0\)</span> if <span class="math notranslate nohighlight">\(x &lt; 0\)</span> and <span class="math notranslate nohighlight">\(1\)</span> if <span class="math notranslate nohighlight">\(x &gt; 0\)</span> (we also usually set it to <span class="math notranslate nohighlight">\(0\)</span> if <span class="math notranslate nohighlight">\(x = 0\)</span> to ensure that the derivative is defined everywhere).
-We still lose half the input range, but the crucial point is that as long as <span class="math notranslate nohighlight">\(x &gt; 0\)</span> we are fine.</p>
+We still lose half the input range, but the crucial point is that as long as <span class="math notranslate nohighlight">\(x &gt; 0\)</span>, we are fine.</p>
 <p>Interestingly, this function is not called the “most lazy activation possible” but has the fancy name <strong>Rectified Linear Unit</strong> instead (ReLU for short).
 Not only is this function very ~~lazy~~ simple, but it works extremely well in practice.
-So well in fact, that ReLU and its variants are the default activation functions people go with when creating neural networks.</p>
+So well, that ReLU and its variants are the default activation functions people go with when creating neural networks.</p>
 <p>Note that the ReLU function is also directly present in PyTorch:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -831,7 +831,7 @@ The formula for GELU is <span class="math notranslate nohighlight">\(f(x) = x \P
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fc6aa138b20&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7fd48ad875b0&gt;]
 </pre></div>
 </div>
 <img alt="../_images/fe77e8e4e3b977173942de7d590831726d1efe0def07bc91760af2493565c8e2.png" src="../_images/fe77e8e4e3b977173942de7d590831726d1efe0def07bc91760af2493565c8e2.png" />
@@ -866,7 +866,7 @@ tensor([[ 0.3189, -0.4245,  0.3057],
 </div>
 </div>
 <p>Let’s say that we would like to retrieve the embeddings for IDs <code class="docutils literal notranslate"><span class="pre">3</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code> and <code class="docutils literal notranslate"><span class="pre">5</span></code>.
-Then we could simply pass the tensor containing these IDs to the embedding layer:</p>
+Then, we could simply pass the tensor containing these IDs to the embedding layer:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">emb_x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
@@ -910,15 +910,15 @@ tensor([[ 0.3189, -0.4245,  0.3057],
 </div>
 </div>
 <p>Embeddings are extremely useful in LLMs because they allow us to map discrete units (like words or word positions) to high-dimensional, continuous vectors such that the vectors can be learned by the LLM.
-For example, we could create <em>word embeddings</em> in such a way that semantically similar words result in embeddings which are spatially close to each other.
-We could then pass these word embeddings to other layer that would learn further features.</p>
+For example, we could create <em>word embeddings</em> in such a way that semantically similar words result in embeddings that are spatially close to each other.
+We could then pass these word embeddings to other layers that would learn further features.</p>
 </section>
 <section id="dropout">
 <h2>Dropout<a class="headerlink" href="#dropout" title="Link to this heading">#</a></h2>
 <p>As we already explained in the chapter on computational graphs, one of the biggest challenges when training neural networks is to avoid overfitting.
-We briefly talked about a few methods that can be used to accomplish this - however, we have not mentioned one of the most important methods which is called <strong>dropout</strong>.</p>
-<p>The idea here is to randomly drop some neurons during training to avoid neurons becoming too dependent on other specific neurons.
-This way we force neurons to learn robust features.</p>
+We briefly talked about a few methods that can be used to accomplish this - however, we haven’t mentioned one of the most important methods known as <strong>dropout</strong>.</p>
+<p>The idea is to randomly drop some neurons during training to prevent them from becoming too dependent on other specific neurons.
+This way, we force them to learn robust features.</p>
 <p>Technically speaking, the dropout layer randomly zeroes some of the elements of the input tensor using sampling from a Bernoulli distribution with probability <code class="docutils literal notranslate"><span class="pre">p</span></code>.
 Furthermore, the outputs are normalized via scaling by a factor of <code class="docutils literal notranslate"><span class="pre">1/(1-p)</span></code>.</p>
 <p>Let’s have a look at an example:</p>
@@ -1044,16 +1044,16 @@ Furthermore, the outputs are normalized via scaling by a factor of <code class="
 </div>
 </div>
 </div>
-<p>Note that the <code class="docutils literal notranslate"><span class="pre">train()</span></code> function does not actually <em>do any training</em>, it only <em>sets</em> a layer or a model <em>to training mode</em>.</p>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">train()</span></code> function doesn’t actually <em>do any training</em>, it only <em>sets</em> a layer or a model <em>to training mode</em>.</p>
 <blockquote>
-<div><p>A common source of bugs when training models is to forget to set the model to training mode during training or to evaluation mode during evaluation, so watch out for that.</p>
+<div><p>A common source of bugs when training models is forgetting to set the model to training mode during training or to evaluation mode during evaluation, so be mindful of that.</p>
 </div></blockquote>
 </section>
 <section id="layer-normalization">
 <h2>Layer Normalization<a class="headerlink" href="#layer-normalization" title="Link to this heading">#</a></h2>
 <p>Another important concept for stabilizing training is called <strong>layer normalization</strong>.</p>
-<p>This is a technique that is used to normalize inputs across features of individual samples in a batch.
-The idea is to ensure that each input to the next layer has a mean of zero and a variance of one.</p>
+<p>This technique normalizes inputs across features of individual samples in a batch.
+The idea behind this is to ensure that each input to the next layer has a mean of zero and a variance of one.</p>
 <p>To accomplish this, we compute the mean and the variance across features for each sample and then normalize them.</p>
 <p>Consider the following tensor:</p>
 <div class="cell docutils container">
@@ -1115,7 +1115,7 @@ The idea is to ensure that each input to the next layer has a mean of zero and a
 </div>
 </div>
 </div>
-<p>If we recompute the mean and the variance of the new tensor, we will see that the mean is now zero and the variance is now one for every sample:</p>
+<p>If we recompute the mean and the variance of the new tensor, we will find that the mean is now zero and the variance is one for every sample:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_norm</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1142,8 +1142,8 @@ The idea is to ensure that each input to the next layer has a mean of zero and a
 </div>
 </div>
 </div>
-<p>Commonly we also scale and shift each normalized feature using learnable parameters <code class="docutils literal notranslate"><span class="pre">scale</span></code> and <code class="docutils literal notranslate"><span class="pre">shift</span></code>.
-If we would implement a full <code class="docutils literal notranslate"><span class="pre">LayerNorm</span></code> layer from scratch it would look as following:</p>
+<p>Commonly, we also scale and shift each normalized feature using learnable parameters <code class="docutils literal notranslate"><span class="pre">scale</span></code> and <code class="docutils literal notranslate"><span class="pre">shift</span></code>.
+If we were to implement a full <code class="docutils literal notranslate"><span class="pre">LayerNorm</span></code> layer from scratch, it would look as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LayerNorm</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>

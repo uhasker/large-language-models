@@ -403,12 +403,12 @@ document.write(`
 <h2>The Idea<a class="headerlink" href="#the-idea" title="Link to this heading">#</a></h2>
 <p>The core of a Large Language Model expects some kind of sequence, so first we need to be able to convert a text into a sequence of some kind.</p>
 <p>This is the job of the <strong>tokenizer</strong>.
-The tokenizer splits the input text into a seqquence of individual units - called <strong>tokens</strong> - for further processing by the LLM.
-A token is simply any string - tokens can be characters, they can be subwords, words and (theoretically) even larger units of text.</p>
+The tokenizer splits the input text into a sequence of individual units - called <strong>tokens</strong> - for further processing by the LLM.
+A token is simply any string - tokens can be characters, subwords, words and (theoretically) even larger units of text.</p>
 <p>There are many different strategies that can be used to split a text into tokens.
 These strategies mainly differ in the <strong>vocabulary</strong> they allow for.
 The vocabulary is the list of all possible tokens that can be produced by a tokenizer.</p>
-<p>One very simple strategy would be to do character tokenization, i.e. to simply split the text into it’s individual characters:</p>
+<p>One very simple strategy would be to do character tokenization, i.e. to split the text into its individual characters:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">tokenize_characters</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
@@ -424,10 +424,10 @@ The vocabulary is the list of all possible tokens that can be produced by a toke
 </div>
 </div>
 </div>
-<p>The problem with this approach is that the model would have to learn everything from the ground up - including how to form words - which will make
-Additionally, this will result in very long sequence lengths (since every character is a separate unit) which will make it harder for our model to “pay attention” to the relevant parts.</p>
+<p>The problem with this approach is that the model would have to learn everything from the ground up - including how to form words.
+Additionally, this will result in very long sequence lengths (since every character is a separate unit), which will make it harder for our model to “pay attention” to the relevant parts.</p>
 <p>One better way is to use word tokenization - just split the text into words.
-Here how to simplest word tokenizer might look like:</p>
+Here, how the simplest word tokenizer might look like:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">tokenize_words</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
@@ -444,13 +444,13 @@ Here how to simplest word tokenizer might look like:</p>
 </div>
 </div>
 <p>There are two objections to this approach.</p>
-<p>First, we would need to manually handle a lot of special cases like punctuation and words with apostrophes (should <code class="docutils literal notranslate"><span class="pre">don't</span></code> be a single token or two tokens?).</p>
+<p>First, we would need to manually handle a lot of special cases such as punctuation and words with apostrophes (should <code class="docutils literal notranslate"><span class="pre">don't</span></code> be a single token or two tokens?).</p>
 <p>Second and more important, this approach implicitly treats all words as equally important and leads to an extremely large <strong>vocabulary size</strong> (which is just the number of possible tokens).
-In the later chapters we will see that the size of the LLM grows with the vocabulary size, so we want to keep that reasonable.
+In the later chapters, we will see that the size of the LLM grows with the vocabulary size, so we want to keep that reasonable.
 This becomes especially important once we move beyond the English language and consider - well - the rest of the world.</p>
-<p>We’ve now considered two opposite approaches and found flaws with both of them.
-Character tokenization results in units that are too small and we end up with very long sequences.
-Word tokenization results in units that are too large and we end up with a lot of possible units.</p>
+<p>So far, we have considered two opposing approaches and identified flaws in both.
+Character tokenization results in units that are too small, and we end up with very long sequences.
+Word tokenization results in units that are too large, leading to a lot of possible units.</p>
 <p>Therefore, most modern tokenizers have settled somewhere in between character and word tokenization and do something called <strong>subword tokenization</strong>.</p>
 </section>
 <section id="subword-tokenization">
@@ -554,7 +554,7 @@ Instead, it returns a list of integers, where every integer is an ID representin
 </div>
 </div>
 </div>
-<p>It seems like the <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> tokenizer breaks word that aren’t in its predefined vocabulary into smaller subwords and backs off to individual characters if that’s not possible.
+<p>It seems like the <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> tokenizer breaks words not found in its predefined vocabulary into smaller subwords and backs off to individual characters if necessary.
 We will cover the specifics of this in a second.
 Before we do that, let’s look at tokenizers in the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> library, since that’s the library we will use most of the time.</p>
 </section>
@@ -572,14 +572,14 @@ Before we do that, let’s look at tokenizers in the <code class="docutils liter
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.9.19/x64/lib/python3.9/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.9.20/x64/lib/python3.9/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;transformers.models.gpt2.tokenization_gpt2_fast.GPT2TokenizerFast&#39;&gt;
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.9.19/x64/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:1601: FutureWarning: `clean_up_tokenization_spaces` was not set. It will be set to `True` by default. This behavior will be depracted in transformers v4.45, and will be then set to `False` by default. For more details check this issue: https://github.com/huggingface/transformers/issues/31884
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.9.20/x64/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:1601: FutureWarning: `clean_up_tokenization_spaces` was not set. It will be set to `True` by default. This behavior will be depracted in transformers v4.45, and will be then set to `False` by default. For more details check this issue: https://github.com/huggingface/transformers/issues/31884
   warnings.warn(
 </pre></div>
 </div>
@@ -620,7 +620,7 @@ Before we do that, let’s look at tokenizers in the <code class="docutils liter
 </div>
 </div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> tokenizer has more than 50.000 tokens, which is quite a large number, but certainly not as large as the number of all possible words that can be formed in the English and other languages.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> tokenizer has more than 50.000 tokens, which is quite a large number, but certainly not as large as the number of all possible words that can be formed in English and other languages.</p>
 <p>We can map a text to its token IDs using the <code class="docutils literal notranslate"><span class="pre">encode</span></code> method of the <code class="docutils literal notranslate"><span class="pre">tokenizer</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -699,12 +699,12 @@ This is not important to us except as a technical detail.</p>
 </div>
 </div>
 </div>
-<p>This will not only return the token IDs (called <code class="docutils literal notranslate"><span class="pre">input_ids</span></code> in this dictionary), but also an <code class="docutils literal notranslate"><span class="pre">attention_mask</span></code>.
+<p>This will not only return the token IDs (called <code class="docutils literal notranslate"><span class="pre">input_ids</span></code> in this dictionary) but also an <code class="docutils literal notranslate"><span class="pre">attention_mask</span></code>.
 We will cover the purpose of this in later chapters.</p>
 </section>
 <section id="the-byte-pair-encoding-algorithm">
 <h2>The Byte-Pair Encoding Algorithm<a class="headerlink" href="#the-byte-pair-encoding-algorithm" title="Link to this heading">#</a></h2>
-<p>How exactly are subwords tokenizers created?</p>
+<p>How exactly are subword tokenizers created?</p>
 <p>We could theoretically manually define all the respective subwords, but this is pretty tedious and becomes quite hard to do for tokenizers with 50.000 possible tokens.
 Therefore, subword tokenizers are usually <em>trained</em>.</p>
 <p>Let’s consider the following text:</p>
@@ -749,10 +749,10 @@ Therefore, subword tokenizers are usually <em>trained</em>.</p>
 </div>
 </div>
 <p>We will now use the <code class="docutils literal notranslate"><span class="pre">token_ids</span></code> list to train our own (very limited) tokenizer.
-The most very popular method to train tokenizers is called <strong>Byte Pair Encoding (BPE)</strong>, which builds a vocabulary by iteratively merging frequent characters into subwords and frequent subwords into words.</p>
+The most popular method to train tokenizers is called <strong>Byte Pair Encoding (BPE)</strong> which builds a vocabulary by iteratively merging frequent characters into subwords and frequent subwords into words.</p>
 <p>Basically, we begin with an initial list of token IDs.
 At every step, we identify the pair of token IDs that is most common in our sequence and “merge” that pair into a new token.
-For example, if the pair <code class="docutils literal notranslate"><span class="pre">(126,</span> <span class="pre">84)</span></code> is the most common pair, we would generate a new token with some ID that doesn’t exist so far, replace all occurrences of <code class="docutils literal notranslate"><span class="pre">(126,</span> <span class="pre">84)</span></code> with this new tokens and continue the process.</p>
+For example, if the pair <code class="docutils literal notranslate"><span class="pre">(126,</span> <span class="pre">84)</span></code> is the most common pair, we would generate a new token with some ID that doesn’t exist so far, replace all occurrences of <code class="docutils literal notranslate"><span class="pre">(126,</span> <span class="pre">84)</span></code> with these new tokens and continue the process.</p>
 <p>To get started, let’s write a helper function that identifies the most common token pair in our sequence:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -782,7 +782,7 @@ For example, if the pair <code class="docutils literal notranslate"><span class=
 </div>
 </div>
 </div>
-<p>This pair corresponds to the characters <code class="docutils literal notranslate"><span class="pre">e</span></code> and <code class="docutils literal notranslate"><span class="pre">r</span></code> which makes sense if we look at the text and observe the frequencies of the character pairs:</p>
+<p>This pair corresponds to the characters <code class="docutils literal notranslate"><span class="pre">e</span></code> and <code class="docutils literal notranslate"><span class="pre">r</span></code>, which makes sense if we look at the text and observe the frequencies of the character pairs:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">101</span><span class="p">),</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">114</span><span class="p">))</span>
@@ -826,10 +826,10 @@ For example, if the pair <code class="docutils literal notranslate"><span class=
 </div>
 </div>
 </div>
-<p>Now we simply repeatedly perform a merge of the most common token pairs.
+<p>Now, we simply repeatedly perform a merge of the most common token pairs.
 Note that this would include tokens that were the result of a merge, so BPE can merge tokens recursively.</p>
 <p>One important question to consider is how many steps we want to perform.
-This is basically a hyperparameter - the more tokens we have, the larger our vocabulary size, but the smaller our sequence lengths will be.</p>
+This is basically a hyperparameter - the more tokens we have, the larger our vocabulary size but the smaller our sequence lengths will be.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_merges</span> <span class="o">=</span> <span class="mi">50</span>
